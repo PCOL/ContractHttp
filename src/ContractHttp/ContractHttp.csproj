@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Reflection" Version="4.3.0" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.0.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
+    <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Fluent.IL" Version="1.0.0-alpha4" />
+    <PackageReference Include="DynProxy" Version="1.0.0-alpha1" />
+    <Content Include="ControllerFactory.cs" />
+    <Content Include="HttpCallContractAttribute.cs" />
+    <Content Include="HttpCallMethod.cs" />
+    <Content Include="HttpClientContractAttribute.cs" />
+    <Content Include="HttpClientProxy.cs" />
+    <Content Include="HttpControllerAttribute.cs" />
+    <Content Include="HttpControllerEndPointAttribute.cs" />
+    <Content Include="IControllerFactory.cs" />
+    <Content Include="ProcessAsContentAttribute.cs" />
+    <Content Include="FromParameterAttribute.cs" />
+    <Content Include="AttributeUtility.cs" />
+    <Content Include="BindToModelAttribute.cs" />
+    <Content Include="ControllerMethodParameterAttribute.cs" />
+    <Content Include="ControllerMethodParameterFromOption.cs" />
+    <Content Include="DynamicControllerMiddleware.cs" />
+    <Content Include="ExceptionHandlerAttribute.cs" />
+    <Content Include="HttpClientProxyExtensionMethods.cs" />
+    <Content Include="HttpControllerExtensionMethods.cs" />
+    <Content Include="HttpModelValidationAttribute.cs" />
+    <Content Include="HttpResponseAttribute.cs" />
+    <Content Include="IHttpClientFactory.cs" />
+    <Content Include="SendAsContentAttribute.cs" />
+    <Content Include="SendAsHeaderAttribute.cs" />
+    <Content Include="SendAsQueryAttribute.cs" />
+    <Content Include="ServiceCallExecutedContext.cs" />
+    <Content Include="ServiceCallExecutingContext.cs" />
+    <Content Include="ServiceCallFilterAttribute.cs" />
+    <Content Include="ServiceCallFilterEmitter.cs" />
+    <Content Include="Utility.cs" />
+    <Content Include="IProxy.cs" />
+    <Content Include="Reflection\ParameterInfoExtensions.cs" />
+    <Content Include="Reflection\Binder.cs" />
+    <Content Include="Reflection\AssemblyCache.cs" />
+    <Content Include="Reflection\Emit\ArrayBuilder.cs" />
+    <Content Include="Reflection\Emit\AssemblyBuilderCache.cs" />
+    <Content Include="Reflection\Emit\ITypeFactoryContext.cs" />
+    <Content Include="Reflection\Emit\ReflectionEmitExtensions.cs" />
+    <Content Include="Reflection\Emit\ReflectionEmitPropertyExtensions.cs" />
+    <Content Include="Reflection\Emit\TypeFactory.cs" />
+    <Content Include="Reflection\Emit\TypeFactoryContext.cs" />
+    <Content Include="Reflection\Emit\TypeFactoryExtension.cs" />
+  </ItemGroup>
+</Project>
