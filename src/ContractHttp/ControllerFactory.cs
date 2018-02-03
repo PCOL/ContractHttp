@@ -5,8 +5,8 @@
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
-    using ContractHttp.Reflection;
     using ContractHttp.Reflection.Emit;
+    using FluentIL;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Primitives;
@@ -119,8 +119,7 @@
         public Type CreateControllerType(Type controllerInterface, Type controllerServiceType)
         {
             string typeName = TypeName(controllerInterface);
-            Type controllerType = TypeFactory
-                .GetType(typeName, true);
+            Type controllerType = this.GetType(typeName, true);
 
             if (controllerType == null)
             {
@@ -148,12 +147,12 @@
 
             TypeAttributes typeAttributes = TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.BeforeFieldInit;
 
-            TypeBuilder typeBuilder = this
-                .ModuleBuilder
-                .DefineType(
-                    controllerTypeName,
-                    typeAttributes,
-                    typeof(Controller));
+            var typeBuilder = this
+                .NewType(controllerTypeName)
+                    .Class()
+                    .Public()
+                    .BeforeFieldInit()
+                    .InheritsFrom<Controller>();
 
             typeBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<ControllerAttribute>());
 
@@ -165,27 +164,35 @@
 
             this.ProcessAttributes(typeBuilder, controllerInterface);
 
-            FieldBuilder controllerServiceTypeField = typeBuilder.DefineField("controllerService", controllerServiceType, FieldAttributes.Private);
+            var controllerServiceTypeField = typeBuilder
+                .NewField("controllerService", controllerServiceType)
+                .Private();
 
             // Add a constructor to the type.
-            var ctorBuilder = this.AddConstructor(typeBuilder, controllerServiceType, controllerServiceTypeField);
+            var ctorBuilder = this.AddConstructor(
+                typeBuilder,
+                controllerServiceType,
+                controllerServiceTypeField);
 
-            TypeFactoryContext context = new TypeFactoryContext(typeBuilder, controllerInterface, controllerServiceType, null, controllerServiceTypeField, null, ctorBuilder);
+            var context = new ControllerFactoryContext(typeBuilder, controllerInterface, controllerServiceType, null, controllerServiceTypeField, null, ctorBuilder);
 
             this.ImplementInterface(context);
 
             // Create the type.
-            return typeBuilder.CreateTypeInfo().AsType();
+            return typeBuilder.CreateType();
         }
 
         /// <summary>
         /// Adds a constructor to the adapter type.
         /// </summary>
-        /// <param name="typeBuilder">The <see cref="TypeBuilder"/> use to construct the type.</param>
+        /// <param name="typeBuilder">The <see cref="ITypeBuilder"/> use to construct the type.</param>
         /// <param name="controllerServiceType">The <see cref="Type"/> controllers service implementation.</param>
-        /// <param name="controllerServiceTypeField">The <see cref="FieldBuilder"/> which will hold the instance of the controllers service implementation type.</param>
+        /// <param name="controllerServiceTypeField">The <see cref="IFieldBuilder"/> which will hold the instance of the controllers service implementation type.</param>
         /// <returns>The <see cref="ConstructorBuilder"/> used to build the constructor.</returns>
-        private ConstructorBuilder AddConstructor(TypeBuilder typeBuilder, Type controllerServiceType, FieldBuilder controllerServiceTypeField)
+        private IConstructorBuilder AddConstructor(
+            ITypeBuilder typeBuilder,
+            Type controllerServiceType,
+            IFieldBuilder controllerServiceTypeField)
         {
 /*
             ConstructorBuilder defaultConstructorBuilder = typeBuilder.DefineConstructor(
@@ -196,22 +203,21 @@
             ILGenerator defaultIL = defaultConstructorBuilder.GetILGenerator();
             defaultIL.Emit(OpCodes.Ret);
 */
-            ConstructorBuilder constructorBuilder = typeBuilder.DefineConstructor(
-                MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName,
-                CallingConventions.HasThis,
-                new Type[]
-                {
-                    controllerServiceType
-                });
+            var constructorBuilder = typeBuilder
+                .NewConstructor()
+                .Public()
+                .HideBySig()
+                .SpecialName()
+                .RTSpecialName()
+                .CallingConvention(CallingConventions.HasThis)
+                .Param(controllerServiceType, "controllerService");
 
-            constructorBuilder.DefineParameter(1, ParameterAttributes.None, "controllerService");
-
-            ILGenerator il = constructorBuilder.GetILGenerator();
-            il.Emit(OpCodes.Ldarg_0);
-            il.Emit(OpCodes.Ldarg_1);
-            il.Emit(OpCodes.Stfld, controllerServiceTypeField);
-
-            il.Emit(OpCodes.Ret);
+            constructorBuilder
+                .Body()
+                    .LdArg0()
+                    .LdArg1()
+                    .StFld(controllerServiceTypeField)
+                    .Ret();
 
             return constructorBuilder;
         }
@@ -220,9 +226,9 @@
         /// Implements the adapter types interfaces on the adapted type.
         /// </summary>
         /// <param name="context">The current adapter context.</param>
-        private void ImplementInterface(TypeFactoryContext context)
+        private void ImplementInterface(ControllerFactoryContext context)
         {
-            Dictionary<string, MethodBuilder> propertyMethods = new Dictionary<string, MethodBuilder>();
+            var propertyMethods = new Dictionary<string, IMethodBuilder>();
 
             // Type[] implementedInterfaces = context.NewType.GetInterfaces();
             // if (implementedInterfaces.IsNullOrEmpty() == false)
@@ -257,18 +263,19 @@
                 }
                 else if (memberInfo.MemberType == MemberTypes.Property)
                 {
-                    PropertyBuilder propertyBuilder = context.TypeBuilder.DefineProperty(memberInfo.Name, PropertyAttributes.SpecialName, ((PropertyInfo)memberInfo).PropertyType, null);
+                    var propertyBuilder = context
+                        .TypeBuilder
+                        .NewProperty(memberInfo.Name, ((PropertyInfo)memberInfo).PropertyType)
+                        .Attributes(PropertyAttributes.SpecialName);
 
-                    MethodBuilder getMethod;
-                    if (propertyMethods.TryGetValue(memberInfo.PropertyGetName(), out getMethod) == true)
+                    if (propertyMethods.TryGetValue(memberInfo.PropertyGetName(), out IMethodBuilder getMethod) == true)
                     {
-                        propertyBuilder.SetGetMethod(getMethod);
+                        propertyBuilder.GetMethod = getMethod;
                     }
 
-                    MethodBuilder setMethod;
-                    if (propertyMethods.TryGetValue(memberInfo.PropertySetName(), out setMethod) == true)
+                    if (propertyMethods.TryGetValue(memberInfo.PropertySetName(), out IMethodBuilder setMethod) == true)
                     {
-                        propertyBuilder.SetSetMethod(setMethod);
+                        propertyBuilder.SetMethod = setMethod;
                     }
                 }
             }
@@ -281,7 +288,10 @@
         /// <param name="methodInfo">The method to build.</param>
         /// <param name="methodArgs">The methods argument types.</param>
         /// <returns>The built method.</returns>
-        private MethodBuilder BuildMethod(TypeFactoryContext context, MethodInfo methodInfo, Type[] methodArgs)
+        private IMethodBuilder BuildMethod(
+            ControllerFactoryContext context,
+            MethodInfo methodInfo,
+            Type[] methodArgs)
         {
             string name = methodInfo.Name;
 
@@ -306,12 +316,14 @@
             MethodAttributes attrs = methodInfo.Attributes & ~MethodAttributes.Abstract; // & ~MethodAttributes.Virtual;
 
             //MethodAttributes attrs = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual;
-            MethodBuilder methodBuilder = context.TypeBuilder.DefineMethod(
-                methodInfo.Name,
-                attrs,
-                CallingConventions.HasThis,
-                typeof(IActionResult),
-                methodParmTypes);
+            var methodBuilder = context
+                .TypeBuilder
+                .NewMethod(methodInfo.Name)
+                .MethodAttributes(attrs)
+                .CallingConvention(CallingConventions.HasThis)
+                .Returns<IActionResult>();
+
+                //methodParmTypes);
 
             var parms = methodInfo.GetParameters();
             if (methodParmAttrs.Any() == true)
@@ -346,51 +358,51 @@
             PropertyInfo requestServicesProp = typeof(HttpContext).GetProperty("RequestServices", typeof(IServiceProvider));
 
             // Emit Method IL
-            ILGenerator methodIL = methodBuilder.GetILGenerator();
-            LocalBuilder localResponse = methodIL.DeclareLocal(typeof(IActionResult));
-            LocalBuilder localReturnValue = null;
+            IEmitter methodIL = methodBuilder.Body();
+            methodIL.DeclareLocal<IActionResult>(out ILocal localResponse);
+            ILocal localReturnValue = null;
 
             // Does the method return any data?
             if (methodInfo.ReturnType != typeof(void))
             {
-                localReturnValue = methodIL.DeclareLocal(serviceMethod.ReturnType);
+                methodIL.DeclareLocal(serviceMethod.ReturnType, out localReturnValue);
             }
 
-            LocalBuilder localEx = methodIL.DeclareLocal(typeof(Exception));
+            methodIL.DeclareLocal<Exception>(out ILocal localEx);
 
             // Store Controller reference
-            LocalBuilder localController = methodIL.DeclareLocal(typeof(Controller));
+            methodIL.DeclareLocal<Controller>(out ILocal localController);
             methodIL.Emit(OpCodes.Ldarg_0);
             methodIL.Emit(OpCodes.Stloc_S, localController);
 
             // Get Services
-            LocalBuilder localServices = methodIL.DeclareLocal(typeof(IServiceProvider));
+            methodIL.DeclareLocal<IServiceProvider>(out ILocal localServices);
             methodIL.Emit(OpCodes.Ldarg_0);
             methodIL.Emit(OpCodes.Callvirt, requestProp.GetGetMethod());
             methodIL.Emit(OpCodes.Callvirt, httpContextProp.GetGetMethod());
             methodIL.Emit(OpCodes.Callvirt, requestServicesProp.GetGetMethod());
             methodIL.Emit(OpCodes.Stloc_S, localServices);
 
-            methodIL.BeginExceptionBlock();
+            methodIL.BeginExceptionBlock(out ILabel blockLocal);
 
             // Check for service calls.
             var serviceCallEmitter = new ServiceCallFilterEmitter(methodInfo.DeclaringType, methodIL);
             serviceCallEmitter.EmitExecuting(localController, localServices);
 
-            LocalBuilder proxyArguments = null;
+            ILocal proxyArguments = null;
             if (methodParmAttrs.Any() == true)
             {
                 // Load the proxy method arguments into an array.
-                proxyArguments = methodIL.DeclareLocal(typeof(object[]));
+                methodIL.DeclareLocal<object[]>(out proxyArguments);
 
-                methodIL.EmitArray(
+                methodIL.Array(
                     typeof(object),
                     proxyArguments,
                     methodParmTypes.Length,
-                    (il, i) =>
+                    (i) =>
                     {
-                        il.EmitLdArg(i);
-                        il.EmitConv(methodParmTypes[i], typeof(object), false);
+                        methodIL.LdArg(i + 1);
+                        methodIL.Conv(methodParmTypes[i], typeof(object), false);
                     });
 
                 methodIL.EmitWriteLine("------------------- PROXY ARGS --------------------");
@@ -433,7 +445,7 @@
                         continue;
                     }
 
-                    methodIL.EmitLdArg(i);
+                    methodIL.LdArg(i + 1);
                 }
 
                 // Call the service method
@@ -441,7 +453,7 @@
             }
             else
             {
-                LocalBuilder l = methodIL.DeclareLocal(typeof(string));
+                methodIL.DeclareLocal<string>(out ILocal l);
                 methodIL.Emit(OpCodes.Ldarg_1);
                 methodIL.EmitToString();
                 methodIL.Emit(OpCodes.Stloc_S, l);
@@ -528,12 +540,14 @@
         /// </summary>
         /// <param name="methodBuilder">The method builder.</param>
         /// <param name="parmInfos">An array of <see cref="Tuple{string, ParameterAttributes}"/> objects.</param>
-        private void BuildParameters(MethodBuilder methodBuilder, IEnumerable<ControllerMethodParameterAttribute> methodParms)
+        private void BuildParameters(
+            IMethodBuilder methodBuilder,
+            IEnumerable<ControllerMethodParameterAttribute> methodParms)
         {
             int index = 1;
             foreach (var methodParm in methodParms)
             {
-                var parmBuilder = methodBuilder.DefineParameter(index++, ParameterAttributes.None, methodParm.ParameterName);
+                var parmBuilder = methodBuilder.Param(methodParm.ParameterType, methodParm.ParameterName);
 
                 if (methodParm.From == ControllerMethodParameterFromOption.Body)
                 {
@@ -576,11 +590,13 @@
         /// </summary>
         /// <param name="methodBuilder">The method builder.</param>
         /// <param name="parmInfos">An array of <see cref="ParameterInfo"/> objects.</param>
-        private void BuildParameters(MethodBuilder methodBuilder, ParameterInfo[] parmInfos)
+        private void BuildParameters(
+            IMethodBuilder methodBuilder,
+            ParameterInfo[] parmInfos)
         {
             for (int i = 0; i < parmInfos.Length; i++)
             {
-                var parmBuilder = methodBuilder.DefineParameter(i + 1, parmInfos[i].Attributes, parmInfos[i].Name);
+                var parmBuilder = methodBuilder.Param(parmInfos[i].ParameterType, parmInfos[i].Name, parmInfos[i].Attributes); //  .DefineParameter(i + 1, parmInfos[i].Attributes, parmInfos[i].Name);
                 var attrs = parmInfos[i].GetCustomAttributes();
                 if (attrs == null)
                 {
@@ -666,9 +682,9 @@
         /// <param name="methodIL">An IL Generator.</param>
         /// <param name="attr">Amn <see cref="ExceptionHandlerAttribute"/>.</param>
         /// <param name="localResponse">A local to receive the <see cref="IActionResult"/>.</param>
-        private void EmitCatchBlock(ILGenerator methodIL, ExceptionHandlerAttribute attr, LocalBuilder localResponse)
+        private void EmitCatchBlock(IEmitter methodIL, ExceptionHandlerAttribute attr, ILocal localResponse)
         {
-            LocalBuilder localEx = methodIL.DeclareLocal(attr.ExceptionType);
+            methodIL.DeclareLocal(attr.ExceptionType, out ILocal localEx);
 
             methodIL.BeginCatchBlock(attr.ExceptionType);
             methodIL.Emit(OpCodes.Stloc_S, localEx);
@@ -678,7 +694,7 @@
 
             if (attr.ModelType != null)
             {
-                LocalBuilder localModel = methodIL.DeclareLocal(attr.ModelType);
+                methodIL.DeclareLocal(attr.ModelType, out ILocal localModel);
                 this.EmitModelBinder(methodIL, localEx, localModel);
                 this.EmitStatusCodeCall(methodIL, attr.StatusCode, localModel, localResponse);
             }
@@ -688,13 +704,13 @@
             }
         }
 
-        private void EmitConverter(ILGenerator methodIL, LocalBuilder localFrom, Type toType)
+        private void EmitConverter(IEmitter methodIL, ILocal localFrom, Type toType)
         {
             methodIL.Emit(OpCodes.Ldloc_S, localFrom);
             EmitConverter(methodIL, localFrom.LocalType, toType);
         }
 
-        private void EmitConverter(ILGenerator methodIL, Type fromType, Type toType)
+        private void EmitConverter(IEmitter methodIL, Type fromType, Type toType)
         {
             if (fromType == toType)
             {
@@ -777,13 +793,13 @@
         /// <param name="methodIL">An IL Generator.</param>
         /// <param name="localFrom">A local containing the type to bind from.</param>
         /// <param name="localTo">A local containing the type to bind to.</param>
-        private void EmitModelBinder(ILGenerator methodIL, LocalBuilder localFrom, LocalBuilder localTo)
+        private void EmitModelBinder(IEmitter methodIL, ILocal localFrom, ILocal localTo)
         {
             //MethodInfo bindMethod = typeof(Binder).GetMethod("bind", new[] { typeof(Type), typeof(object) });
             MethodInfo getObjectMethod = typeof(Reflection.Binder).GetMethod("GetObject", Type.EmptyTypes).MakeGenericMethod(localTo.LocalType);
             ConstructorInfo binderCtor = typeof(Reflection.Binder).GetConstructor(new[] { typeof(object) });
 
-            var localBinder = methodIL.DeclareLocal(typeof(Reflection.Binder));
+            methodIL.DeclareLocal<Reflection.Binder>(out ILocal localBinder);
 
             // Create binder instance.
             methodIL.Emit(OpCodes.Ldloc_S, localFrom);
@@ -800,46 +816,48 @@
         /// <summary>
         /// Emits a call to return a status code as an <see cref="IActionResult"/>.
         /// </summary>
-        /// <param name="methodIL">A IL Generator.</param>
+        /// <param name="emitter">A IL Generator.</param>
         /// <param name="statusCode">The status code.</param>
         /// <param name="localResponse">A local to receive the <see cref="IActionResult"/>.</param>
-        private void EmitStatusCodeCall(ILGenerator methodIL, int statusCode, LocalBuilder localResponse)
+        private IEmitter EmitStatusCodeCall(IEmitter emitter, int statusCode, ILocal localResponse)
         {
             MethodInfo statusCodeMethod = typeof(ControllerBase).GetMethod("StatusCode", new Type[] { typeof(int)});
 
-            methodIL.Emit(OpCodes.Ldarg_0);
-            methodIL.Emit(OpCodes.Ldc_I4, statusCode);
-            methodIL.Emit(OpCodes.Callvirt, statusCodeMethod);
-            methodIL.Emit(OpCodes.Stloc_S, localResponse);
+            emitter.Emit(OpCodes.Ldarg_0);
+            emitter.Emit(OpCodes.Ldc_I4, statusCode);
+            emitter.Emit(OpCodes.Callvirt, statusCodeMethod);
+            emitter.Emit(OpCodes.Stloc_S, localResponse);
+
+            return emitter;
         }
 
         /// <summary>
         /// Emits a call to the return a status code and result as an <see cref="IActionResult"/>
         /// </summary>
-        /// <param name="methodIL"></param>
+        /// <param name="emitter"></param>
         /// <param name="statusCode"></param>
         /// <param name="local"></param>
         /// <param name="localResponse"></param>
-        private void EmitStatusCodeCall(ILGenerator methodIL, int statusCode, LocalBuilder local, LocalBuilder localResponse)
+        private void EmitStatusCodeCall(IEmitter emitter, int statusCode, ILocal local, ILocal localResponse)
         {
             MethodInfo statusCodeWithResultMethod = typeof(ControllerBase).GetMethod("StatusCode", new Type[] { typeof(int), typeof(object)});
-            methodIL.Emit(OpCodes.Ldarg_0);
-            methodIL.Emit(OpCodes.Ldc_I4, statusCode);
+            emitter.Emit(OpCodes.Ldarg_0);
+            emitter.Emit(OpCodes.Ldc_I4, statusCode);
             if (local != null)
             {
-                methodIL.Emit(OpCodes.Ldloc_S, local);
+                emitter.Emit(OpCodes.Ldloc_S, local);
             }
             else
             {
-                methodIL.Emit(OpCodes.Ldnull);
+                emitter.Emit(OpCodes.Ldnull);
             }
 
-            methodIL.Emit(OpCodes.Callvirt, statusCodeWithResultMethod);
-            methodIL.Emit(OpCodes.Stloc_S, localResponse);
+            emitter.Emit(OpCodes.Callvirt, statusCodeWithResultMethod);
+            emitter.Emit(OpCodes.Stloc_S, localResponse);
         }
 
 
-        private void ProcessAttributes(TypeBuilder typeBuilder, Type type)
+        private void ProcessAttributes(ITypeBuilder typeBuilder, Type type)
         {
             foreach (var attr in type.GetTypeInfo().GetCustomAttributes())
             {
@@ -861,7 +879,7 @@
             }
         }
 
-        private void ProcessAttributes(MethodBuilder methodBuilder, MethodInfo methodInfo)
+        private void ProcessAttributes(IMethodBuilder methodBuilder, MethodInfo methodInfo)
         {
             foreach (var attr in methodInfo.GetCustomAttributes())
             {
@@ -909,7 +927,7 @@
         /// <param name="methodBuilder">The method being built.</param>
         /// <param name="methodInfo">The method being called.</param>
         /// <returns>True if any resolved; otherwise false.</returns>
-        private bool ResolveMvcAttributes(MethodBuilder methodBuilder, MethodInfo methodInfo)
+        private bool ResolveMvcAttributes(IMethodBuilder methodBuilder, MethodInfo methodInfo)
         {
             HttpGetAttribute getAttr = methodInfo.GetCustomAttribute<HttpGetAttribute>(true);
             if (getAttr != null)
@@ -949,7 +967,9 @@
             return false;
         }
 
-        private void ResolveHttpControllerEndPointAttribute(MethodBuilder methodBuilder, MethodInfo methodInfo)
+        private void ResolveHttpControllerEndPointAttribute(
+            IMethodBuilder methodBuilder,
+            MethodInfo methodInfo)
         {
             HttpControllerEndPointAttribute attr = methodInfo.GetCustomAttribute<HttpControllerEndPointAttribute>(false);
             if (attr != null)

@@ -7,6 +7,7 @@
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
+    using DynProxy;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.Extensions.DependencyInjection;
@@ -17,12 +18,8 @@
     /// </summary>
     /// <typeparam name="T">The proxy type.</typeparam>
     public class HttpClientProxy<T>
+        : Proxy<T>
     {
-        /// <summary>
-        /// A reference to the proxy object.
-        /// </summary>
-        private readonly IProxy proxy;
-
         /// <summary>
         /// A reference to the services.
         /// </summary>
@@ -44,13 +41,17 @@
         private HttpClientContractAttribute clientContractAttribute;
 
         /// <summary>
+        /// The <see cref="HttpClient"/> to use.
+        /// </summary>
+        private HttpClient httpClient;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="HttpClientProxy{T}"/> class.
         /// </summary>
-        /// <param name="proxy">The proxy.</param>
         /// <param name="baseUri">The base uri.</param>
         /// <param name="serviceProvider">The current dependency injection scope.</param>
-        public HttpClientProxy(IProxy proxy, string baseUri, IServiceProvider serviceProvider = null)
-            : this(proxy, baseUri, TimeSpan.FromMinutes(1), serviceProvider)
+        public HttpClientProxy(string baseUri, IServiceProvider serviceProvider = null)
+            : this(baseUri, TimeSpan.FromMinutes(1), serviceProvider)
         {
         }
 
@@ -60,17 +61,42 @@
         /// <param name="baseUri">The base uri.</param>
         /// <param name="timeout">The default timeout value.</param>
         /// <param name="serviceProvider">The current dependency injection scope.</param>
-        public HttpClientProxy(IProxy proxy, string baseUri, TimeSpan timeout, IServiceProvider serviceProvider = null)
+        public HttpClientProxy(string baseUri, TimeSpan timeout, IServiceProvider serviceProvider = null)
         {
             this.ThrowIfNotInterface(typeof(T), "T");
-            Utility.ThrowIfArgumentNull(proxy, nameof(proxy));
             Utility.ThrowIfArgumentNullOrEmpty(baseUri, nameof(baseUri));
 
-            this.proxy = proxy;
-            this.proxy.InvokeMethod = this.InvokeInternal;
             this.baseUri = baseUri;
             this.timeout = timeout;
             this.services = serviceProvider;
+
+            this.CheckContractAttribute();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpClientProxy{T}"/> class.
+        /// </summary>
+        /// <param name="baseUri">The base uri.</param>
+        /// <param name="httpClient">The <see cref="HttpClient"/> to use.</param>
+        public HttpClientProxy(string baseUri, HttpClient httpClient = null)
+            : this(baseUri, TimeSpan.FromMinutes(1), httpClient)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpClientProxy{T}"/> class.
+        /// </summary>
+        /// <param name="baseUri">The base uri.</param>
+        /// <param name="timeout">The default timeout value.</param>
+        /// <param name="httpClient">The <see cref="HttpClient"/> to use.</param>
+        public HttpClientProxy(string baseUri, TimeSpan timeout, HttpClient httpClient = null)
+        {
+            this.ThrowIfNotInterface(typeof(T), "T");
+            Utility.ThrowIfArgumentNullOrEmpty(baseUri, nameof(baseUri));
+
+            this.baseUri = baseUri;
+            this.timeout = timeout;
+            this.httpClient = httpClient;
 
             this.CheckContractAttribute();
         }
@@ -97,16 +123,6 @@
         }
 
         /// <summary>
-        /// Returns the transparent proxy for the current instance of <see cref="Proxy{T}"/>
-        /// </summary>
-        /// <returns>The transparent proxy for the current proxy instance.</returns>
-        public object GetTransparentProxy()
-        {
-            return this.proxy.GetProxyObject();
-        }
-
-/*
-        /// <summary>
         /// Intercepts the invocation of methods on the proxied interface.
         /// </summary>
         /// <param name="method">The method being called.</param>
@@ -116,7 +132,6 @@
         {
             return this.InvokeInternal(method, arguments);
         }
-*/
 
         /// <summary>
         /// Creates a <see cref="HttpRequestMessage"/> and adds headers for the correlation id and source id.
@@ -184,61 +199,6 @@
                 }
             }
 
-/*
-            int contentArg = -1;
-            int responseArg = -1;
-            int dataArg = -1;
-            Type dataArgType = null;
-            ParameterInfo[] parms = method.GetParameters();
-            Dictionary<string, string> headers = null;
-            if (parms != null)
-            {
-                for (int i = 0; i < parms.Length; i++)
-                {
-                    names[i] = parms[i].Name;
-                    if (parms[i].IsOut == true)
-                    {
-                        Type pType = parms[i].ParameterType.GetElementType();
-                        if (pType == typeof(HttpResponseMessage))
-                        {
-                            responseArg = i;
-                        }
-                        else
-                        {
-                            dataArg = i;
-                            dataArgType = pType;
-                        }
-                    }
-
-                    var attrs = parms[i].GetCustomAttributes();
-                    if (attrs != null &&
-                        attrs.Any() == true)
-                    {
-                        if (contentArg == -1)
-                        {
-                            if (this.HasAttribute(attrs, typeof(SendAsContentAttribute), typeof(FromBodyAttribute)))
-                            {
-                                contentArg = i;
-                            }
-                        }
-
-                        var headerAttr = attrs.FirstOrDefault(a => a.GetType() == typeof(SendAsHeaderAttribute));
-                        if (headerAttr != null)
-                        {
-                            if (headers == null)
-                            {
-                                headers = new Dictionary<string, string>();
-                            }
-
-                            headers.Add(((SendAsHeaderAttribute)headerAttr).Name, arguments[i].ToString());
-                        }
-                    }
-                }
-            }
-
-            uri = this.ResolveUri(uri, names, arguments);
-*/
-
             var client = this.GetHttpClient();
             //client.Timeout = timeout;
 
@@ -268,7 +228,10 @@
         /// <param name="httpMethod"></param>
         /// <param name="template"></param>
         /// <returns></returns>
-        private bool GetMethodAndTemplateFromAttribute(HttpMethodAttribute attr, out HttpCallMethod httpMethod, out string template)
+        private bool GetMethodAndTemplateFromAttribute(
+            HttpMethodAttribute attr,
+            out HttpCallMethod httpMethod,
+            out string template)
         {
             httpMethod = HttpCallMethod.HttpGet;
             template = ((HttpMethodAttribute)attr).Template;
@@ -392,7 +355,14 @@
         /// <param name="dataArg">The index of the data argument, or -1 if one is not found.</param>
         /// <param name="dataArgType">The <see cref="Type"/> of the data argment, or null if one is not found.</param>
         /// <returns>A array of argument names.</returns>
-        private string[] CheckArgs(MethodInfo method, out int contentArg, out int responseArg, out int dataArg, out Type dataArgType, out IDictionary<string, int> queryStrings, out IDictionary<string, int> headers)
+        private string[] CheckArgs(
+            MethodInfo method,
+            out int contentArg,
+            out int responseArg,
+            out int dataArg,
+            out Type dataArgType,
+            out IDictionary<string, int> queryStrings,
+            out IDictionary<string, int> headers)
         {
             contentArg = -1;
             responseArg = -1;
@@ -468,7 +438,6 @@
                     request.Headers.TryAddWithoutValidation(item.Key, args[item.Value].ToString());
                 }
             }
-
         }
 
         /// <summary>
@@ -490,7 +459,12 @@
         /// <param name="inArgs">The method calls arguments.</param>
         /// <param name="contentType">The content type.</param>
         /// <returns>The result of the call.</returns>
-        private object GetAsync(HttpClient client, MethodInfo method, string uri, object[] inArgs, string contentType)
+        private object GetAsync(
+            HttpClient client,
+            MethodInfo method,
+            string uri,
+            object[] inArgs,
+            string contentType)
         {
             int contentArg, responseArg, dataArg;
             Type dataArgType;
@@ -531,8 +505,11 @@ Console.WriteLine("Uri: {0}", uri);
             req.Headers.Add("Accept", contentType);
             this.AddHeaders(req, headers, inArgs);
 
-            //var result = client.GetAsync(uri);
+Console.WriteLine("Send Request - {0}", req.Method);
+
             var result = client.SendAsync(req);
+
+Console.WriteLine("Response: {0}", result.Result.StatusCode);
             return this.ProcessResult(result, returnType, inArgs, contentArg, responseArg, dataArg, dataArgType);
         }
 
@@ -545,16 +522,24 @@ Console.WriteLine("Uri: {0}", uri);
         /// <param name="inArgs">The method calls arguments.</param>
         /// <param name="contentType">The content type.</param>
         /// <returns>The result of the call.</returns>
-        private object PostAsync(HttpClient client, MethodInfo method, string uri, object[] inArgs, string contentType)
+        private object PostAsync(
+            HttpClient client,
+            MethodInfo method,
+            string uri,
+            object[] inArgs,
+            string contentType)
         {
-            int contentArg, responseArg, dataArg;
-            Type dataArgType;
-            IDictionary<string, int> queryStrings;
-            IDictionary<string, int> headers;
-
 Console.WriteLine("PostAsync: {0}, {1}", uri, inArgs.Length);
 
-            string[] names = this.CheckArgs(method, out contentArg, out responseArg, out dataArg, out dataArgType, out queryStrings, out headers);
+            string[] names = this.CheckArgs(
+                method,
+                out int contentArg,
+                out int responseArg,
+                out int dataArg,
+                out Type dataArgType,
+                out IDictionary<string, int> queryStrings,
+                out IDictionary<string, int> headers);
+
             uri = this.ResolveUri(uri, names, inArgs);
 
             if (queryStrings != null)
@@ -580,7 +565,6 @@ Console.WriteLine("PostAsync: {0}, {1}, {2}, {3}", uri, contentArg, responseArg,
             request.Content = content;
             this.AddHeaders(request, headers, inArgs);
 
-            //Task<HttpResponseMessage> result = client.PostAsync(uri, content);
             Task<HttpResponseMessage> result = client.SendAsync(request);
             if (this.IsAsync(returnType) == true)
             {
@@ -601,34 +585,43 @@ Console.WriteLine("PostAsync: {0}, {1}, {2}, {3}", uri, contentArg, responseArg,
         /// <param name="dataArg">The data argument index.</param>
         /// <param name="dataArgType">The data argument type.</param>
         /// <returns>The result.</returns>
-        private object ProcessResult(Task<HttpResponseMessage> result, Type returnType, object[] inArgs, int contentArg, int responseArg, int dataArg, Type dataArgType)
+        private object ProcessResult(
+            Task<HttpResponseMessage> result,
+            Type returnType,
+            object[] inArgs,
+            int contentArg,
+            int responseArg,
+            int dataArg,
+            Type dataArgType)
         {
             HttpResponseMessage response = result.Result;
+
+            if (responseArg != -1)
+            {
+                inArgs[responseArg] = response;
+            }
+
             if (returnType == typeof(HttpResponseMessage))
             {
                 return response;
             }
             else
             {
-                string content = response.Content.ReadAsStringAsync().Result;
                 response.EnsureSuccessStatusCode();
             }
 
-            if (returnType != typeof(HttpResponseMessage) &&
-                returnType != typeof(void))
+            string content = response.Content.ReadAsStringAsync().Result;
+            if (content.IsNullOrEmpty() == false)
             {
-                string content = response.Content.ReadAsStringAsync().Result;
-                return JsonConvert.DeserializeObject(content, returnType);
-            }
-            else if (dataArg != -1)
-            {
-                string content = response.Content.ReadAsStringAsync().Result;
-                inArgs[dataArg] = JsonConvert.DeserializeObject(content, dataArgType);
-            }
-
-            if (responseArg != -1)
-            {
-                inArgs[responseArg] = response;
+                if (returnType != typeof(HttpResponseMessage) &&
+                    returnType != typeof(void))
+                {
+                    return JsonConvert.DeserializeObject(content, returnType);
+                }
+                else if (dataArg != -1)
+                {
+                    inArgs[dataArg] = JsonConvert.DeserializeObject(content, dataArgType);
+                }
             }
 
             return null;
@@ -640,6 +633,11 @@ Console.WriteLine("PostAsync: {0}, {1}, {2}, {3}", uri, contentArg, responseArg,
         /// <returns>An <see cref="HttpClient"/> instance.</returns>
         private HttpClient GetHttpClient()
         {
+            if (this.httpClient != null)
+            {
+                return this.httpClient;
+            }
+
             // Can we get a client?
             var httpClient = this.services.GetService<HttpClient>();
             if (httpClient != null)
@@ -707,7 +705,7 @@ Console.WriteLine("PostAsync: {0}, {1}, {2}, {3}", uri, contentArg, responseArg,
             /// <summary>
             /// Initializes a new instance of the <see cref="AsyncCall{U}"/> class.
             /// </summary>
-            /// <param name="client">The <see cref="IHttpClient"/> to use.</param>
+            /// <param name="client">The <see cref="HttpClient"/> to use.</param>
             public AsyncCall(HttpClient client)
             {
                 this.client = client;

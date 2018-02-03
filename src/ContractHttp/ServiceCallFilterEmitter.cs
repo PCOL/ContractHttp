@@ -5,9 +5,8 @@ namespace ContractHttp
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
-
-    using ContractHttp.Reflection;
     using ContractHttp.Reflection.Emit;
+    using FluentIL;
     using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
@@ -27,15 +26,15 @@ namespace ContractHttp
 
         private static readonly MethodInfo delegateInvokeMethod = typeof(Delegate).GetMethod("DynamicInvoke", new[] { typeof(object[]) });
 
-        private ILGenerator ilGen;
+        private IEmitter ilGen;
 
-        private LocalBuilder localServiceCallAttrs;
+        private ILocal localServiceCallAttrs;
 
-        public ServiceCallFilterEmitter(Type type, ILGenerator ilGen )
+        public ServiceCallFilterEmitter(Type type, IEmitter ilGen)
         {
             this.Type = type;
             this.ilGen = ilGen;
-            var attrs = this.Type.GetTypeInfo().GetCustomAttributes<ServiceCallFilterAttribute>();
+            var attrs = this.Type.GetCustomAttributes<ServiceCallFilterAttribute>();
             if (attrs != null &&
                 attrs.Any() == true)
             {
@@ -43,7 +42,7 @@ namespace ContractHttp
             }
             else
             {
-                var methods = this.Type.GetTypeInfo().GetMethods();
+                var methods = this.Type.GetMethods();
                 if (methods != null &&
                     methods.Any() == true)
                 {
@@ -70,21 +69,22 @@ namespace ContractHttp
         /// </summary>
         /// <param name="localController">A <see cref="LocalBuilder"/> containing a controller instance.</param>
         /// <param name="localServices">A <see cref="LocalBuilder"/> containing a services instance.</param>
-        public void EmitExecuting(LocalBuilder localController, LocalBuilder localServices)
+        public void EmitExecuting(ILocal localController, ILocal localServices)
         {
             if (this.HasAttributes == false)
             {
                 return;
             }
 
-            this.localServiceCallAttrs = ilGen.DeclareLocal(typeof(IEnumerable<ServiceCallFilterAttribute>));
-            this.ilGen.EmitGetCustomAttributes<ServiceCallFilterAttribute>(this.Type, this.localServiceCallAttrs);
-    
+            this.ilGen
+                .DeclareLocal<IEnumerable<ServiceCallFilterAttribute>>(out this.localServiceCallAttrs)
+                .EmitGetCustomAttributes<ServiceCallFilterAttribute>(this.Type, this.localServiceCallAttrs);
+
             this.ilGen.EmitIfNotNullOrEmpty(
                 this.localServiceCallAttrs,
                 (il) =>
                 {
-                    il.EmitForEach(
+                    il.ForEach(
                         this.localServiceCallAttrs,
                         (item) =>
                         {
@@ -96,9 +96,9 @@ namespace ContractHttp
         /// <summary>
         /// Emits IL to the 'OnExecuted' method on <see cref="ServiceCallFilterAttribute"/> instances.
         /// </summary>
-        /// <param name="localController">A <see cref="LocalBuilder"/> containing a controller instance.</param>
-        /// <param name="localServices">A <see cref="LocalBuilder"/> containing a services instance.</param>
-        public void EmitExecuted(LocalBuilder localController, LocalBuilder localServices)
+        /// <param name="localController">A <see cref="ILocal"/> containing a controller instance.</param>
+        /// <param name="localServices">A <see cref="ILocal"/> containing a services instance.</param>
+        public void EmitExecuted(ILocal localController, ILocal localServices)
         {
             if (this.HasAttributes == false)
             {
@@ -109,7 +109,7 @@ namespace ContractHttp
                 this.localServiceCallAttrs,
                 (il) =>
                 {
-                    il.EmitForEach(
+                    il.ForEach(
                         this.localServiceCallAttrs,
                         (item) =>
                         {
@@ -122,10 +122,10 @@ namespace ContractHttp
         /// Emits IL to create a new instance of a <see cref="ServiceCallExecutingContext"/> and call the service call filter attributes
         /// 'OnExecuting' method.
         /// </summary>
-        /// <param name="localAttr">A <see cref="LocalBuilder"/> containing a attribute instance.</param>
-        /// <param name="localController">A <see cref="LocalBuilder"/> containing a controller instance.</param>
-        /// <param name="localServices">A <see cref="LocalBuilder"/> containing a services instance.</param>
-        private void EmitExecuting(LocalBuilder localAttr, LocalBuilder localController, LocalBuilder localServices)
+        /// <param name="localAttr">A <see cref="ILocal"/> containing a attribute instance.</param>
+        /// <param name="localController">A <see cref="ILocal"/> containing a controller instance.</param>
+        /// <param name="localServices">A <see cref="ILocal"/> containing a services instance.</param>
+        private void EmitExecuting(ILocal localAttr, ILocal localController, ILocal localServices)
         {
             this.EmitPreamble(localAttr, localController, localServices);
 
@@ -138,10 +138,10 @@ namespace ContractHttp
         /// Emits IL to create a new instance of a <see cref="ServiceCallExecutedContext"/> and call the service call filter attributes
         /// 'OnExecuted' method.
         /// </summary>
-        /// <param name="localAttr">A <see cref="LocalBuilder"/> containing a attribute instance.</param>
-        /// <param name="localController">A <see cref="LocalBuilder"/> containing a controller instance.</param>
-        /// <param name="localServices">A <see cref="LocalBuilder"/> containing a services instance.</param>
-        private void EmitExecuted(LocalBuilder localAttr, LocalBuilder localController, LocalBuilder localServices)
+        /// <param name="localAttr">A <see cref="ILocal"/> containing a attribute instance.</param>
+        /// <param name="localController">A <see cref="ILocal"/> containing a controller instance.</param>
+        /// <param name="localServices">A <see cref="ILocal"/> containing a services instance.</param>
+        private void EmitExecuted(ILocal localAttr, ILocal localController, ILocal localServices)
         {
             this.EmitPreamble(localAttr, localController, localServices);
 
@@ -154,10 +154,10 @@ namespace ContractHttp
         /// Emits IL to resolve <see cref="IServiceProvider"/> into a <see cref="IFrameworkServices"/> instance and
         /// setup the attribute and arguments to construct an instance of the attribute class.
         /// </summary>
-        /// <param name="localAttr">A <see cref="LocalBuilder"/> containing a attribute instance.</param>
-        /// <param name="localController">A <see cref="LocalBuilder"/> containing a controller instance.</param>
-        /// <param name="localServices">A <see cref="LocalBuilder"/> containing a <see cref="IServiceProvider"/> instance.</param>
-        private void EmitPreamble(LocalBuilder localAttr, LocalBuilder localController, LocalBuilder localServices)
+        /// <param name="localAttr">A <see cref="ILocal"/> containing a attribute instance.</param>
+        /// <param name="localController">A <see cref="ILocal"/> containing a controller instance.</param>
+        /// <param name="localServices">A <see cref="ILocal"/> containing a <see cref="IServiceProvider"/> instance.</param>
+        private void EmitPreamble(ILocal localAttr, ILocal localController, ILocal localServices)
         {
 /*
             var funcType = typeof(Func<IServiceProvider, IFrameworkServices>);

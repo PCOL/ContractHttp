@@ -1,12 +1,12 @@
-namespace ContractHttp.Reflection.Emit
+namespace ContractHttp
 {
     using System;
-    using System.Reflection.Emit;
-
+    using FluentIL;
+    
     /// <summary>
-    /// Defines the type factory context interface.
+    /// Defines the controller factory context interface.
     /// </summary>
-    public interface ITypeFactoryContext
+    public interface IControllerFactoryContext
     {
         /// <summary>
         /// Gets the new type.
@@ -26,6 +26,6 @@ namespace ContractHttp.Reflection.Emit
         /// <summary>
         /// Gets the <see cref="FieldBuilder"/> which will contain the base object instance.
         /// </summary>
-        FieldBuilder BaseObjectField { get; }
+        IFieldBuilder BaseObjectField { get; }
     }
 }

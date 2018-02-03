@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
-    <PackageReference Include="Fluent.IL" Version="1.0.0-alpha4" />
+    <PackageReference Include="Fluent.IL" Version="1.0.0-alpha5" />
     <PackageReference Include="DynProxy" Version="1.0.0-alpha1" />
     <Content Include="ControllerFactory.cs" />
     <Content Include="HttpCallContractAttribute.cs" />
@@ -45,16 +45,9 @@
     <Content Include="ServiceCallFilterEmitter.cs" />
     <Content Include="Utility.cs" />
     <Content Include="IProxy.cs" />
-    <Content Include="Reflection\ParameterInfoExtensions.cs" />
+    <Content Include="ControllerFactoryContext.cs" />
+    <Content Include="IControllerFactoryContext.cs" />
+    <Content Include="Reflection\Emit\ReflectionEmitExtensionMethods.cs" />
     <Content Include="Reflection\Binder.cs" />
-    <Content Include="Reflection\AssemblyCache.cs" />
-    <Content Include="Reflection\Emit\ArrayBuilder.cs" />
-    <Content Include="Reflection\Emit\AssemblyBuilderCache.cs" />
-    <Content Include="Reflection\Emit\ITypeFactoryContext.cs" />
-    <Content Include="Reflection\Emit\ReflectionEmitExtensions.cs" />
-    <Content Include="Reflection\Emit\ReflectionEmitPropertyExtensions.cs" />
-    <Content Include="Reflection\Emit\TypeFactory.cs" />
-    <Content Include="Reflection\Emit\TypeFactoryContext.cs" />
-    <Content Include="Reflection\Emit\TypeFactoryExtension.cs" />
   </ItemGroup>
 </Project>
