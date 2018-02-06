@@ -148,12 +148,6 @@
                 request.Headers.Add("X-Log-Correlation-Id", correlationId);
             }
 
-            // var sourceId = LogContext.GetContextPropertyValue(LogEntry.SourceIdProperty);
-            // if (string.IsNullOrEmpty(sourceId) == false)
-            // {
-            //     request.Headers.Add("X-Log-Source-Id", sourceId);
-            // }
-
             return request;
         }
 
@@ -215,6 +209,9 @@
                 ////returnObj = this.PutAsync(client, method, uri, arguments, contentType);
             }
             else if (httpMethod == HttpCallMethod.HttpPatch)
+            {
+            }
+            else if (httpMethod == HttpCallMethod.HttpDelete)
             {
             }
 
