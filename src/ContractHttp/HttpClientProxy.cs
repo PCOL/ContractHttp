@@ -138,12 +138,29 @@
         /// </summary>
         /// <param name="method">The http method.</param>
         /// <param name="uri">The request uri.</param>
+        /// <param name="content">The content.</param>
+        /// <param name="contentType">The content type.</param>
         /// <returns>A <see cref="HttpRequestMessage"/>.</returns>
-        private static HttpRequestMessage CreateRequest(System.Net.Http.HttpMethod method, string uri, string correlationId = null)
+        internal static HttpRequestMessage CreateRequest(
+            HttpMethod method,
+            string uri,
+            HttpContent content,
+            string contentType,
+            string correlationId = null)
         {
             var request = new HttpRequestMessage(method, uri);
 
-            if (string.IsNullOrEmpty(correlationId) == false)
+            if (content != null)
+            {
+                request.Content = content;
+            }
+
+            if (contentType.IsNullOrEmpty() == false)
+            {
+                request.Headers.Add("Accept", contentType);
+            }
+
+            if (correlationId.IsNullOrEmpty() == false)
             {
                 request.Headers.Add("X-Log-Correlation-Id", correlationId);
             }
@@ -160,19 +177,18 @@
         private object InvokeInternal(MethodInfo method, object[] arguments)
         {
             string[] names = new string[arguments.Length];
-            object returnObj = null;
 
-            HttpCallMethod httpMethod = HttpCallMethod.HttpGet;
+            HttpMethod httpMethod = HttpMethod.Get;
             string localBaseUri = this.GetBaseUri();
             string uri = localBaseUri;
             string contentType = "application/json";
             TimeSpan timeout = this.timeout;
 
             // Gets the http call contract attribute from the method.
-            HttpCallContractAttribute attr = method.GetCustomAttribute<HttpCallContractAttribute>(false);
+            var attr = method.GetCustomAttribute<HttpCallContractAttribute>(false);
             if (attr != null)
             {
-                httpMethod = attr.Method;
+                httpMethod = this.GetMethodFromAttribute(attr);
                 uri = this.CombineUri(localBaseUri, attr.Uri);
                 contentType = attr.ContentType;
 
@@ -181,82 +197,86 @@
                     timeout = attr.Timeout.Value;
                 }
             }
-            else
+
+            // Check for a http method attribute.
+            HttpMethodAttribute methodAttr = method.GetCustomAttribute<HttpMethodAttribute>(false);
+            if (methodAttr != null)
             {
-                // Check for a http method attribute.
-                HttpMethodAttribute methodAttr = method.GetCustomAttribute<HttpMethodAttribute>(false);
-                if (methodAttr != null)
-                {
-                    string route;
-                    this.GetMethodAndTemplateFromAttribute(methodAttr, out httpMethod, out route);
-                    uri = this.CombineUri(localBaseUri, route);
-                }
+                string route = this.GetMethodAndTemplateFromAttribute(methodAttr, ref httpMethod);
+                uri = this.CombineUri(localBaseUri, route);
             }
 
             var client = this.GetHttpClient();
             //client.Timeout = timeout;
 
-            if (httpMethod == HttpCallMethod.HttpGet)
-            {
-                returnObj = this.GetAsync(client, method, uri, arguments, contentType);
-            }
-            else if (httpMethod == HttpCallMethod.HttpPost)
-            {
-                returnObj = this.PostAsync(client, method, uri, arguments, contentType);
-            }
-            else if (httpMethod == HttpCallMethod.HttpPut)
-            {
-                ////returnObj = this.PutAsync(client, method, uri, arguments, contentType);
-            }
-            else if (httpMethod == HttpCallMethod.HttpPatch)
-            {
-            }
-            else if (httpMethod == HttpCallMethod.HttpDelete)
-            {
-            }
-
-            return returnObj;
+            return this.BuildAndSendRequest(client, method, httpMethod, uri, arguments, contentType);
         }
 
         /// <summary>
-        /// 
+        /// Gets the <see cref="HttpMethod"/> from a <see cref="HttpCallContractAttribute"/>.
         /// </summary>
-        /// <param name="attrs"></param>
-        /// <param name="httpMethod"></param>
-        /// <param name="template"></param>
-        /// <returns></returns>
-        private bool GetMethodAndTemplateFromAttribute(
-            HttpMethodAttribute attr,
-            out HttpCallMethod httpMethod,
-            out string template)
+        /// <param name="attr">The <see cref="HttpCallContractAttribute"/></param>
+        /// <returns>A <see cref="HttpMethod"/>.</returns>
+        private HttpMethod GetMethodFromAttribute(HttpCallContractAttribute attr)
         {
-            httpMethod = HttpCallMethod.HttpGet;
-            template = ((HttpMethodAttribute)attr).Template;
+            switch (attr.Method)
+            {
+                case HttpCallMethod.HttpPost:
+                    return HttpMethod.Post;
 
+                case HttpCallMethod.HttpPut:
+                    return HttpMethod.Put;
+
+                case HttpCallMethod.HttpPatch:
+                    return new HttpMethod("Patch");
+
+                case HttpCallMethod.HttpDelete:
+                    return HttpMethod.Delete;
+            }
+
+            return HttpMethod.Get;
+        }
+
+        /// <summary>
+        /// Gets the Http method and the template from a <see cref="HttpMethodAttribute"/>.
+        /// </summary>
+        /// <param name="attr">The <see cref="HttpMethodAttribute"/> instance.</param>
+        /// <param name="httpMethod">A variable to receive the <see cref="HttpMethod"/>.</param>
+        /// <returns>The attribute template.</returns>
+        private string GetMethodAndTemplateFromAttribute(
+            HttpMethodAttribute attr,
+            ref HttpMethod httpMethod)
+        {
             if (attr is HttpGetAttribute)
             {
-                httpMethod = HttpCallMethod.HttpGet;
+                httpMethod = HttpMethod.Get;
             }
             else if (attr is HttpPostAttribute)
             {
-                httpMethod = HttpCallMethod.HttpPost;
+                httpMethod = HttpMethod.Post;
             }
             else if (attr is HttpPutAttribute)
             {
-                httpMethod = HttpCallMethod.HttpPut;
+                httpMethod = HttpMethod.Put;
             }
             else if (attr is HttpPatchAttribute)
             {
-                httpMethod = HttpCallMethod.HttpPatch;
+                httpMethod = new HttpMethod("Patch");
             }
             else if (attr is HttpDeleteAttribute)
             {
-                httpMethod = HttpCallMethod.HttpDelete;
+                httpMethod = HttpMethod.Delete;
             }
 
-            return true;
+            return ((HttpMethodAttribute)attr).Template;
         }
 
+        /// <summary>
+        /// Checks if a list of attributes contains any of a provided list.
+        /// </summary>
+        /// <param name="attrs">The attribute listto check.</param>
+        /// <param name="attrTypes">The attributes to check for.</param>
+        /// <returns>True if any are found; otherwise false.</returns>
         private bool HasAttribute(IEnumerable<Attribute> attrs, params Type[] attrTypes)
         {
             foreach (var attr in attrs)
@@ -379,15 +399,15 @@
 
                     if (parms[i].IsOut == true)
                     {
-                        Type pType = parms[i].ParameterType.GetElementType();
-                        if (pType == typeof(HttpResponseMessage))
+                        Type parmType = parms[i].ParameterType.GetElementType();
+                        if (parmType == typeof(HttpResponseMessage))
                         {
                             responseArg = i;
                         }
                         else
                         {
                             dataArg = i;
-                            dataArgType = pType;
+                            dataArgType = parmType;
                         }
                     }
 
@@ -448,86 +468,23 @@
         }
 
         /// <summary>
-        /// Executes a GET request for a method call.
-        /// </summary>
-        /// <param name="client">The <see cref="HttpClient"/> to use.</param>
-        /// <param name="method">The methods info.</param>
-        /// <param name="uri">The requests Uri.</param>
-        /// <param name="inArgs">The method calls arguments.</param>
-        /// <param name="contentType">The content type.</param>
-        /// <returns>The result of the call.</returns>
-        private object GetAsync(
-            HttpClient client,
-            MethodInfo method,
-            string uri,
-            object[] inArgs,
-            string contentType)
-        {
-            int contentArg, responseArg, dataArg;
-            Type dataArgType;
-            IDictionary<string, int> queryStrings;
-            IDictionary<string, int> headers;
-
-            string[] names = this.CheckArgs(method, out contentArg, out responseArg, out dataArg, out dataArgType, out queryStrings, out headers);
-            uri = this.ResolveUri(uri, names, inArgs);
-
-            if (queryStrings != null)
-            {
-                var query = string.Join("&", queryStrings.Select(q => $"{q.Key}={inArgs[q.Value]}"));
-                uri += $"?{query}";
-            }
-
-Console.WriteLine("Uri: {0}", uri);
-
-            Type returnType = method.ReturnType;
-
-            if (this.IsAsync(returnType) == true)
-            {
-                var genericReturnTypes = returnType.GetGenericArguments();
-                if (genericReturnTypes[0] == typeof(HttpResponseMessage))
-                {
-                    var request = HttpClientProxy<T>.CreateRequest(System.Net.Http.HttpMethod.Get, uri);
-                    request.Headers.Add("Accept", contentType);
-                    this.AddHeaders(request, headers, inArgs);
-                    return client.SendAsync(request);
-                }
-
-                Type asyncType = typeof(HttpClientProxy<>.AsyncCall<>).MakeGenericType(typeof(T), genericReturnTypes[0]);
-                object obj = Activator.CreateInstance(asyncType, client);
-                var mi = asyncType.GetMethod("GetAsync", new Type[] { typeof(string) });
-                return mi.Invoke(obj, new object[] { uri });
-            }
-
-            var req = HttpClientProxy<T>.CreateRequest(System.Net.Http.HttpMethod.Get, uri);
-            req.Headers.Add("Accept", contentType);
-            this.AddHeaders(req, headers, inArgs);
-
-Console.WriteLine("Send Request - {0}", req.Method);
-
-            var result = client.SendAsync(req);
-
-Console.WriteLine("Response: {0}", result.Result.StatusCode);
-            return this.ProcessResult(result, returnType, inArgs, contentArg, responseArg, dataArg, dataArgType);
-        }
-
-        /// <summary>
-        /// Executes a POST request for a method call.
+        /// Builds a request, sends it, and proecesses the response.
         /// </summary>
         /// <param name="client">The <see cref="HttpClient"/> to use.</param>
         /// <param name="method">The method info.</param>
+        /// <param name="httpMethod">The http method.</param>
         /// <param name="uri">The request Uri.</param>
         /// <param name="inArgs">The method calls arguments.</param>
         /// <param name="contentType">The content type.</param>
-        /// <returns>The result of the call.</returns>
-        private object PostAsync(
+        /// <returns>The result of the request.</returns>
+        private object BuildAndSendRequest(
             HttpClient client,
             MethodInfo method,
+            HttpMethod httpMethod,
             string uri,
             object[] inArgs,
             string contentType)
         {
-Console.WriteLine("PostAsync: {0}, {1}", uri, inArgs.Length);
-
             string[] names = this.CheckArgs(
                 method,
                 out int contentArg,
@@ -545,8 +502,6 @@ Console.WriteLine("PostAsync: {0}, {1}", uri, inArgs.Length);
                 uri += $"?{query}";
             }
 
-Console.WriteLine("PostAsync: {0}, {1}, {2}, {3}", uri, contentArg, responseArg, dataArg);
-
             HttpContent content = null;
             if (contentArg != -1)
             {
@@ -558,23 +513,30 @@ Console.WriteLine("PostAsync: {0}, {1}, {2}, {3}", uri, contentArg, responseArg,
 
             Type returnType = method.ReturnType;
 
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
-            request.Content = content;
+            HttpRequestMessage request = HttpClientProxy<T>.CreateRequest(httpMethod, uri, content, contentType);
             this.AddHeaders(request, headers, inArgs);
-
-            Task<HttpResponseMessage> result = client.SendAsync(request);
             if (this.IsAsync(returnType) == true)
             {
-                return result;
+                var genericReturnTypes = returnType.GetGenericArguments();
+                if (genericReturnTypes[0] == typeof(HttpResponseMessage))
+                {
+                    return client.SendAsync(request);
+                }
+
+                Type asyncType = typeof(AsyncCall<>).MakeGenericType(genericReturnTypes[0]);
+                object obj = Activator.CreateInstance(asyncType, client);
+                var mi = asyncType.GetMethod("SendAsync", new Type[] { typeof(HttpRequestMessage) });
+                return mi.Invoke(obj, new object[] { request });
             }
 
+            Task<HttpResponseMessage> result = client.SendAsync(request);
             return this.ProcessResult(result, returnType, inArgs, contentArg, responseArg, dataArg, dataArgType);
         }
 
         /// <summary>
         /// Processes the result.
         /// </summary>
-        /// <param name="result">A <see cref="Task"/> of type <see cref="HttpResponseMessage"/>.</param>
+        /// <param name="responseTask">A <see cref="Task"/> of type <see cref="HttpResponseMessage"/>.</param>
         /// <param name="returnType">The return type.</param>
         /// <param name="inArgs">The in arguments.</param>
         /// <param name="contentArg">The content argument index.</param>
@@ -583,7 +545,7 @@ Console.WriteLine("PostAsync: {0}, {1}, {2}, {3}", uri, contentArg, responseArg,
         /// <param name="dataArgType">The data argument type.</param>
         /// <returns>The result.</returns>
         private object ProcessResult(
-            Task<HttpResponseMessage> result,
+            Task<HttpResponseMessage> responseTask,
             Type returnType,
             object[] inArgs,
             int contentArg,
@@ -591,7 +553,28 @@ Console.WriteLine("PostAsync: {0}, {1}, {2}, {3}", uri, contentArg, responseArg,
             int dataArg,
             Type dataArgType)
         {
-            HttpResponseMessage response = result.Result;
+            HttpResponseMessage response = responseTask.Result;
+            object result = null;
+
+            string content = response.Content.ReadAsStringAsync().Result;
+            if (content.IsNullOrEmpty() == false)
+            {
+                if (returnType != typeof(HttpResponseMessage) &&
+                    returnType != typeof(void))
+                {
+                    result = JsonConvert.DeserializeObject(content, returnType);
+                }
+                else if (dataArg != -1)
+                {
+                    inArgs[dataArg] = JsonConvert.DeserializeObject(content, dataArgType);
+                }
+            }
+
+            if (responseArg == -1 &&
+                returnType != typeof(HttpResponseMessage))
+            {
+                response.EnsureSuccessStatusCode();
+            }
 
             if (responseArg != -1)
             {
@@ -602,26 +585,8 @@ Console.WriteLine("PostAsync: {0}, {1}, {2}, {3}", uri, contentArg, responseArg,
             {
                 return response;
             }
-            else
-            {
-                response.EnsureSuccessStatusCode();
-            }
 
-            string content = response.Content.ReadAsStringAsync().Result;
-            if (content.IsNullOrEmpty() == false)
-            {
-                if (returnType != typeof(HttpResponseMessage) &&
-                    returnType != typeof(void))
-                {
-                    return JsonConvert.DeserializeObject(content, returnType);
-                }
-                else if (dataArg != -1)
-                {
-                    inArgs[dataArg] = JsonConvert.DeserializeObject(content, dataArgType);
-                }
-            }
-
-            return null;
+            return result;
         }
 
         /// <summary>
@@ -664,7 +629,7 @@ Console.WriteLine("PostAsync: {0}, {1}, {2}, {3}", uri, contentArg, responseArg,
         /// <param name="name">The types name.</param>
         private void ThrowIfNotInterface(Type type, string name)
         {
-            if (type.GetTypeInfo().IsInterface == false)
+            if (type.IsInterface == false)
             {
                 throw new InvalidOperationException(string.Format("{0} must be an interface", name));
             }
@@ -683,68 +648,12 @@ Console.WriteLine("PostAsync: {0}, {1}, {2}, {3}", uri, contentArg, responseArg,
                 uri += "/";
             }
 
-            uri += path.TrimStart('/');
+            if (path.IsNullOrEmpty() == false)
+            {
+                uri += path.TrimStart('/');
+            }
 
             return uri;
-        }
-
-        /// <summary>
-        /// Represents a typed asynchronous call.
-        /// </summary>
-        /// <typeparam name="U">The calls data type.</typeparam>
-        private class AsyncCall<U>
-        {
-            /// <summary>
-            /// A reference to a client.
-            /// </summary>
-            private readonly HttpClient client;
-
-            /// <summary>
-            /// Initializes a new instance of the <see cref="AsyncCall{U}"/> class.
-            /// </summary>
-            /// <param name="client">The <see cref="HttpClient"/> to use.</param>
-            public AsyncCall(HttpClient client)
-            {
-                this.client = client;
-            }
-
-            /// <summary>
-            /// Represents a get call.
-            /// </summary>
-            /// <param name="uri">The uri to call.</param>
-            /// <returns>A <see cref="Task"/>.</returns>
-            public Task<U> GetAsync(string uri)
-            {
-                var request = HttpClientProxy<T>.CreateRequest(System.Net.Http.HttpMethod.Get, uri);
-                return this.SendAsync(request);
-            }
-
-            /// <summary>
-            /// Sends a request.
-            /// </summary>
-            /// <param name="request">The request to send.</param>
-            /// <returns>A <see cref="Task"/>.</returns>
-            public Task<U> SendAsync(HttpRequestMessage request)
-            {
-                Type dataType = typeof(U);
-                Task<HttpResponseMessage> task = this.client.SendAsync(request);
-                return task.ContinueWith<U>(
-                    (t) =>
-                    {
-                        HttpResponseMessage response = ((Task<HttpResponseMessage>)t).Result;
-
-                        response.EnsureSuccessStatusCode();
-                        if (typeof(U) != typeof(void))
-                        {
-                            string json = response.Content.ReadAsStringAsync().Result;
-                            object content = JsonConvert.DeserializeObject(json, dataType);
-
-                            return (U)content;
-                        }
-
-                        return default(U);
-                    });
-            }
         }
     }
 }

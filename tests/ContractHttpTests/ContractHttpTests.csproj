@@ -15,9 +15,15 @@
     <PackageReference Include="Moq" Version="4.8.1" />
     <ProjectReference Include="..\..\src\ContractHttp\ContractHttp.csproj" />
     <Content Include="ClientUnitTests.cs" />
-    <Content Include="HttpClientProxyUnitTests.cs" />
     <Content Include="Resources\ITestService.cs" />
     <Content Include="Resources\TestController.cs" />
     <Content Include="Resources\Models\TestData.cs" />
+    <Content Include="Resources\TestControllerWithHeaders.cs" />
+    <Content Include="Resources\ITestServiceWithHeaders.cs" />
+    <Content Include="TestUtils.cs" />
+    <Content Include="TestServiceProxyUnitTests.cs" />
+    <Content Include="TestServiceWithHeaderProxyUnitTests.cs" />
+    <Content Include="Resources\Models\CreateResponseModel.cs" />
+    <Content Include="Resources\Models\CreateModel.cs" />
   </ItemGroup>
 </Project>

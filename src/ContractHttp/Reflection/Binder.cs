@@ -88,12 +88,10 @@ namespace ContractHttp.Reflection
             var props = typeof(TSource).GetProperties();
             foreach (var prop in props)
             {
-                Console.WriteLine("Checking {0} [{1}]", prop.Name, prop.PropertyType);
                 var propertyInfo = typeof(TDestination).GetProperty(prop.Name);
                 if (propertyInfo != null &&
                     propertyInfo.PropertyType == prop.PropertyType)
                 {
-                    Console.WriteLine("Binding");
                     propertyInfo.SetValue(destination, prop.GetValue(source));
                 }
             }

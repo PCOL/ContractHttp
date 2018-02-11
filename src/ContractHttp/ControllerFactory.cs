@@ -145,8 +145,6 @@
                 controllerTypeName = attr.ControllerTypeName;
             }
 
-            TypeAttributes typeAttributes = TypeAttributes.Class | TypeAttributes.Public | TypeAttributes.BeforeFieldInit;
-
             var typeBuilder = this
                 .NewType(controllerTypeName)
                     .Class()
@@ -544,7 +542,6 @@
             IMethodBuilder methodBuilder,
             IEnumerable<ControllerMethodParameterAttribute> methodParms)
         {
-            int index = 1;
             foreach (var methodParm in methodParms)
             {
                 var parmBuilder = methodBuilder.Param(methodParm.ParameterType, methodParm.ParameterName);
@@ -859,7 +856,7 @@
 
         private void ProcessAttributes(ITypeBuilder typeBuilder, Type type)
         {
-            foreach (var attr in type.GetTypeInfo().GetCustomAttributes())
+            foreach (var attr in type.GetCustomAttributes())
             {
 /*
                 if (attr is SwaggerRequestHeaderParameterAttribute)

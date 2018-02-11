@@ -38,7 +38,7 @@ namespace ContractHttp
             if (controllerType == null)
             {
                 controllerType = factory.CreateControllerType<TController>(typeof(TService));
-                assemblies.Add(controllerType.GetTypeInfo().Assembly);
+                assemblies.Add(controllerType.Assembly);
                 controllerTypes.Add(controllerType);
             }
 
@@ -67,7 +67,7 @@ namespace ContractHttp
             if (controllerType == null)
             {
                 controllerType = factory.CreateControllerType<TService>(typeof(TService));
-                assemblies.Add(controllerType.GetTypeInfo().Assembly);
+                assemblies.Add(controllerType.Assembly);
                 controllerTypes.Add(controllerType);
             }
 
@@ -110,7 +110,7 @@ namespace ContractHttp
             if (controllerType == null)
             {
                 controllerType = factory.CreateControllerType(contractType, serviceType);
-                assemblies.Add(controllerType.GetTypeInfo().Assembly);
+                assemblies.Add(controllerType.Assembly);
                 controllerTypes.Add(controllerType);
             }
 

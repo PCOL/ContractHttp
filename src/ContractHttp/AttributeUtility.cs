@@ -11,60 +11,108 @@ namespace ContractHttp
     /// </summary>
     public static class AttributeUtility
     {
-        public static void TransferAttribute<TResult>(this MethodInfo methodInfo, MethodBuilder methodBuilder)
-            where TResult : Attribute
+        /// <summary>
+        /// Transfers attributes from a defined method to a new one.
+        /// </summary>
+        /// <typeparam name="TAttr">The attribute type.</typeparam>
+        /// <param name="methodInfo">The defined method.</param>
+        /// <param name="methodBuilder">The new method builder.</param>
+        public static void TransferAttribute<TAttr>(
+            this MethodInfo methodInfo,
+            MethodBuilder methodBuilder)
+            where TAttr : Attribute
         {
-            var attr = methodInfo.GetCustomAttribute<TResult>(false);
+            var attr = methodInfo.GetCustomAttribute<TAttr>(false);
             if (attr != null)
             {
                 methodBuilder.SetCustomAttribute(
-                    BuildAttribute<TResult>(
+                    BuildAttribute<TAttr>(
                         () =>
                         {
-                            return GetAttributePropertyValues<TResult>(attr, new string[0]);
+                            return GetAttributePropertyValues<TAttr>(attr, new string[0]);
                         }));
             }
         }
 
-        public static void TransferAttributes<T, TResult>(this MethodInfo methodInfo, MethodBuilder methodBuilder)
-            where TResult : Attribute
+        /// <summary>
+        /// Transfers attributes from a defined method to a new one.
+        /// </summary>
+        /// <typeparam name="T">The parameter type.</typeparam>
+        /// <typeparam name="TAttr">The attribute type.</typeparam>
+        /// <param name="methodInfo">The defined method.</param>
+        /// <param name="methodBuilder">The new method builder.</param>
+        public static void TransferAttributes<T, TAttr>(
+            this MethodInfo methodInfo,
+            MethodBuilder methodBuilder)
+            where TAttr : Attribute
         {
-            var attrs = methodInfo.GetCustomAttributes<TResult>(false);
+            var attrs = methodInfo.GetCustomAttributes<TAttr>(false);
             if (attrs.IsNullOrEmpty() == true)
             {
                 return;
             }
 
-            methodInfo.TransferAttributesInternal<TResult>(methodBuilder, attrs, new Type[] { typeof(T) });
+            methodInfo.TransferAttributesInternal<TAttr>(methodBuilder, attrs, new Type[] { typeof(T) });
         }
 
-        public static void TransferAttribute<T1, T2, TResult>(this MethodInfo methodInfo, MethodBuilder methodBuilder)
-            where TResult : Attribute
+        /// <summary>
+        /// Transfers attributes from a defined method to a new one.
+        /// </summary>
+        /// <typeparam name="T1">The first parameter type.</typeparam>
+        /// <typeparam name="T2">The second parameter type.</typeparam>
+        /// <typeparam name="TAttr">The attribute type.</typeparam>
+        /// <param name="methodInfo">The defined method.</param>
+        /// <param name="methodBuilder">The new method builder.</param>
+        public static void TransferAttribute<T1, T2, TAttr>(
+            this MethodInfo methodInfo,
+            MethodBuilder methodBuilder)
+            where TAttr : Attribute
         {
-            var attrs = methodInfo.GetCustomAttributes<TResult>(false);
+            var attrs = methodInfo.GetCustomAttributes<TAttr>(false);
             if (attrs.IsNullOrEmpty() == true)
             {
                 return;
             }
 
-            methodInfo.TransferAttributesInternal<TResult>(methodBuilder, attrs, new Type[] { typeof(T1), typeof(T2) });
+            methodInfo.TransferAttributesInternal<TAttr>(methodBuilder, attrs, new Type[] { typeof(T1), typeof(T2) });
         }
 
-        public static void TransferAttribute<T1, T2, T3, TResult>(this MethodInfo methodInfo, MethodBuilder methodBuilder)
-            where TResult : Attribute
+        /// <summary>
+        /// Transfers attributes from a defined method to a new one.
+        /// </summary>
+        /// <typeparam name="T1">The first parameter type.</typeparam>
+        /// <typeparam name="T2">The second parameter type.</typeparam>
+        /// <typeparam name="T3">The third parameter type.</typeparam>
+        /// <typeparam name="TAttr">The attribute type.</typeparam>
+        /// <param name="methodInfo">The defined method.</param>
+        /// <param name="methodBuilder">The new method builder.</param>
+        public static void TransferAttribute<T1, T2, T3, TAttr>(
+            this MethodInfo methodInfo,
+            MethodBuilder methodBuilder)
+            where TAttr : Attribute
         {
-            var attrs = methodInfo.GetCustomAttributes<TResult>(false);
+            var attrs = methodInfo.GetCustomAttributes<TAttr>(false);
             if (attrs.IsNullOrEmpty() == true)
             {
                 return;
             }
 
-            methodInfo.TransferAttributesInternal<TResult>(methodBuilder, attrs, new Type[] { typeof(T1), typeof(T2), typeof(T3) });
+            methodInfo.TransferAttributesInternal<TAttr>(methodBuilder, attrs, new Type[] { typeof(T1), typeof(T2), typeof(T3) });
         }
 
-        private static void TransferAttributesInternal<T>(this MethodInfo methodInfo, MethodBuilder methodBuilder, IEnumerable<T> attrs, Type[] ctorArgTypes)
+        /// <summary>
+        /// Transfers attributes from a defined method to a new one.
+        /// </summary>
+        /// <param name="methodInfo">The defined method.</param>
+        /// <param name="methodBuilder">The new method builder.</param>
+        /// <param name="attrs">A list of attributes.</param>
+        /// <param name="ctorArgTypes">An array of constructor arguments types.</param>
+        private static void TransferAttributesInternal<T>(
+            this MethodInfo methodInfo,
+            MethodBuilder methodBuilder,
+            IEnumerable<T> attrs,
+            Type[] ctorArgTypes)
         {
-// Console.WriteLine("Type: {0}", typeof(T).Name);
             var ctor = typeof(T).GetConstructor(ctorArgTypes);
             if (ctor == null)
             {
@@ -91,17 +139,15 @@ namespace ContractHttp
                         if (value is Type)
                         {
                             value = Type.GetTypeFromHandle(((Type)value).TypeHandle);
-
-// Console.WriteLine("Value: {0} - {1}", value, value == typeof(Type));
                         }
-                        
+
                         ctorParmValues[i] = value;
                         ignoreProperties.Add(prop.Name);
                     }
                 }
-                
+
                 methodBuilder.SetCustomAttribute(
-                    BuildAttributeInternal(
+                    BuildAttribute(
                         ctor,
                         ctorParmValues,
                         () =>
@@ -111,15 +157,24 @@ namespace ContractHttp
             }
         }
 
-        internal static Tuple<PropertyInfo, object>[] GetAttributePropertyValues<TResult>(TResult attr, IEnumerable<string> ignoreProperties)
+        /// <summary>
+        /// Gets an array for attribute property values.
+        /// </summary>
+        /// <typeparam name="TAttr">The attribute type.</typeparam>
+        /// <param name="attr"></param>
+        /// <param name="ignoreProperties"></param>
+        /// <returns>An array of properties and values.</returns>
+        internal static Tuple<PropertyInfo, object>[] GetAttributePropertyValues<TAttr>(
+            TAttr attr,
+            IEnumerable<string> ignoreProperties)
         {
-            var properties = typeof(TResult).GetProperties(BindingFlags.GetProperty | BindingFlags.SetProperty | BindingFlags.Public | BindingFlags.Instance);
+            var properties = attr.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.SetProperty | BindingFlags.Public | BindingFlags.Instance);
             if (properties.IsNullOrEmpty() == false)
             {
                 var propertyValues = new List<Tuple<PropertyInfo, object>>(properties.Length);
                 for (int i = 0; i < properties.Length; i++)
                 {
-                    if (properties[i].DeclaringType == typeof(TResult) &&
+                    if (properties[i].DeclaringType == attr.GetType() &&
                         properties[i].SetMethod != null &&
                         (ignoreProperties == null || ignoreProperties.Contains(properties[i].Name, StringComparer.OrdinalIgnoreCase) == false))
                     {
@@ -127,7 +182,6 @@ namespace ContractHttp
                         if (value is Type)
                         {
                             value = value as Type;
-// Console.WriteLine("Property: {0} - {1}", value, value == typeof(Type));
                         }
 
                         propertyValues.Add(
@@ -143,55 +197,81 @@ namespace ContractHttp
                 }
             }
 
-            return null;            
+            return null;
         }
 
-        public static CustomAttributeBuilder BuildAttribute<TResult>(Func<Tuple<PropertyInfo, object>[]> action = null)
+        /// <summary>
+        /// Builds an attribute with no constructor arguments.
+        /// </summary>
+        /// <param name="func">A function to return properties and values.</param>
+        /// <returns>A <see cref="CustomAttributeBuilder"/> instance.</returns>
+        public static CustomAttributeBuilder BuildAttribute<TResult>(
+            Func<Tuple<PropertyInfo, object>[]> func = null)
             where TResult : Attribute
         {
             var ctor = typeof(TResult).GetConstructor(Type.EmptyTypes);
-            return BuildAttributeInternal(ctor, new object[0], action);
+            return BuildAttribute(ctor, new object[0], func);
         }
 
-        public static CustomAttributeBuilder BuildAttribute<T, TResult>(T constructorArg, Func<Tuple<PropertyInfo, object>[]> action = null)
+        /// <summary>
+        /// Builds an attribute with one constructor argument.
+        /// </summary>
+        /// <param name="constructorArg1">The constructor argument value.</param>
+        /// <param name="func">A function to return properties and values.</param>
+        /// <returns>A <see cref="CustomAttributeBuilder"/> instance.</returns>
+        public static CustomAttributeBuilder BuildAttribute<T, TResult>(
+            T constructorArg,
+            Func<Tuple<PropertyInfo, object>[]> func = null)
             where TResult : Attribute
         {
             var ctor = typeof(TResult).GetConstructor(new Type[] { typeof(T) });
-            return BuildAttributeInternal(ctor, new object[] { constructorArg }, action);
+            return BuildAttribute(ctor, new object[] { constructorArg }, func);
         }
 
-        public static CustomAttributeBuilder BuildAttribute<T1, T2, TResult>(T1 constructorArg1, T2 constructorArg2, Func<Tuple<PropertyInfo, object>[]> action = null)
+        /// <summary>
+        /// Builds an attribute with two constructor arguments.
+        /// </summary>
+        /// <param name="constructorArg1">The first constructor argument value.</param>
+        /// <param name="constructorArg2">The second constructor argument value.</param>
+        /// <param name="func">A function to return properties and values.</param>
+        /// <returns>A <see cref="CustomAttributeBuilder"/> instance.</returns>
+        public static CustomAttributeBuilder BuildAttribute<T1, T2, TResult>(
+            T1 constructorArg1,
+            T2 constructorArg2,
+            Func<Tuple<PropertyInfo, object>[]> func = null)
             where TResult : Attribute
         {
             var ctor = typeof(TResult).GetConstructor(new Type[] { typeof(T1), typeof(T2) });
-            return BuildAttributeInternal(ctor, new object[] { constructorArg1, constructorArg2 }, action);
+            return BuildAttribute(ctor, new object[] { constructorArg1, constructorArg2 }, func);
         }
 
-        public static CustomAttributeBuilder BuildAttributeInternal(ConstructorInfo ctor, object[] ctorValues, Func<Tuple<PropertyInfo, object>[]> action)
+        /// <summary>
+        /// Builds an attribute.
+        /// </summary>
+        /// <param name="ctor">The constructor.</param>
+        /// <param name="ctorValues">The constructor parameter values.</param>
+        /// <param name="func">A function to return properties and values.</param>
+        /// <returns>A <see cref="CustomAttributeBuilder"/> instance.</returns>
+        public static CustomAttributeBuilder BuildAttribute(
+            ConstructorInfo ctor,
+            object[] ctorValues,
+            Func<Tuple<PropertyInfo, object>[]> func)
         {
-            if (action != null)
+            var results = func?.Invoke();
+            if (results != null)
             {
-                var results = action();
-                if (results != null)
+                PropertyInfo[] propertyInfos = new PropertyInfo[results.Length];
+                object[] propertyValues = new object[results.Length];
+                for (int i = 0; i < results.Length; i++)
                 {
-                    PropertyInfo[] propertyInfos = new PropertyInfo[results.Length];
-                    object[] propertyValues = new object[results.Length];
-                    for (int i = 0; i < results.Length; i++)
-                    {
-                        propertyInfos[i] = results[i].Item1;
-                        propertyValues[i] = results[i].Item2;
-                    }
-/*
-Console.WriteLine("Ctor: {0}", ctor);
-Console.WriteLine("CtorValues: {0}", string.Join(", ", ctorValues.Select(v => v.GetType().Name)));
-Console.WriteLine("PropertyInfos: {0}", string.Join<string>(", ", propertyInfos.Select(p => p.GetType().Name)));
-Console.WriteLine("PropertyValues: {0}", string.Join(", ", propertyValues));
-*/
-                    return new CustomAttributeBuilder(ctor, ctorValues, propertyInfos, propertyValues);
+                    propertyInfos[i] = results[i].Item1;
+                    propertyValues[i] = results[i].Item2;
                 }
+
+                return new CustomAttributeBuilder(ctor, ctorValues, propertyInfos, propertyValues);
             }
-                
-            return new CustomAttributeBuilder(ctor, ctorValues);            
+
+            return new CustomAttributeBuilder(ctor, ctorValues);
         }
     }
 }

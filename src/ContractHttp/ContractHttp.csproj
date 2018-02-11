@@ -29,7 +29,6 @@
     <Content Include="BindToModelAttribute.cs" />
     <Content Include="ControllerMethodParameterAttribute.cs" />
     <Content Include="ControllerMethodParameterFromOption.cs" />
-    <Content Include="DynamicControllerMiddleware.cs" />
     <Content Include="ExceptionHandlerAttribute.cs" />
     <Content Include="HttpClientProxyExtensionMethods.cs" />
     <Content Include="HttpControllerExtensionMethods.cs" />
@@ -49,5 +48,6 @@
     <Content Include="IControllerFactoryContext.cs" />
     <Content Include="Reflection\Emit\ReflectionEmitExtensionMethods.cs" />
     <Content Include="Reflection\Binder.cs" />
+    <Content Include="AsyncCall.cs" />
   </ItemGroup>
 </Project>

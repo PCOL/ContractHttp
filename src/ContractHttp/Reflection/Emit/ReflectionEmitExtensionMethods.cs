@@ -8,6 +8,9 @@ namespace ContractHttp.Reflection.Emit
     using System.Reflection.Emit;
     using FluentIL;
 
+    /// <summary>
+    /// Reflection emit extension methods
+    /// </summary>
     public static class ReflectionEmitExtensions
     {
         private static readonly MethodInfo getCustomAttributeTMethod = typeof(CustomAttributeExtensions).GetMethod("GetCustomAttribute", new[] { typeof(MemberInfo), typeof(bool) });
@@ -16,14 +19,13 @@ namespace ContractHttp.Reflection.Emit
 
         private static readonly MethodInfo getMethodByMetadataToken = typeof(ReflectionExtensions).GetMethod("GetMethod", new[] { typeof(Type), typeof(int) });
 
-
         /// <summary>
         /// Emits IL to call writeline with the object of the top of the evaluation stack.
         /// </summary>
         /// <param name="ilGen">THe <see cref="ILGenerator"/> to use.</param>
         public static IEmitter EmitToString(this IEmitter ilGen)
         {
-            MethodInfo toStringMethod = typeof(object).GetTypeInfo().GetMethod("ToString", Type.EmptyTypes);
+            MethodInfo toStringMethod = typeof(object).GetMethod("ToString", Type.EmptyTypes);
             return ilGen.CallVirt(toStringMethod);
         }
 
