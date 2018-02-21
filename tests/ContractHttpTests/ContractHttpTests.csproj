@@ -5,13 +5,13 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0-preview-20170628-02" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
     <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.1" />
     <PackageReference Include="Moq" Version="4.8.1" />
     <ProjectReference Include="..\..\src\ContractHttp\ContractHttp.csproj" />
     <Content Include="ClientUnitTests.cs" />
@@ -25,5 +25,8 @@
     <Content Include="TestServiceWithHeaderProxyUnitTests.cs" />
     <Content Include="Resources\Models\CreateResponseModel.cs" />
     <Content Include="Resources\Models\CreateModel.cs" />
+    <Content Include="Resources\ITestControllerService.cs" />
+    <Content Include="Resources\TestControllerService.cs" />
+    <Content Include="ControllerServiceUnitTests.cs" />
   </ItemGroup>
 </Project>

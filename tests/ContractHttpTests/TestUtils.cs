@@ -8,19 +8,20 @@ namespace ContractHttpTests
 
     public static class TestUtils
     {
-        public static TestServer CreateTestServer(Action<IServiceCollection> action)
+        public static TestServer CreateTestServer(Action<IServiceCollection> configureServices = null, Action<IApplicationBuilder> configure = null)
         {
             var testServer = new TestServer(
                 new WebHostBuilder()
+                    .UseUrls("http://localhost")
                     .ConfigureServices(
                         services =>
                         {
-                            action?.Invoke(services);
-                            services.AddMvc();
+                            configureServices?.Invoke(services);
                         })
                     .Configure(
                         app =>
                         {
+                            configure?.Invoke(app);
                             app.UseMvc();
                         }));
 

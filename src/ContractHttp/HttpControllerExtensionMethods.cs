@@ -4,7 +4,8 @@ namespace ContractHttp
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
@@ -110,8 +111,12 @@ namespace ContractHttp
             if (controllerType == null)
             {
                 controllerType = factory.CreateControllerType(contractType, serviceType);
-                assemblies.Add(controllerType.Assembly);
                 controllerTypes.Add(controllerType);
+            }
+
+            if (assemblies.FirstOrDefault(a => a == controllerType.Assembly) == null)
+            {
+                assemblies.Add(controllerType.Assembly);
             }
 
             services.AddSingleton(serviceType, serviceImpl);

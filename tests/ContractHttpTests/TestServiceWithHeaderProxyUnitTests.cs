@@ -27,7 +27,8 @@ namespace ContractHttpTests
             this.testServer = TestUtils.CreateTestServer(
                 services =>
                 {
-                    services.AddSingleton<TestControllerWithHeaders>();
+                    services.AddTransient<TestControllerWithHeaders>();
+                    services.AddMvc();
                 });
 
             this.clientProxy = new HttpClientProxy<ITestServiceWithHeaders>("http://localhost", testServer.CreateClient());

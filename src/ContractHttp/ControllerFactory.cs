@@ -43,8 +43,19 @@
         /// <returns>The type name.</returns>
         public static string GetTypeName(Type controllerInterface)
         {
+            return GetTypeName(controllerInterface, out HttpControllerAttribute attr);
+        }
+
+        /// <summary>
+        /// Gets the name of the controller type and the <see cref="HttpControllerAttribute"/> if one extists.
+        /// </summary>
+        /// <param name="controllerInterface">The controller interface type.</param>
+        /// <param name="attr">A variable to receive the <see cref="HttpControllerAttribute"/> instance.</param>
+        /// <returns>The type name.</returns>
+        private static string GetTypeName(Type controllerInterface, out HttpControllerAttribute attr)
+        {
             var controllerTypeName = TypeName(controllerInterface);
-            HttpControllerAttribute attr = controllerInterface.GetCustomAttribute<HttpControllerAttribute>();
+            attr = controllerInterface.GetCustomAttribute<HttpControllerAttribute>();
             if (attr != null &&
                 attr.ControllerTypeName != null)
             {
@@ -118,7 +129,7 @@
         /// <returns>A <see cref="Type"/> representing the new adapter.</returns>
         public Type CreateControllerType(Type controllerInterface, Type controllerServiceType)
         {
-            string typeName = TypeName(controllerInterface);
+            string typeName = GetTypeName(controllerInterface);
             Type controllerType = this.GetType(typeName, true);
 
             if (controllerType == null)
@@ -137,13 +148,9 @@
         /// <returns>A <see cref="Type"/> representing the new adapter.</returns>
         private Type GenerateControllerType(Type controllerInterface, Type controllerServiceType)
         {
-            string controllerTypeName = TypeName(controllerInterface);
-            HttpControllerAttribute attr = controllerInterface.GetCustomAttribute<HttpControllerAttribute>();
-            if (attr != null &&
-                attr.ControllerTypeName != null)
-            {
-                controllerTypeName = attr.ControllerTypeName;
-            }
+            string controllerTypeName = GetTypeName(
+                controllerInterface,
+                out HttpControllerAttribute attr);
 
             var typeBuilder = this
                 .NewType(controllerTypeName)
@@ -333,6 +340,13 @@
                 this.BuildParameters(methodBuilder, parms);
             }
 
+            if (this.ResolveMvcAttributes(methodBuilder, methodInfo) == false)
+            {
+                this.ResolveHttpControllerEndPointAttribute(methodBuilder, methodInfo);
+            }
+
+            this.ProcessAttributes(methodBuilder, methodInfo);
+
             Type returnModelType = methodInfo.ReturnType;
             int successStatusCode = 200;
             int failStatusCode = 500;
@@ -366,22 +380,23 @@
                 methodIL.DeclareLocal(serviceMethod.ReturnType, out localReturnValue);
             }
 
-            methodIL.DeclareLocal<Exception>(out ILocal localEx);
+            methodIL
+                .DeclareLocal<Exception>(out ILocal localEx)
 
-            // Store Controller reference
-            methodIL.DeclareLocal<Controller>(out ILocal localController);
-            methodIL.Emit(OpCodes.Ldarg_0);
-            methodIL.Emit(OpCodes.Stloc_S, localController);
+                // Store Controller reference
+                .DeclareLocal<Controller>(out ILocal localController)
+                .LdArg0()
+                .StLoc(localController)
 
-            // Get Services
-            methodIL.DeclareLocal<IServiceProvider>(out ILocal localServices);
-            methodIL.Emit(OpCodes.Ldarg_0);
-            methodIL.Emit(OpCodes.Callvirt, requestProp.GetGetMethod());
-            methodIL.Emit(OpCodes.Callvirt, httpContextProp.GetGetMethod());
-            methodIL.Emit(OpCodes.Callvirt, requestServicesProp.GetGetMethod());
-            methodIL.Emit(OpCodes.Stloc_S, localServices);
+                // Get Services
+                .DeclareLocal<IServiceProvider>(out ILocal localServices)
+                .LdArg0()
+                .CallVirt(requestProp.GetGetMethod())
+                .CallVirt(httpContextProp.GetGetMethod())
+                .CallVirt(requestServicesProp.GetGetMethod())
+                .StLoc(localServices)
 
-            methodIL.BeginExceptionBlock(out ILabel blockLocal);
+                .Try();
 
             // Check for service calls.
             var serviceCallEmitter = new ServiceCallFilterEmitter(methodInfo.DeclaringType, methodIL);
@@ -391,24 +406,27 @@
             if (methodParmAttrs.Any() == true)
             {
                 // Load the proxy method arguments into an array.
-                methodIL.DeclareLocal<object[]>(out proxyArguments);
+                methodIL
+                    .DeclareLocal<object[]>(out proxyArguments)
 
-                methodIL.Array(
-                    typeof(object),
-                    proxyArguments,
-                    methodParmTypes.Length,
-                    (i) =>
-                    {
-                        methodIL.LdArg(i + 1);
-                        methodIL.Conv(methodParmTypes[i], typeof(object), false);
-                    });
+                    .Array(
+                        typeof(object),
+                        proxyArguments,
+                        methodParmTypes.Length,
+                        (i) =>
+                        {
+                            methodIL
+                                .LdArg(i + 1)
+                                .Conv(methodParmTypes[i], typeof(object), false);
+                        });
 
                 methodIL.EmitWriteLine("------------------- PROXY ARGS --------------------");
                 methodIL.EmitWriteLine(proxyArguments);
 
                 // Load the service object.
-                methodIL.Emit(OpCodes.Ldarg_0);
-                methodIL.Emit(OpCodes.Ldfld, context.BaseObjectField);
+                methodIL
+                    .LdArg0()
+                    .LdFld(context.BaseObjectField);
 
                 // Iterate through service parameters
                 for (int i = 0; i < parms.Length; i++)
@@ -418,9 +436,10 @@
                     {
                         if (string.IsNullOrEmpty(fromModelAttr.PropertyName) == false)
                         {
-                            methodIL.EmitLoadArrayElement(proxyArguments, methodParmIndex[fromModelAttr.ParameterName]);
-                            methodIL.Emit(OpCodes.Ldstr, fromModelAttr.PropertyName);
-                            methodIL.Emit(OpCodes.Call, binderGetValueMethod.MakeGenericMethod(parms[i].ParameterType));
+                            methodIL
+                                .EmitLoadArrayElement(proxyArguments, methodParmIndex[fromModelAttr.ParameterName])
+                                .LdStr(fromModelAttr.PropertyName)
+                                .Call(binderGetValueMethod.MakeGenericMethod(parms[i].ParameterType));
                         }
                         else
                         {
@@ -434,11 +453,12 @@
                     var fromHeaderAttr = parms[i].GetCustomAttribute<FromHeaderAttribute>();
                     if (fromHeaderAttr != null)
                     {
-                        methodIL.Emit(OpCodes.Ldarg_0);
-                        methodIL.Emit(OpCodes.Callvirt, requestProp.GetGetMethod());
-                        methodIL.Emit(OpCodes.Callvirt, headersProp.GetGetMethod());
-                        methodIL.Emit(OpCodes.Ldstr, fromHeaderAttr.Name);
-                        methodIL.Emit(OpCodes.Callvirt, itemProp.GetGetMethod());
+                        methodIL
+                            .LdArg0()
+                            .CallVirt(requestProp.GetGetMethod())
+                            .CallVirt(headersProp.GetGetMethod())
+                            .LdStr(fromHeaderAttr.Name)
+                            .CallVirt(itemProp.GetGetMethod());
 
                         continue;
                     }
@@ -447,41 +467,36 @@
                 }
 
                 // Call the service method
-                methodIL.Emit(OpCodes.Callvirt, serviceMethod);
+                methodIL
+                    .CallVirt(serviceMethod);
             }
             else
             {
-                methodIL.DeclareLocal<string>(out ILocal l);
-                methodIL.Emit(OpCodes.Ldarg_1);
-                methodIL.EmitToString();
-                methodIL.Emit(OpCodes.Stloc_S, l);
-
-                methodIL.EmitWriteLine("--------------------- ARGS --------------------");
-                methodIL.EmitWriteLine(l);
-
                 // Load the base object and method parameters then call the service method.
-                methodIL.Emit(OpCodes.Ldarg_0);
-                methodIL.Emit(OpCodes.Ldfld, context.BaseObjectField);
-                methodIL.EmitLoadParameters(parms);
-                methodIL.Emit(OpCodes.Callvirt, serviceMethod);
+                methodIL
+                    .LdArg0()
+                    .LdFld(context.BaseObjectField)
+                    .EmitLoadParameters(parms)
+                    .CallVirt(serviceMethod);
             }
 
             if (localReturnValue != null)
             {
-                methodIL.Emit(OpCodes.Stloc_S, localReturnValue);
+                methodIL
+                    .StLoc(localReturnValue)
 
-                methodIL.EmitIfNotNull(
-                    localReturnValue,
-                    (il) =>
-                    {
-                        il.EmitWriteLine("**************** SUCCESS *****************");
-                        this.EmitStatusCodeCall(il, successStatusCode, localReturnValue, localResponse);
-                    },
-                    (il) =>
-                    {
-                        il.EmitWriteLine("**************** FAIL *****************");
-                        this.EmitStatusCodeCall(il, failStatusCode, null, localResponse);
-                    });
+                    .EmitIfNotNull(
+                        localReturnValue,
+                        (il) =>
+                        {
+                            il.EmitWriteLine("**************** SUCCESS *****************");
+                            this.EmitStatusCodeCall(il, successStatusCode, localReturnValue, localResponse);
+                        },
+                        (il) =>
+                        {
+                            il.EmitWriteLine("**************** FAIL *****************");
+                            this.EmitStatusCodeCall(il, failStatusCode, null, localResponse);
+                        });
             }
             else
             {
@@ -513,22 +528,17 @@
                 this.EmitStatusCodeCall(methodIL, StatusCodes.Status500InternalServerError, localResponse);
             }
 
-            methodIL.BeginFinallyBlock();
+            methodIL
+                .Finally();
 
             // Emit Service Call Attribute Executed calls.
             serviceCallEmitter.EmitExecuted(localController, localServices);
 
-            methodIL.EndExceptionBlock();
+            methodIL
+                .EndExceptionBlock()
 
-            methodIL.Emit(OpCodes.Ldloc_S, localResponse);
-            methodIL.Emit(OpCodes.Ret);
-
-            if (this.ResolveMvcAttributes(methodBuilder, methodInfo) == false)
-            {
-                this.ResolveHttpControllerEndPointAttribute(methodBuilder, methodInfo);
-            }
-
-            this.ProcessAttributes(methodBuilder, methodInfo);
+                .LdLoc(localResponse)
+                .Ret();
 
             return methodBuilder;
         }
