@@ -1,7 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix>alpha1</VersionSuffix>
+    <PackageId>ContractHttp</PackageId>
+    <Authors>pcol</Authors>
+    <AssemblyTitle>ContractHttp</AssemblyTitle>
+    <Description>A contract based REST client and server library.</Description>
+    <PackageReleaseNotes>Initial release</PackageReleaseNotes>
+    <PackageTags>rest http dynamic controller </PackageTags>
+    <PackageProjectUrl>https://github.com/PCOL/ContractHttp</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/PCOL/ContractHttp/blob/master/LICENSE</PackageLicenseUrl>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <DebugType>portable</DebugType>
+    <AssemblyName>ContractHttp</AssemblyName>
+    <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Reflection" Version="4.3.0" />
