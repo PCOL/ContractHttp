@@ -435,6 +435,14 @@
                             headers.Add(header, i);
                         }
                     }
+
+                    if (contentArg == -1 &&
+                        parms[i].ParameterType.IsPrimitive == false &&
+                        parms[i].ParameterType != typeof(string) &&
+                        parms[i].ParameterType != typeof(Guid))
+                    {
+                        contentArg = i;
+                    }
                 }
             }
 
