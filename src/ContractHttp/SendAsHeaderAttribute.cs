@@ -12,5 +12,7 @@ namespace ContractHttp
         }
 
         public string Name { get; }
+
+        public string Format { get; set; }
     }
 }

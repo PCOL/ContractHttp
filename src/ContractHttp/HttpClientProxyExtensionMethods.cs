@@ -1,5 +1,6 @@
 namespace ContractHttp
 {
+    using System;
     using System.Net.Http;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -62,6 +63,17 @@ namespace ContractHttp
 
                     return proxy.GetProxyObject();
                 });
+
+            return services;
+        }
+
+        public static IServiceCollection AddAuthorizationHeaderFactory(
+            this IServiceCollection services,
+            string scheme,
+            Func<string> getAuthHeaderValue)
+        {
+            services.AddSingleton<IAuthorizationHeaderFactory>(
+                new AuthorizationHeaderFactory(scheme, getAuthHeaderValue));
 
             return services;
         }

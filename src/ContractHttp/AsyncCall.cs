@@ -25,17 +25,6 @@ namespace ContractHttp
             this.httpClient = httpClient;
         }
 
-        // /// <summary>
-        // /// Represents a get call.
-        // /// </summary>
-        // /// <param name="uri">The uri to call.</param>
-        // /// <returns>A <see cref="Task"/>.</returns>
-        // public Task<T> GetAsync(string uri, string contentType)
-        // {
-        //     var request = HttpClientProxy<T>.CreateRequest(HttpMethod.Get, uri);
-        //     return this.SendAsync(request);
-        // }
-
         /// <summary>
         /// Sends a request.
         /// </summary>
@@ -45,6 +34,11 @@ namespace ContractHttp
         {
             Type dataType = typeof(T);
             Task<HttpResponseMessage> task = this.httpClient.SendAsync(request);
+            if (dataType == typeof(HttpResponseMessage))
+            {
+                return (Task<T>)(object)task;
+            }
+
             return task.ContinueWith<T>(
                 (t) =>
                 {
@@ -54,20 +48,25 @@ namespace ContractHttp
                     }
 
                     HttpResponseMessage response = ((Task<HttpResponseMessage>)t).Result;
-                    T result = default(T);
-
-                    if (dataType != typeof(void))
-                    {
-                        string json = response.Content.ReadAsStringAsync().Result;
-                        if (json.IsNullOrEmpty() == false)
-                        {
-                            result = JsonConvert.DeserializeObject<T>(json);
-                        }
-                    }
 
                     if (dataType != typeof(HttpResponseMessage))
                     {
                         response.EnsureSuccessStatusCode();
+                    }
+
+                    T result = default(T);
+                    if (dataType != typeof(void))
+                    {
+                        string content = response.Content.ReadAsStringAsync().Result;
+                        if (dataType == typeof(string))
+                        {
+                            return (T)(object)content;
+                        }
+
+                        if (content.IsNullOrEmpty() == false)
+                        {
+                            result = JsonConvert.DeserializeObject<T>(content);
+                        }
                     }
 
                     return result;

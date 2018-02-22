@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
@@ -374,19 +375,33 @@
         /// <returns>A array of argument names.</returns>
         private string[] CheckArgs(
             MethodInfo method,
+            object[] inArgs,
             out int contentArg,
             out int responseArg,
             out int dataArg,
             out Type dataArgType,
-            out IDictionary<string, int> queryStrings,
-            out IDictionary<string, int> headers)
+            out IDictionary<string, string> formUrl,
+            out IDictionary<string, string> queryStrings,
+            out IDictionary<string, string> headers)
         {
             contentArg = -1;
             responseArg = -1;
             dataArg = -1;
             dataArgType = null;
+            formUrl = null;
             queryStrings = null;
             headers = null;
+
+            var formUrlAttrs = method.GetCustomAttributes<AddFormUrlEncodedPropertyAttribute>();
+            if (formUrlAttrs.Any() == true)
+            {
+                formUrl = formUrl ?? new Dictionary<string, string>();
+
+                foreach (var attr in formUrlAttrs)
+                {
+                    formUrl.Add(attr.Key, attr.Value);
+                }
+            }
 
             ParameterInfo[] parms = method.GetParameters();
             string[] names = new string[parms.Length];
@@ -423,16 +438,51 @@
                             }
                         }
 
-                        foreach (var query in attrs.OfType<SendAsQueryAttribute>().Select(a => a.Name))
+                        if (inArgs[i] != null)
                         {
-                            queryStrings = queryStrings ?? new Dictionary<string, int>();
-                            queryStrings.Add(query, i);
-                        }
+                            var formUrlAttr = attrs.OfType<SendAsFormUrlAttribute>().FirstOrDefault();
+                            if (formUrlAttr != null)
+                            {
+                                formUrl = formUrl ?? new Dictionary<string, string>();
 
-                        foreach (var header in attrs.OfType<SendAsHeaderAttribute>().Select(a => a.Name))
-                        {
-                            headers = headers ?? new Dictionary<string, int>();
-                            headers.Add(header, i);
+                                if (typeof(IDictionary<string, string>).IsAssignableFrom(inArgs[i].GetType()) == true)
+                                {
+                                    foreach (var item in (IDictionary<string, string>)inArgs[i])
+                                    {
+                                        formUrl.Add(item.Key, item.Value);
+                                    }
+                                }
+                                if (typeof(IDictionary<string, object>).IsAssignableFrom(inArgs[i].GetType()) == true)
+                                {
+                                    foreach (var item in (IDictionary<string, object>)inArgs[i])
+                                    {
+                                        formUrl.Add(item.Key, item.Value.ToString());
+                                    }
+                                }
+                                else
+                                {
+                                    formUrl.Add(formUrlAttr.Name, inArgs[i].ToString());
+                                }
+                            }
+
+                            foreach (var query in attrs.OfType<SendAsQueryAttribute>().Select(a => a.Name))
+                            {
+                                queryStrings = queryStrings ?? new Dictionary<string, string>();
+                                queryStrings.Add(query, inArgs[i].ToString());
+                            }
+
+                            foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
+                            {
+                                headers = headers ?? new Dictionary<string, string>();
+                                if (string.IsNullOrEmpty(attr.Format) == false)
+                                {
+                                    headers.Add(attr.Name, string.Format(attr.Format, inArgs[i].ToString()));
+                                }
+                                else
+                                {
+                                    headers.Add(attr.Name, inArgs[i].ToString());
+                                }
+                            }
                         }
                     }
 
@@ -449,7 +499,23 @@
             return names;
         }
 
-        private void AddHeaders(HttpRequestMessage request, IDictionary<string, int> headers, object[] args)
+        private void AddHeaders(HttpRequestMessage request, MethodInfo method)
+        {
+            var headerAttrs = method
+                .GetCustomAttributes<AddHeaderAttribute>()
+                .Union(
+                    method.DeclaringType.GetCustomAttributes<AddHeaderAttribute>());
+
+            if (headerAttrs.Any() == true)
+            {
+                foreach (var attr in headerAttrs)
+                {
+                    request.Headers.TryAddWithoutValidation(attr.Header, attr.Value);
+                }
+            }
+        }
+
+        private void AddHeaders(HttpRequestMessage request, IDictionary<string, string> headers)
         {
             if (headers == null)
             {
@@ -458,10 +524,7 @@
 
             foreach (var item in headers)
             {
-                if (args[item.Value] != null)
-                {
-                    request.Headers.TryAddWithoutValidation(item.Key, args[item.Value].ToString());
-                }
+                request.Headers.TryAddWithoutValidation(item.Key, item.Value.ToString());
             }
         }
 
@@ -495,23 +558,29 @@
         {
             string[] names = this.CheckArgs(
                 method,
+                inArgs,
                 out int contentArg,
                 out int responseArg,
                 out int dataArg,
                 out Type dataArgType,
-                out IDictionary<string, int> queryStrings,
-                out IDictionary<string, int> headers);
+                out IDictionary<string, string> formUrl,
+                out IDictionary<string, string> queryStrings,
+                out IDictionary<string, string> headers);
 
             uri = this.ResolveUri(uri, names, inArgs);
 
             if (queryStrings != null)
             {
-                var query = string.Join("&", queryStrings.Select(q => $"{q.Key}={inArgs[q.Value]}"));
+                var query = string.Join("&", queryStrings.Select(q => $"{q.Key}={q.Value}"));
                 uri += $"?{query}";
             }
 
             HttpContent content = null;
-            if (contentArg != -1)
+            if (formUrl != null)
+            {
+                content = new FormUrlEncodedContent(formUrl);
+            }
+            else if (contentArg != -1)
             {
                 content = new StringContent(
                     JsonConvert.SerializeObject(inArgs[contentArg]),
@@ -522,7 +591,21 @@
             Type returnType = method.ReturnType;
 
             HttpRequestMessage request = HttpClientProxy<T>.CreateRequest(httpMethod, uri, content, contentType);
-            this.AddHeaders(request, headers, inArgs);
+            this.AddHeaders(request, method);
+            this.AddHeaders(request, headers);
+
+            if (method.GetCustomAttribute<AddAuthorizationHeaderAttribute>() != null ||
+                method.DeclaringType.GetCustomAttribute<AddAuthorizationHeaderAttribute>() != null)
+            {
+                var authFactory = this.services.GetService<IAuthorizationHeaderFactory>();
+                if (authFactory != null)
+                {
+                    request.Headers.Authorization = new AuthenticationHeaderValue(
+                        authFactory.GetAuthorizationHeaderScheme(),
+                        authFactory.GetAuthorizationHeaderValue());
+                }
+            }
+
             if (this.IsAsync(returnType) == true)
             {
                 var genericReturnTypes = returnType.GetGenericArguments();
