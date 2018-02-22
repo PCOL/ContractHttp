@@ -4,6 +4,7 @@
     using System.Net.Http;
     using ContractHttp;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
 
     class Program
     {
@@ -13,9 +14,7 @@
 
             using (var webHost = StartServer(url))
             {
-                var httpClient = new HttpClient();
-                var proxy = new HttpClientProxy<ICustomerClient>(url, httpClient);
-                var client = proxy.GetProxyObject();
+                var client = webHost.Services.GetService<ICustomerClient>();
 
                 var customers = client.GetCustomers();
                 if (customers != null)
@@ -28,14 +27,18 @@
             }
         }
 
-
-
         private static IWebHost StartServer(string url)
         {
             var webHost = new WebHostBuilder()
                 .UseKestrel()
                 .UseStartup<Startup>()
                 .UseUrls(url)
+                .ConfigureServices(
+                    services =>
+                    {
+                        services.AddHttpClient(new HttpClient());
+                        services.AddHttpClientProxy<ICustomerClient>(url);
+                    })
                 .Build();
 
             webHost.Start();
