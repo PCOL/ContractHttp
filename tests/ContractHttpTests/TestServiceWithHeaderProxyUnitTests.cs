@@ -31,14 +31,20 @@ namespace ContractHttpTests
                     services.AddMvc();
                 });
 
-            this.clientProxy = new HttpClientProxy<ITestServiceWithHeaders>("http://localhost", testServer.CreateClient());
+            this.clientProxy = new HttpClientProxy<ITestServiceWithHeaders>(
+                "http://localhost",
+                testServer.CreateClient());
+
             this.testService = clientProxy.GetProxyObject();
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            this.testServer.Dispose();
+            if (this.testServer != null)
+            {
+                this.testServer.Dispose();
+            }
         }
 
         [TestMethod]

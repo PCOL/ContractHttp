@@ -28,5 +28,7 @@
     <Content Include="Resources\ITestControllerService.cs" />
     <Content Include="Resources\TestControllerService.cs" />
     <Content Include="ControllerServiceUnitTests.cs" />
+    <Content Include="Resources\ITestServiceUsingMvcAttributes.cs" />
+    <Content Include="TestServiceUsingMvcAttributesProxyUnitTests.cs" />
   </ItemGroup>
 </Project>

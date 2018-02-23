@@ -1,5 +1,6 @@
 namespace ContractHttpTests.Resources
 {
+    using System.Collections.Generic;
     using System.Net.Http;
     using System.Threading.Tasks;
     using ContractHttp;
@@ -15,35 +16,20 @@ namespace ContractHttpTests.Resources
         [HttpCallContract(HttpCallMethod.HttpGet, "{name}")]
         TestData Get(string name);
 
+        [HttpCallContract(HttpCallMethod.HttpPost, "")]
+        HttpResponseMessage Create(CreateModel model);
+
+
+        [HttpCallContract(HttpCallMethod.HttpPost, "form")]
+        HttpResponseMessage CreateFormUrlEncoded([SendAsFormUrl]Dictionary<string, string> parms);
+
+        [HttpCallContract(HttpCallMethod.HttpPost, "form")]
+        HttpResponseMessage CreateFormUrlEncoded(
+            [SendAsFormUrl(Name = "Name")]string name,
+            [SendAsFormUrl(Name = "Value")]string value);
+
         [HttpCallContract(HttpCallMethod.HttpDelete, "{name}")]
         HttpResponseMessage Delete(string name);
 
-        [HttpGet("")]
-        HttpResponseMessage GetUsingMvcAttribute();
-
-        [HttpGet("")]
-        Task<HttpResponseMessage> GetUsingMvcAttributeAsync();
-
-
-        [HttpGet("{name}")]
-        TestData GetUsingMvcAttribute(string name);
-
-        [HttpDelete("{name}")]
-        HttpResponseMessage DeleteUsingMvcAttribute(string name);
-
-        [HttpDelete("{name}")]
-        Task<HttpResponseMessage> DeleteUsingMvcAttributeAsync(string name);
-
-        [HttpPost()]
-        CreateResponseModel CreateUsingMvcAttibute([SendAsContent]CreateModel model);
-
-        [HttpPost()]
-        Task<CreateResponseModel> CreateUsingMvcAttibuteAsync([SendAsContent]CreateModel model);
-
-        [HttpPost()]
-        CreateResponseModel CreateWithHttpResponseUsingMvcAttibute([SendAsContent]CreateModel model, out HttpResponseMessage response);
-
-        [HttpPut("{name}")]
-        HttpResponseMessage UpdateModelUsingMvcAttribute(string name, [SendAsContent]TestData value);
     }
 }

@@ -5,11 +5,10 @@ namespace ContractHttp
     public class SendAsFormUrlAttribute
         : Attribute
     {
-        public SendAsFormUrlAttribute(string name)
+        public SendAsFormUrlAttribute()
         {
-            this.Name = name;
         }
 
-        public string Name { get; }
+        public string Name { get; set;}
     }
 }

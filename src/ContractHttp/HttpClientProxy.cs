@@ -373,24 +373,25 @@
         /// <param name="dataArg">The index of the data argument, or -1 if one is not found.</param>
         /// <param name="dataArgType">The <see cref="Type"/> of the data argment, or null if one is not found.</param>
         /// <returns>A array of argument names.</returns>
-        private string[] CheckArgs(
+        private HttpRequestMessage CheckArgsAndBuildRequest(
+            HttpMethod httpMethod,
+            string uri,
+            string contentType,
             MethodInfo method,
             object[] inArgs,
-            out int contentArg,
             out int responseArg,
             out int dataArg,
-            out Type dataArgType,
-            out IDictionary<string, string> formUrl,
-            out IDictionary<string, string> queryStrings,
-            out IDictionary<string, string> headers)
+            out Type dataArgType)
         {
-            contentArg = -1;
             responseArg = -1;
             dataArg = -1;
             dataArgType = null;
-            formUrl = null;
-            queryStrings = null;
-            headers = null;
+
+            Dictionary<string, string> formUrl = null;
+            Dictionary<string, string> queryStrings = null;
+            Dictionary<string, string> headers = null;
+
+            HttpContent content = null;
 
             var formUrlAttrs = method.GetCustomAttributes<AddFormUrlEncodedPropertyAttribute>();
             if (formUrlAttrs.Any() == true)
@@ -428,75 +429,110 @@
 
                     var attrs = parms[i].GetCustomAttributes();
                     if (attrs != null &&
-                        attrs.Any() == true)
+                        attrs.Any() == true &&
+                        inArgs[i] != null)
                     {
-                        if (contentArg == -1)
+                        if (content == null)
                         {
                             if (this.HasAttribute(attrs, typeof(SendAsContentAttribute), typeof(FromBodyAttribute)) == true)
                             {
-                                contentArg = i;
+                                content = new StringContent(
+                                    JsonConvert.SerializeObject(inArgs[i]),
+                                    Encoding.UTF8,
+                                    contentType);
                             }
-                        }
 
-                        if (inArgs[i] != null)
-                        {
                             var formUrlAttr = attrs.OfType<SendAsFormUrlAttribute>().FirstOrDefault();
                             if (formUrlAttr != null)
                             {
                                 formUrl = formUrl ?? new Dictionary<string, string>();
 
-                                if (typeof(IDictionary<string, string>).IsAssignableFrom(inArgs[i].GetType()) == true)
+                                if (typeof(Dictionary<string, string>).IsAssignableFrom(inArgs[i].GetType()) == true)
                                 {
-                                    foreach (var item in (IDictionary<string, string>)inArgs[i])
-                                    {
-                                        formUrl.Add(item.Key, item.Value);
-                                    }
+                                    content = new FormUrlEncodedContent((Dictionary<string, string>)inArgs[i]);
                                 }
-                                if (typeof(IDictionary<string, object>).IsAssignableFrom(inArgs[i].GetType()) == true)
+                                else if (typeof(Dictionary<string, object>).IsAssignableFrom(inArgs[i].GetType()) == true)
                                 {
-                                    foreach (var item in (IDictionary<string, object>)inArgs[i])
+                                    var list = ((Dictionary<string, object>)inArgs[i]).Select(kvp => new KeyValuePair<string, string>(kvp.Key, kvp.Value?.ToString()));
+                                    content = new FormUrlEncodedContent(list);
+                                }
+                                else if (this.IsModelObject(parms[i].ParameterType) == true)
+                                {
+                                    var list = new Dictionary<string, string>();
+                                    var properties = inArgs[i].GetType().GetProperties();
+                                    foreach (var property in properties)
                                     {
-                                        formUrl.Add(item.Key, item.Value.ToString());
+                                        list.Add(property.Name, property.GetValue(inArgs[i])?.ToString());
                                     }
+
+                                    content = new FormUrlEncodedContent(list);
                                 }
                                 else
                                 {
-                                    formUrl.Add(formUrlAttr.Name, inArgs[i].ToString());
+                                    formUrl.Add(formUrlAttr.Name ?? parms[i].Name, inArgs[i].ToString());
                                 }
                             }
+                        }
 
-                            foreach (var query in attrs.OfType<SendAsQueryAttribute>().Select(a => a.Name))
+                        foreach (var query in attrs.OfType<SendAsQueryAttribute>().Select(a => a.Name))
+                        {
+                            queryStrings = queryStrings ?? new Dictionary<string, string>();
+                            queryStrings.Add(query, inArgs[i].ToString());
+                        }
+
+                        foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
+                        {
+                            headers = headers ?? new Dictionary<string, string>();
+                            if (string.IsNullOrEmpty(attr.Format) == false)
                             {
-                                queryStrings = queryStrings ?? new Dictionary<string, string>();
-                                queryStrings.Add(query, inArgs[i].ToString());
+                                headers.Add(attr.Name, string.Format(attr.Format, inArgs[i].ToString()));
                             }
-
-                            foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
+                            else
                             {
-                                headers = headers ?? new Dictionary<string, string>();
-                                if (string.IsNullOrEmpty(attr.Format) == false)
-                                {
-                                    headers.Add(attr.Name, string.Format(attr.Format, inArgs[i].ToString()));
-                                }
-                                else
-                                {
-                                    headers.Add(attr.Name, inArgs[i].ToString());
-                                }
+                                headers.Add(attr.Name, inArgs[i].ToString());
                             }
                         }
                     }
 
-                    if (contentArg == -1 &&
-                        parms[i].ParameterType.IsPrimitive == false &&
-                        parms[i].ParameterType != typeof(string) &&
-                        parms[i].ParameterType != typeof(Guid))
+                    if (content == null &&
+                        this.IsModelObject(parms[i].ParameterType) == true)
                     {
-                        contentArg = i;
+                        content = new StringContent(
+                            JsonConvert.SerializeObject(inArgs[i]),
+                            Encoding.UTF8,
+                            contentType);
                     }
                 }
             }
 
-            return names;
+            if (content == null &&
+                formUrl != null)
+            {
+                content = new FormUrlEncodedContent(formUrl);
+            }
+
+            // Build Uri
+            uri = this.ResolveUri(uri, names, inArgs);
+            if (queryStrings != null)
+            {
+                var query = string.Join("&", queryStrings.Select(q => $"{q.Key}={q.Value}"));
+                uri += $"?{query}";
+            }
+
+            // Build request
+            var request = new HttpRequestMessage(httpMethod, uri);
+            request.Content = content;
+            this.AddHeaders(request, method);
+            this.AddHeaders(request, headers);
+
+            return request;
+        }
+
+        private bool IsModelObject(Type type)
+        {
+            return type.IsPrimitive == false &&
+                type.IsClass == true &&
+                type != typeof(string);
         }
 
         private void AddHeaders(HttpRequestMessage request, MethodInfo method)
@@ -556,44 +592,17 @@
             object[] inArgs,
             string contentType)
         {
-            string[] names = this.CheckArgs(
+            var request = this.CheckArgsAndBuildRequest(
+                httpMethod,
+                uri,
+                contentType,
                 method,
                 inArgs,
-                out int contentArg,
                 out int responseArg,
                 out int dataArg,
-                out Type dataArgType,
-                out IDictionary<string, string> formUrl,
-                out IDictionary<string, string> queryStrings,
-                out IDictionary<string, string> headers);
-
-            uri = this.ResolveUri(uri, names, inArgs);
-
-            if (queryStrings != null)
-            {
-                var query = string.Join("&", queryStrings.Select(q => $"{q.Key}={q.Value}"));
-                uri += $"?{query}";
-            }
-
-            HttpContent content = null;
-            if (formUrl != null)
-            {
-                content = new FormUrlEncodedContent(formUrl);
-            }
-            else if (contentArg != -1)
-            {
-                content = new StringContent(
-                    JsonConvert.SerializeObject(inArgs[contentArg]),
-                    Encoding.UTF8,
-                    contentType);
-            }
+                out Type dataArgType);
 
             Type returnType = method.ReturnType;
-
-            HttpRequestMessage request = HttpClientProxy<T>.CreateRequest(httpMethod, uri, content, contentType);
-            this.AddHeaders(request, method);
-            this.AddHeaders(request, headers);
-
             if (method.GetCustomAttribute<AddAuthorizationHeaderAttribute>() != null ||
                 method.DeclaringType.GetCustomAttribute<AddAuthorizationHeaderAttribute>() != null)
             {
@@ -621,7 +630,7 @@
             }
 
             Task<HttpResponseMessage> result = client.SendAsync(request);
-            return this.ProcessResult(result, returnType, inArgs, contentArg, responseArg, dataArg, dataArgType);
+            return this.ProcessResult(result, returnType, inArgs, responseArg, dataArg, dataArgType);
         }
 
         /// <summary>
@@ -630,7 +639,6 @@
         /// <param name="responseTask">A <see cref="Task"/> of type <see cref="HttpResponseMessage"/>.</param>
         /// <param name="returnType">The return type.</param>
         /// <param name="inArgs">The in arguments.</param>
-        /// <param name="contentArg">The content argument index.</param>
         /// <param name="responseArg">The response argument index.</param>
         /// <param name="dataArg">The data argument index.</param>
         /// <param name="dataArgType">The data argument type.</param>
@@ -639,7 +647,6 @@
             Task<HttpResponseMessage> responseTask,
             Type returnType,
             object[] inArgs,
-            int contentArg,
             int responseArg,
             int dataArg,
             Type dataArgType)

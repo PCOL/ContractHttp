@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -19,8 +20,6 @@ namespace ContractHttpTests
     {
         private TestServer testServer;
 
-        private HttpClientProxy<ITestService> clientProxy;
-
         private ITestService testService;
 
         [TestInitialize]
@@ -33,14 +32,21 @@ namespace ContractHttpTests
                     services.AddMvc();
                 });
 
-            this.clientProxy = new HttpClientProxy<ITestService>("http://localhost", testServer.CreateClient());
-            this.testService = clientProxy.GetProxyObject();
+            var httpClient = testServer.CreateClient();
+            var testServiceProxy = new HttpClientProxy<ITestService>(
+                "http://localhost",
+                httpClient);
+
+            this.testService = testServiceProxy.GetProxyObject();
         }
 
         [TestCleanup]
         public void TestCleanup()
         {
-            this.testServer.Dispose();
+            if (this.testServer != null)
+            {
+                this.testServer.Dispose();
+            }
         }
 
         [TestMethod]
@@ -68,6 +74,78 @@ namespace ContractHttpTests
         }
 
         [TestMethod]
+        public void CreateProxy_Create_Good()
+        {
+            var response = this.testService.Create(
+                new CreateModel()
+                {
+                    Name = "good",
+                    Value = "Test"
+                });
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void CreateProxy_Create_Bad()
+        {
+            var response = this.testService.Create(
+                new CreateModel()
+                {
+                    Name = "bad",
+                    Value = "Test"
+                });
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void CreateProxy_Create_FormUrlEncodedDictionary_Good()
+        {
+            var response = this.testService.CreateFormUrlEncoded(
+                new Dictionary<string, string>()
+                {
+                    { "Name", "good" },
+                    { "Value", "test" }
+                });
+
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void CreateProxy_Create_FormUrlEncodedDictionary_Bad()
+        {
+            var response = this.testService.CreateFormUrlEncoded(
+                new Dictionary<string, string>()
+                {
+                    { "Name", "bad" },
+                    { "Value", "test" }
+                });
+
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void CallCreate_WithFormUrlEncoded_Good()
+        {
+            var response = this.testService.CreateFormUrlEncoded("good", "test");
+
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void CallCreate_WithFormUrlEncoded_Bad()
+        {
+            var response = this.testService.CreateFormUrlEncoded("bad", "test");
+
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+        }
+
+        [TestMethod]
         public void CreateProxy_DeleteByName_Good()
         {
             var response = this.testService.Delete("good");
@@ -81,143 +159,6 @@ namespace ContractHttpTests
             var response = this.testService.Delete("bad");
             Assert.IsNotNull(response);
             Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
-        }
-
-        [TestMethod]
-        public void CreateProxy_GetUsingMvcAttribute()
-        {
-            var response = this.testService.GetUsingMvcAttribute();
-            Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        [TestMethod]
-        public async Task CreateProxy_GetUsingMvcAttributeAsync()
-        {
-            var response = await this.testService.GetUsingMvcAttributeAsync();
-            Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-        }
-
-        [TestMethod]
-        public void CreateProxy_GetUsingMvcAttributeTestDataByName()
-        {
-            var testData = this.testService.GetUsingMvcAttribute("Name");
-            Assert.IsNotNull(testData);
-            Assert.AreEqual("Name", testData.Name);
-            Assert.AreEqual("Address", testData.Address);
-        }
-
-        [TestMethod]
-        public void CreateProxy_DeleteByNameUsingMvcAttribute_Good()
-        {
-            var response = this.testService.DeleteUsingMvcAttribute("good");
-            Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
-        }
-
-        [TestMethod]
-        public void CreateProxy_DeleteByNameUsingMvcAttribute_Bad()
-        {
-            var response = this.testService.DeleteUsingMvcAttribute("bad");
-            Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
-        }
-
-        [TestMethod]
-        public async Task CreateProxy_DeleteByNameUsingMvcAttributeAsync_Good()
-        {
-            var response = await this.testService.DeleteUsingMvcAttributeAsync("good");
-            Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
-        }
-
-        [TestMethod]
-        public void CreateProxy_UpdateModelUsingMvcAttribute_Good()
-        {
-            var response = this.testService.UpdateModelUsingMvcAttribute(
-                "test",
-                new TestData()
-                {
-                    Name = "test",
-                    Address = "Somewhere"
-                });
-            Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
-        }
-
-        [TestMethod]
-        public void CreateProxy_CreateUsingMvcAttribute_Good()
-        {
-            var response = this.testService.CreateUsingMvcAttibute(
-                new CreateModel()
-                {
-                    Name = "good",
-                    Value = "value"
-                });
-
-            Assert.IsNotNull(response);
-            Assert.IsNotNull(response.Id);
-        }
-
-        [TestMethod]
-        [ExpectedException(typeof(HttpRequestException))]
-        public void CreateProxy_CreateUsingMvcAttribute_Bad()
-        {
-            this.testService.CreateUsingMvcAttibute(
-                new CreateModel()
-                {
-                    Name = "bad",
-                    Value = "value"
-                });
-        }
-
-        [TestMethod]
-        public async Task CreateProxy_CreateUsingMvcAttributeAsync_Good()
-        {
-            var response = await this.testService.CreateUsingMvcAttibuteAsync(
-                new CreateModel()
-                {
-                    Name = "good",
-                    Value = "value"
-                });
-
-            Assert.IsNotNull(response);
-            Assert.IsNotNull(response.Id);
-        }
-
-        [TestMethod]
-        public void CreateProxy_CreateWithHttpResponseUsingMvcAttribute_Good()
-        {
-            var result = this.testService.CreateWithHttpResponseUsingMvcAttibute(
-                new CreateModel()
-                {
-                    Name = "good",
-                    Value = "value"
-                },
-                out HttpResponseMessage response);
-
-            Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
-
-            Assert.IsNotNull(result);
-            Assert.IsNotNull(result.Id);
-        }
-
-        [TestMethod]
-        public void CreateProxy_CreateWithHttpResponseUsingMvcAttribute_Bad()
-        {
-            var result = this.testService.CreateWithHttpResponseUsingMvcAttibute(
-                new CreateModel()
-                {
-                    Name = "bad",
-                    Value = "value"
-                },
-                out HttpResponseMessage response);
-
-            Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.Conflict , response.StatusCode);
-            Assert.IsNull(result);
         }
     }
 }

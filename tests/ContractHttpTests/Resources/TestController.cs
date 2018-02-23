@@ -4,6 +4,7 @@ namespace ContractHttpTests.Resources
     using Microsoft.AspNetCore.Http;
     using ContractHttpTests.Resources.Models;
     using System;
+    using System.Collections.Generic;
 
     [Route("api/test")]
     public class TestController
@@ -49,8 +50,32 @@ namespace ContractHttpTests.Resources
                         Id = Guid.NewGuid().ToString()
                     });
             }
+            else if (model.Name == "conflict")
+            {
+                return this.StatusCode(StatusCodes.Status409Conflict);
+            }
 
-            return this.StatusCode(StatusCodes.Status409Conflict);
+            return this.StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        [HttpPost("form")]
+        public IActionResult CreateFromForm([FromForm]CreateModel model)
+        {
+            if (model.Name == "good")
+            {
+                return this.StatusCode(
+                    StatusCodes.Status201Created,
+                    new CreateResponseModel()
+                    {
+                        Id = Guid.NewGuid().ToString()
+                    });
+            }
+            else if (model.Name == "conflict")
+            {
+                return this.StatusCode(StatusCodes.Status409Conflict);
+            }
+
+            return this.StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpPut("{name}")]
