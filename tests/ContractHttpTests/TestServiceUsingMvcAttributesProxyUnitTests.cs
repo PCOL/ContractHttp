@@ -87,7 +87,7 @@ namespace ContractHttpTests
         {
             var response = this.testService.Delete("bad");
             Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         }
 
         [TestMethod]

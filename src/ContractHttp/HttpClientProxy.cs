@@ -373,9 +373,8 @@
         /// <param name="dataArg">The index of the data argument, or -1 if one is not found.</param>
         /// <param name="dataArgType">The <see cref="Type"/> of the data argment, or null if one is not found.</param>
         /// <returns>A array of argument names.</returns>
-        private HttpRequestMessage CheckArgsAndBuildRequest(
-            HttpMethod httpMethod,
-            string uri,
+        private string[] CheckArgsAndBuildRequest(
+            HttpRequestBuilder requestBuilder,
             string contentType,
             MethodInfo method,
             object[] inArgs,
@@ -387,20 +386,12 @@
             dataArg = -1;
             dataArgType = null;
 
-            Dictionary<string, string> formUrl = null;
-            Dictionary<string, string> queryStrings = null;
-            Dictionary<string, string> headers = null;
-
-            HttpContent content = null;
-
             var formUrlAttrs = method.GetCustomAttributes<AddFormUrlEncodedPropertyAttribute>();
             if (formUrlAttrs.Any() == true)
             {
-                formUrl = formUrl ?? new Dictionary<string, string>();
-
                 foreach (var attr in formUrlAttrs)
                 {
-                    formUrl.Add(attr.Key, attr.Value);
+                    requestBuilder.AddFormUrlProperty(attr.Key, attr.Value);
                 }
             }
 
@@ -432,29 +423,27 @@
                         attrs.Any() == true &&
                         inArgs[i] != null)
                     {
-                        if (content == null)
+                        if (requestBuilder.IsContentSet == false)
                         {
                             if (this.HasAttribute(attrs, typeof(SendAsContentAttribute), typeof(FromBodyAttribute)) == true)
                             {
-                                content = new StringContent(
+                                requestBuilder.SetContent(new StringContent(
                                     JsonConvert.SerializeObject(inArgs[i]),
                                     Encoding.UTF8,
-                                    contentType);
+                                    contentType));
                             }
 
                             var formUrlAttr = attrs.OfType<SendAsFormUrlAttribute>().FirstOrDefault();
                             if (formUrlAttr != null)
                             {
-                                formUrl = formUrl ?? new Dictionary<string, string>();
-
                                 if (typeof(Dictionary<string, string>).IsAssignableFrom(inArgs[i].GetType()) == true)
                                 {
-                                    content = new FormUrlEncodedContent((Dictionary<string, string>)inArgs[i]);
+                                    requestBuilder.SetContent(new FormUrlEncodedContent((Dictionary<string, string>)inArgs[i]));
                                 }
                                 else if (typeof(Dictionary<string, object>).IsAssignableFrom(inArgs[i].GetType()) == true)
                                 {
                                     var list = ((Dictionary<string, object>)inArgs[i]).Select(kvp => new KeyValuePair<string, string>(kvp.Key, kvp.Value?.ToString()));
-                                    content = new FormUrlEncodedContent(list);
+                                    requestBuilder.SetContent(new FormUrlEncodedContent(list));
                                 }
                                 else if (this.IsModelObject(parms[i].ParameterType) == true)
                                 {
@@ -465,67 +454,45 @@
                                         list.Add(property.Name, property.GetValue(inArgs[i])?.ToString());
                                     }
 
-                                    content = new FormUrlEncodedContent(list);
+                                    requestBuilder.SetContent(new FormUrlEncodedContent(list));
                                 }
                                 else
                                 {
-                                    formUrl.Add(formUrlAttr.Name ?? parms[i].Name, inArgs[i].ToString());
+                                    requestBuilder.AddFormUrlProperty(formUrlAttr.Name ?? parms[i].Name, inArgs[i].ToString());
                                 }
                             }
                         }
 
                         foreach (var query in attrs.OfType<SendAsQueryAttribute>().Select(a => a.Name))
                         {
-                            queryStrings = queryStrings ?? new Dictionary<string, string>();
-                            queryStrings.Add(query, inArgs[i].ToString());
+                            requestBuilder.AddQueryString(query, inArgs[i].ToString());
                         }
 
                         foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
                         {
-                            headers = headers ?? new Dictionary<string, string>();
                             if (string.IsNullOrEmpty(attr.Format) == false)
                             {
-                                headers.Add(attr.Name, string.Format(attr.Format, inArgs[i].ToString()));
+                                requestBuilder.AddHeader(attr.Name, string.Format(attr.Format, inArgs[i].ToString()));
                             }
                             else
                             {
-                                headers.Add(attr.Name, inArgs[i].ToString());
+                                requestBuilder.AddHeader(attr.Name, inArgs[i].ToString());
                             }
                         }
                     }
 
-                    if (content == null &&
+                    if (requestBuilder.IsContentSet == false &&
                         this.IsModelObject(parms[i].ParameterType) == true)
                     {
-                        content = new StringContent(
+                        requestBuilder.SetContent(new StringContent(
                             JsonConvert.SerializeObject(inArgs[i]),
                             Encoding.UTF8,
-                            contentType);
+                            contentType));
                     }
                 }
             }
 
-            if (content == null &&
-                formUrl != null)
-            {
-                content = new FormUrlEncodedContent(formUrl);
-            }
-
-            // Build Uri
-            uri = this.ResolveUri(uri, names, inArgs);
-            if (queryStrings != null)
-            {
-                var query = string.Join("&", queryStrings.Select(q => $"{q.Key}={q.Value}"));
-                uri += $"?{query}";
-            }
-
-            // Build request
-            var request = new HttpRequestMessage(httpMethod, uri);
-            request.Content = content;
-            this.AddHeaders(request, method);
-            this.AddHeaders(request, headers);
-
-            return request;
+            return names;
         }
 
         private bool IsModelObject(Type type)
@@ -535,7 +502,7 @@
                 type != typeof(string);
         }
 
-        private void AddHeaders(HttpRequestMessage request, MethodInfo method)
+        private void AddMethodHeaders(HttpRequestBuilder requestBuilder, MethodInfo method)
         {
             var headerAttrs = method
                 .GetCustomAttributes<AddHeaderAttribute>()
@@ -546,21 +513,8 @@
             {
                 foreach (var attr in headerAttrs)
                 {
-                    request.Headers.TryAddWithoutValidation(attr.Header, attr.Value);
+                    requestBuilder.AddHeader(attr.Header, attr.Value);
                 }
-            }
-        }
-
-        private void AddHeaders(HttpRequestMessage request, IDictionary<string, string> headers)
-        {
-            if (headers == null)
-            {
-                return;
-            }
-
-            foreach (var item in headers)
-            {
-                request.Headers.TryAddWithoutValidation(item.Key, item.Value.ToString());
             }
         }
 
@@ -592,15 +546,21 @@
             object[] inArgs,
             string contentType)
         {
-            var request = this.CheckArgsAndBuildRequest(
-                httpMethod,
-                uri,
+            var requestBuilder = new HttpRequestBuilder()
+                .SetMethod(httpMethod);
+
+            var names = this.CheckArgsAndBuildRequest(
+                requestBuilder,
                 contentType,
                 method,
                 inArgs,
                 out int responseArg,
                 out int dataArg,
                 out Type dataArgType);
+
+            this.AddMethodHeaders(requestBuilder, method);
+
+            requestBuilder.SetUri(this.ResolveUri(uri, names, inArgs));
 
             Type returnType = method.ReturnType;
             if (method.GetCustomAttribute<AddAuthorizationHeaderAttribute>() != null ||
@@ -609,12 +569,14 @@
                 var authFactory = this.services.GetService<IAuthorizationHeaderFactory>();
                 if (authFactory != null)
                 {
-                    request.Headers.Authorization = new AuthenticationHeaderValue(
+                    requestBuilder.AddAuthorizationHeader(
                         authFactory.GetAuthorizationHeaderScheme(),
                         authFactory.GetAuthorizationHeaderValue());
                 }
             }
 
+            var request = requestBuilder.Build();
+Console.WriteLine("Request Uri: {0}", request.RequestUri);
             if (this.IsAsync(returnType) == true)
             {
                 var genericReturnTypes = returnType.GetGenericArguments();

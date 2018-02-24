@@ -35,7 +35,18 @@ namespace ContractHttpTests.Resources
                 return this.StatusCode(StatusCodes.Status204NoContent);
             }
 
-            return this.StatusCode(StatusCodes.Status404NotFound);
+            return this.StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        [HttpDelete("")]
+        public IActionResult DeleteAddressFromQuery([FromQuery]string name)
+        {
+            if (name == "good")
+            {
+                return this.StatusCode(StatusCodes.Status204NoContent);
+            }
+
+            return this.StatusCode(StatusCodes.Status500InternalServerError);
         }
 
         [HttpPost]

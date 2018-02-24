@@ -29,18 +29,10 @@ namespace ContractHttpTests
             this.testServer = TestUtils.CreateTestServer(
                 services =>
                 {
-                    List<Assembly> list = new List<Assembly>();
-                    services.AddDynamicController(
-                        typeof(ITestControllerService),
-                        typeof(ITestControllerService),
-                        new TestControllerService(),
-                        list);
-
-                    var mvcBuilder = services.AddMvc();
-                    foreach (var item in list)
-                    {
-                        mvcBuilder.AddApplicationPart(item);
-                    }
+                    services
+                        .AddMvc()
+                        .AddDynamicController<ITestControllerService>(
+                            new TestControllerService());
                 },
                 app =>
                 {

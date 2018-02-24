@@ -146,7 +146,7 @@ namespace ContractHttpTests
         }
 
         [TestMethod]
-        public void CreateProxy_DeleteByName_Good()
+        public void CallDeleteByName_WithUriSegmentName_Good()
         {
             var response = this.testService.Delete("good");
             Assert.IsNotNull(response);
@@ -154,11 +154,27 @@ namespace ContractHttpTests
         }
 
         [TestMethod]
-        public void CreateProxy_DeleteByName_Bad()
+        public void CallDeleteByName_WithUriSegmentName_Bad()
         {
             var response = this.testService.Delete("bad");
             Assert.IsNotNull(response);
-            Assert.AreEqual(HttpStatusCode.NotFound, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void CallDeleteByName_WithQueryStringName_Good()
+        {
+            var response = this.testService.DeleteUsingQueryString("good");
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        [TestMethod]
+        public void CallDeleteByName_WithQueryStringName_Bad()
+        {
+            var response = this.testService.DeleteUsingQueryString("bad");
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         }
     }
 }

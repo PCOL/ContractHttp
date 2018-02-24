@@ -12,14 +12,10 @@ namespace ServerExample
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            List<Assembly> list = new List<Assembly>();
-            services.AddDynamicController(typeof(ICustomerService), new CustomerService(), list);
-
-            var mvcBuilder = services.AddMvc();
-            foreach (var item in list)
-            {
-                mvcBuilder.AddApplicationPart(item);
-            }
+            services.AddMvc()
+                .AddDynamicController(
+                    typeof(ICustomerService),
+                    new CustomerService());
         }
 
         public void Configure(IApplicationBuilder app, ILoggerFactory loggerFactory)

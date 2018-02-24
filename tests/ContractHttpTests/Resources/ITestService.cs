@@ -21,7 +21,8 @@ namespace ContractHttpTests.Resources
 
 
         [HttpCallContract(HttpCallMethod.HttpPost, "form")]
-        HttpResponseMessage CreateFormUrlEncoded([SendAsFormUrl]Dictionary<string, string> parms);
+        HttpResponseMessage CreateFormUrlEncoded(
+            [SendAsFormUrl]Dictionary<string, string> parms);
 
         [HttpCallContract(HttpCallMethod.HttpPost, "form")]
         HttpResponseMessage CreateFormUrlEncoded(
@@ -31,5 +32,7 @@ namespace ContractHttpTests.Resources
         [HttpCallContract(HttpCallMethod.HttpDelete, "{name}")]
         HttpResponseMessage Delete(string name);
 
+        [HttpCallContract(HttpCallMethod.HttpDelete, "")]
+        HttpResponseMessage DeleteUsingQueryString([SendAsQuery("name")] string name);
     }
 }
