@@ -13,6 +13,7 @@
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.Extensions.DependencyInjection;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Represents a proxy class for accessing an Http end point.
@@ -576,7 +577,6 @@
             }
 
             var request = requestBuilder.Build();
-Console.WriteLine("Request Uri: {0}", request.RequestUri);
             if (this.IsAsync(returnType) == true)
             {
                 var genericReturnTypes = returnType.GetGenericArguments();
@@ -586,13 +586,15 @@ Console.WriteLine("Request Uri: {0}", request.RequestUri);
                 }
 
                 Type asyncType = typeof(AsyncCall<>).MakeGenericType(genericReturnTypes[0]);
-                object obj = Activator.CreateInstance(asyncType, client);
+                object obj = Activator.CreateInstance(asyncType, client, method);
                 var mi = asyncType.GetMethod("SendAsync", new Type[] { typeof(HttpRequestMessage) });
                 return mi.Invoke(obj, new object[] { request });
             }
 
             Task<HttpResponseMessage> result = client.SendAsync(request);
-            return this.ProcessResult(result, returnType, inArgs, responseArg, dataArg, dataArgType);
+
+            var fromJsonAttr = method.ReturnParameter.GetCustomAttribute<FromJsonAttribute>();
+            return this.ProcessResult(result, returnType, fromJsonAttr, inArgs, responseArg, dataArg, dataArgType);
         }
 
         /// <summary>
@@ -608,6 +610,7 @@ Console.WriteLine("Request Uri: {0}", request.RequestUri);
         private object ProcessResult(
             Task<HttpResponseMessage> responseTask,
             Type returnType,
+            FromJsonAttribute fromJsonAttr,
             object[] inArgs,
             int responseArg,
             int dataArg,
@@ -622,7 +625,14 @@ Console.WriteLine("Request Uri: {0}", request.RequestUri);
                 if (returnType != typeof(HttpResponseMessage) &&
                     returnType != typeof(void))
                 {
-                    result = JsonConvert.DeserializeObject(content, returnType);
+                    if (fromJsonAttr != null)
+                    {
+                        result = fromJsonAttr.JsonToObject(content, returnType);
+                    }
+                    else
+                    {
+                        result = JsonConvert.DeserializeObject(content, returnType);
+                    }
                 }
                 else if (dataArg != -1)
                 {
