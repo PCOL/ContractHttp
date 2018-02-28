@@ -313,33 +313,33 @@
         }
 
         /// <summary>
-        /// Resolves a Uri from a name/value list.
+        /// Expands a string from a name/value list.
         /// </summary>
-        /// <param name="uri">The uri to resolve.</param>
+        /// <param name="str">The str to expand.</param>
         /// <param name="names">An array of names.</param>
         /// <param name="values">A matching array of values.</param>
-        /// <returns>A <see cref="string"/> containing the resolved Uri.</returns>
-        private string ResolveUri(string uri, string[] names, object[] values)
+        /// <returns>The expanded <see cref="string"/>.</returns>
+        private string ExpandString(string str, string[] names, object[] values)
         {
-            Utility.ThrowIfArgumentNullOrEmpty(uri, nameof(uri));
+            Utility.ThrowIfArgumentNullOrEmpty(str, nameof(str));
 
             int end = 0;
-            int start = uri.IndexOf('{');
+            int start = str.IndexOf('{');
             if (start != -1)
             {
                 string result = string.Empty;
                 while (start != -1)
                 {
-                    result += uri.Substring(end, start - end);
+                    result += str.Substring(end, start - end);
 
-                    end = uri.IndexOf('}', start);
+                    end = str.IndexOf('}', start);
                     if (end == -1)
                     {
                         throw new Exception();
                     }
 
                     object value = null;
-                    string name = uri.Substring(start + 1, end - start - 1);
+                    string name = str.Substring(start + 1, end - start - 1);
 
                     for (int i = 0; i < names.Length; i++)
                     {
@@ -355,14 +355,14 @@
                         result += value.ToString();
                     }
 
-                    start = uri.IndexOf('{', ++end);
+                    start = str.IndexOf('{', ++end);
                 }
 
-                result += uri.Substring(end);
+                result += str.Substring(end);
                 return result;
             }
 
-            return uri;
+            return str;
         }
 
         /// <summary>
@@ -561,18 +561,30 @@
 
             this.AddMethodHeaders(requestBuilder, method);
 
-            requestBuilder.SetUri(this.ResolveUri(uri, names, inArgs));
+            requestBuilder.SetUri(this.ExpandString(uri, names, inArgs));
 
             Type returnType = method.ReturnType;
-            if (method.GetCustomAttribute<AddAuthorizationHeaderAttribute>() != null ||
-                method.DeclaringType.GetCustomAttribute<AddAuthorizationHeaderAttribute>() != null)
+            var authAttr = method.GetCustomAttribute<AddAuthorizationHeaderAttribute>() ??
+                method.DeclaringType.GetCustomAttribute<AddAuthorizationHeaderAttribute>();
+
+            if (authAttr != null)
             {
-                var authFactory = this.services.GetService<IAuthorizationHeaderFactory>();
-                if (authFactory != null)
+                if (authAttr.HeaderValue != null)
                 {
-                    requestBuilder.AddAuthorizationHeader(
-                        authFactory.GetAuthorizationHeaderScheme(),
-                        authFactory.GetAuthorizationHeaderValue());
+                    requestBuilder.AddHeader(
+                        "Authorization",
+                        this.ExpandString(authAttr.HeaderValue, names, inArgs));
+                }
+                else
+                {
+                    var authFactoryType = authAttr.AuthorizationFactoryType ?? typeof(IAuthorizationHeaderFactory);
+                    var authFactory = this.services.GetService(authFactoryType) as IAuthorizationHeaderFactory;
+                    if (authFactory != null)
+                    {
+                        requestBuilder.AddAuthorizationHeader(
+                            authFactory.GetAuthorizationHeaderScheme(),
+                            authFactory.GetAuthorizationHeaderValue());
+                    }
                 }
             }
 
