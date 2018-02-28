@@ -3,7 +3,7 @@ namespace ContractHttp
     using System;
     using Newtonsoft.Json.Linq;
 
-    [AttributeUsage(AttributeTargets.ReturnValue)]
+    [AttributeUsage(AttributeTargets.ReturnValue | AttributeTargets.Parameter)]
     public class FromJsonAttribute
         : Attribute
     {
@@ -26,7 +26,7 @@ namespace ContractHttp
             if (jobj != null)
             {
                 var token = jobj.SelectToken(this.JsonPath);
-                return token.ToObject(dataType);
+                return token?.ToObject(dataType);
             }
 
             return null;

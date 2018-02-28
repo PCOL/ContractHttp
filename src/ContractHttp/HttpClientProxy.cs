@@ -396,6 +396,7 @@
                 }
             }
 
+            bool formUrlContent = false;
             ParameterInfo[] parms = method.GetParameters();
             string[] names = new string[parms.Length];
 
@@ -417,6 +418,8 @@
                             dataArg = i;
                             dataArgType = parmType;
                         }
+
+                        continue;
                     }
 
                     var attrs = parms[i].GetCustomAttributes();
@@ -437,6 +440,7 @@
                             var formUrlAttr = attrs.OfType<SendAsFormUrlAttribute>().FirstOrDefault();
                             if (formUrlAttr != null)
                             {
+                                formUrlContent = true;
                                 if (typeof(Dictionary<string, string>).IsAssignableFrom(inArgs[i].GetType()) == true)
                                 {
                                     requestBuilder.SetContent(new FormUrlEncodedContent((Dictionary<string, string>)inArgs[i]));
@@ -482,7 +486,8 @@
                         }
                     }
 
-                    if (requestBuilder.IsContentSet == false &&
+                    if (formUrlContent == false &&
+                        requestBuilder.IsContentSet == false &&
                         this.IsModelObject(parms[i].ParameterType) == true)
                     {
                         requestBuilder.SetContent(new StringContent(
@@ -503,7 +508,7 @@
                 type != typeof(string);
         }
 
-        private void AddMethodHeaders(HttpRequestBuilder requestBuilder, MethodInfo method)
+        private void AddMethodHeaders(HttpRequestBuilder requestBuilder, MethodInfo method, string[] names, object[] values)
         {
             var headerAttrs = method
                 .GetCustomAttributes<AddHeaderAttribute>()
@@ -514,7 +519,9 @@
             {
                 foreach (var attr in headerAttrs)
                 {
-                    requestBuilder.AddHeader(attr.Header, attr.Value);
+                    requestBuilder.AddHeader(
+                        attr.Header,
+                        this.ExpandString(attr.Value, names, values));
                 }
             }
         }
@@ -559,7 +566,7 @@
                 out int dataArg,
                 out Type dataArgType);
 
-            this.AddMethodHeaders(requestBuilder, method);
+            this.AddMethodHeaders(requestBuilder, method, names, inArgs);
 
             requestBuilder.SetUri(this.ExpandString(uri, names, inArgs));
 
@@ -605,13 +612,13 @@
 
             Task<HttpResponseMessage> result = client.SendAsync(request);
 
-            var fromJsonAttr = method.ReturnParameter.GetCustomAttribute<FromJsonAttribute>();
-            return this.ProcessResult(result, returnType, fromJsonAttr, inArgs, responseArg, dataArg, dataArgType);
+            return this.ProcessResult(method, result, returnType, inArgs, responseArg, dataArg, dataArgType);
         }
 
         /// <summary>
         /// Processes the result.
         /// </summary>
+        /// <param name="method">The method.</param>
         /// <param name="responseTask">A <see cref="Task"/> of type <see cref="HttpResponseMessage"/>.</param>
         /// <param name="returnType">The return type.</param>
         /// <param name="inArgs">The in arguments.</param>
@@ -620,9 +627,9 @@
         /// <param name="dataArgType">The data argument type.</param>
         /// <returns>The result.</returns>
         private object ProcessResult(
+            MethodInfo method,
             Task<HttpResponseMessage> responseTask,
             Type returnType,
-            FromJsonAttribute fromJsonAttr,
             object[] inArgs,
             int responseArg,
             int dataArg,
@@ -637,6 +644,7 @@
                 if (returnType != typeof(HttpResponseMessage) &&
                     returnType != typeof(void))
                 {
+                    var fromJsonAttr = method.ReturnParameter.GetCustomAttribute<FromJsonAttribute>();
                     if (fromJsonAttr != null)
                     {
                         result = fromJsonAttr.JsonToObject(content, returnType);
@@ -648,7 +656,15 @@
                 }
                 else if (dataArg != -1)
                 {
-                    inArgs[dataArg] = JsonConvert.DeserializeObject(content, dataArgType);
+                    var dataFromJsonAttr = method.GetParameters()[dataArg].GetCustomAttribute<FromJsonAttribute>();
+                    if (dataFromJsonAttr != null)
+                    {
+                        inArgs[dataArg] = dataFromJsonAttr.JsonToObject(content, dataArgType);
+                    }
+                    else
+                    {
+                        inArgs[dataArg] = JsonConvert.DeserializeObject(content, dataArgType);
+                    }
                 }
             }
 
