@@ -9,7 +9,8 @@ namespace ContractHttp
 
         private Func<string> getAuthHeaderValue;
 
-        public AuthorizationHeaderFactory(string scheme, Func<string> getAuthHeaderValue)
+        public AuthorizationHeaderFactory(
+            string scheme, Func<string> getAuthHeaderValue)
         {
             this.scheme = scheme;
             this.getAuthHeaderValue = getAuthHeaderValue;

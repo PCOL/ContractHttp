@@ -70,10 +70,18 @@ namespace ContractHttp
         public static IServiceCollection AddAuthorizationHeaderFactory(
             this IServiceCollection services,
             string scheme,
-            Func<string> getAuthHeaderValue)
+            Func<IServiceProvider, string> getAuthHeaderValue)
         {
-            services.AddSingleton<IAuthorizationHeaderFactory>(
-                new AuthorizationHeaderFactory(scheme, getAuthHeaderValue));
+            services.AddScoped<IAuthorizationHeaderFactory>(
+                sp =>
+                {
+                    return new AuthorizationHeaderFactory(
+                        scheme,
+                        () =>
+                        {
+                            return getAuthHeaderValue?.Invoke(sp);
+                        });
+                });
 
             return services;
         }
