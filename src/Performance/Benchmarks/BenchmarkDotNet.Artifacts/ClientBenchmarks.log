@@ -1,0 +1,780 @@
+// ***** BenchmarkRunner: Start   *****
+// Found benchmarks:
+//   ClientBenchmarks.SimpleGet: DefaultJob
+//   ClientBenchmarks.SimpleGetAsync: DefaultJob
+//   ClientBenchmarks.SimpleGetByName: DefaultJob
+//   ClientBenchmarks.SimpleGetByNameAsync: DefaultJob
+
+// Validating benchmarks:
+Assembly Benchmarks which defines benchmarks references non-optimized ContractHttp
+Assembly Benchmarks which defines benchmarks references non-optimized DynProxy
+Assembly Benchmarks which defines benchmarks is non-optimized
+Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.
+// ***** Building 4 benchmark(s) in Parallel: Start   *****
+// ***** Done, took 00:02:12 (132.47 sec)   *****
+// **************************
+// Benchmark: ClientBenchmarks.SimpleGet: DefaultJob
+// *** Execute ***
+// Launch: 1 / 1
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT
+// GC=Concurrent Workstation
+// Job: DefaultJob
+
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Pilot  1: 16 op, 13311293.00 ns, 831.9558 us/op
+Pilot  2: 32 op, 32586486.00 ns, 1.0183 ms/op
+Pilot  3: 64 op, 55181267.00 ns, 862.2073 us/op
+Pilot  4: 128 op, 128018960.00 ns, 1.0001 ms/op
+Pilot  5: 256 op, 212258780.00 ns, 829.1359 us/op
+Pilot  6: 512 op, 380479447.00 ns, 743.1239 us/op
+Pilot  7: 1024 op, 785950090.00 ns, 767.5294 us/op
+
+IdleWarmup  1: 1024 op, 20352.00 ns, 19.8750 ns/op
+IdleWarmup  2: 1024 op, 5184.00 ns, 5.0625 ns/op
+IdleWarmup  3: 1024 op, 8208.00 ns, 8.0156 ns/op
+IdleWarmup  4: 1024 op, 5340.00 ns, 5.2148 ns/op
+IdleWarmup  5: 1024 op, 5268.00 ns, 5.1445 ns/op
+IdleWarmup  6: 1024 op, 5124.00 ns, 5.0039 ns/op
+IdleWarmup  7: 1024 op, 5436.00 ns, 5.3086 ns/op
+IdleWarmup  8: 1024 op, 5292.00 ns, 5.1680 ns/op
+
+IdleTarget  1: 1024 op, 5148.00 ns, 5.0273 ns/op
+IdleTarget  2: 1024 op, 5520.00 ns, 5.3906 ns/op
+IdleTarget  3: 1024 op, 4992.00 ns, 4.8750 ns/op
+IdleTarget  4: 1024 op, 5100.00 ns, 4.9805 ns/op
+IdleTarget  5: 1024 op, 5088.00 ns, 4.9688 ns/op
+IdleTarget  6: 1024 op, 5160.00 ns, 5.0391 ns/op
+IdleTarget  7: 1024 op, 9012.00 ns, 8.8008 ns/op
+IdleTarget  8: 1024 op, 5136.00 ns, 5.0156 ns/op
+IdleTarget  9: 1024 op, 5052.00 ns, 4.9336 ns/op
+IdleTarget 10: 1024 op, 5436.00 ns, 5.3086 ns/op
+IdleTarget 11: 1024 op, 5208.00 ns, 5.0859 ns/op
+IdleTarget 12: 1024 op, 5220.00 ns, 5.0977 ns/op
+IdleTarget 13: 1024 op, 5052.00 ns, 4.9336 ns/op
+IdleTarget 14: 1024 op, 5184.00 ns, 5.0625 ns/op
+IdleTarget 15: 1024 op, 6109.00 ns, 5.9658 ns/op
+
+MainWarmup  1: 1024 op, 765329360.00 ns, 747.3920 us/op
+MainWarmup  2: 1024 op, 813305590.00 ns, 794.2437 us/op
+MainWarmup  3: 1024 op, 776667562.00 ns, 758.4644 us/op
+MainWarmup  4: 1024 op, 824127012.00 ns, 804.8115 us/op
+MainWarmup  5: 1024 op, 1141514397.00 ns, 1.1148 ms/op
+MainWarmup  6: 1024 op, 1070458143.00 ns, 1.0454 ms/op
+
+// BeforeMainRun
+MainTarget  1: 1024 op, 910180370.00 ns, 888.8480 us/op
+MainTarget  2: 1024 op, 953350065.00 ns, 931.0059 us/op
+MainTarget  3: 1024 op, 1814611506.00 ns, 1.7721 ms/op
+MainTarget  4: 1024 op, 1713879621.00 ns, 1.6737 ms/op
+MainTarget  5: 1024 op, 1472517709.00 ns, 1.4380 ms/op
+MainTarget  6: 1024 op, 970440558.00 ns, 947.6959 us/op
+MainTarget  7: 1024 op, 847416208.00 ns, 827.5549 us/op
+MainTarget  8: 1024 op, 1124721863.00 ns, 1.0984 ms/op
+MainTarget  9: 1024 op, 1387732379.00 ns, 1.3552 ms/op
+MainTarget 10: 1024 op, 1316924980.00 ns, 1.2861 ms/op
+MainTarget 11: 1024 op, 1167295697.00 ns, 1.1399 ms/op
+MainTarget 12: 1024 op, 1478714815.00 ns, 1.4441 ms/op
+MainTarget 13: 1024 op, 1014915278.00 ns, 991.1282 us/op
+MainTarget 14: 1024 op, 887992891.00 ns, 867.1806 us/op
+MainTarget 15: 1024 op, 798124212.00 ns, 779.4182 us/op
+MainTarget 16: 1024 op, 792455502.00 ns, 773.8823 us/op
+MainTarget 17: 1024 op, 881109274.00 ns, 860.4583 us/op
+MainTarget 18: 1024 op, 904807313.00 ns, 883.6009 us/op
+MainTarget 19: 1024 op, 947578931.00 ns, 925.3700 us/op
+MainTarget 20: 1024 op, 958091857.00 ns, 935.6366 us/op
+MainTarget 21: 1024 op, 1147026074.00 ns, 1.1201 ms/op
+MainTarget 22: 1024 op, 934758379.00 ns, 912.8500 us/op
+MainTarget 23: 1024 op, 939952694.00 ns, 917.9226 us/op
+MainTarget 24: 1024 op, 1029536768.00 ns, 1.0054 ms/op
+MainTarget 25: 1024 op, 1329077370.00 ns, 1.2979 ms/op
+MainTarget 26: 1024 op, 1155271416.00 ns, 1.1282 ms/op
+MainTarget 27: 1024 op, 1477503148.00 ns, 1.4429 ms/op
+MainTarget 28: 1024 op, 1502379071.00 ns, 1.4672 ms/op
+MainTarget 29: 1024 op, 1317564459.00 ns, 1.2867 ms/op
+MainTarget 30: 1024 op, 1262528861.00 ns, 1.2329 ms/op
+MainTarget 31: 1024 op, 787435666.00 ns, 768.9801 us/op
+MainTarget 32: 1024 op, 849066880.00 ns, 829.1669 us/op
+MainTarget 33: 1024 op, 788976600.00 ns, 770.4850 us/op
+MainTarget 34: 1024 op, 1144218825.00 ns, 1.1174 ms/op
+MainTarget 35: 1024 op, 1162698729.00 ns, 1.1354 ms/op
+MainTarget 36: 1024 op, 1138839170.00 ns, 1.1121 ms/op
+MainTarget 37: 1024 op, 1126415482.00 ns, 1.1000 ms/op
+MainTarget 38: 1024 op, 806403082.00 ns, 787.5030 us/op
+MainTarget 39: 1024 op, 805344224.00 ns, 786.4690 us/op
+MainTarget 40: 1024 op, 1208533278.00 ns, 1.1802 ms/op
+MainTarget 41: 1024 op, 1079269701.00 ns, 1.0540 ms/op
+MainTarget 42: 1024 op, 1283860855.00 ns, 1.2538 ms/op
+MainTarget 43: 1024 op, 1419498528.00 ns, 1.3862 ms/op
+MainTarget 44: 1024 op, 999048687.00 ns, 975.6335 us/op
+MainTarget 45: 1024 op, 954779503.00 ns, 932.4019 us/op
+MainTarget 46: 1024 op, 1023364042.00 ns, 999.3789 us/op
+MainTarget 47: 1024 op, 1566574290.00 ns, 1.5299 ms/op
+MainTarget 48: 1024 op, 1447901879.00 ns, 1.4140 ms/op
+MainTarget 49: 1024 op, 940216535.00 ns, 918.1802 us/op
+MainTarget 50: 1024 op, 992126741.00 ns, 968.8738 us/op
+MainTarget 51: 1024 op, 1016898408.00 ns, 993.0649 us/op
+MainTarget 52: 1024 op, 811053854.00 ns, 792.0448 us/op
+MainTarget 53: 1024 op, 787327976.00 ns, 768.8750 us/op
+MainTarget 54: 1024 op, 832962631.00 ns, 813.4401 us/op
+MainTarget 55: 1024 op, 774594892.00 ns, 756.4403 us/op
+MainTarget 56: 1024 op, 832591889.00 ns, 813.0780 us/op
+MainTarget 57: 1024 op, 896397819.00 ns, 875.3885 us/op
+MainTarget 58: 1024 op, 858357975.00 ns, 838.2402 us/op
+MainTarget 59: 1024 op, 819266881.00 ns, 800.0653 us/op
+MainTarget 60: 1024 op, 810937802.00 ns, 791.9314 us/op
+MainTarget 61: 1024 op, 816026505.00 ns, 796.9009 us/op
+MainTarget 62: 1024 op, 787134283.00 ns, 768.6858 us/op
+MainTarget 63: 1024 op, 834023899.00 ns, 814.4765 us/op
+MainTarget 64: 1024 op, 781280723.00 ns, 762.9695 us/op
+MainTarget 65: 1024 op, 833403450.00 ns, 813.8706 us/op
+MainTarget 66: 1024 op, 798871091.00 ns, 780.1475 us/op
+MainTarget 67: 1024 op, 813594137.00 ns, 794.5255 us/op
+MainTarget 68: 1024 op, 781162163.00 ns, 762.8537 us/op
+MainTarget 69: 1024 op, 831214251.00 ns, 811.7327 us/op
+MainTarget 70: 1024 op, 788219601.00 ns, 769.7457 us/op
+MainTarget 71: 1024 op, 837402347.00 ns, 817.7757 us/op
+MainTarget 72: 1024 op, 817133757.00 ns, 797.9822 us/op
+MainTarget 73: 1024 op, 771701183.00 ns, 753.6144 us/op
+MainTarget 74: 1024 op, 831969772.00 ns, 812.4705 us/op
+MainTarget 75: 1024 op, 793094582.00 ns, 774.5064 us/op
+MainTarget 76: 1024 op, 813807544.00 ns, 794.7339 us/op
+MainTarget 77: 1024 op, 779838429.00 ns, 761.5610 us/op
+MainTarget 78: 1024 op, 834289266.00 ns, 814.7356 us/op
+MainTarget 79: 1024 op, 773806154.00 ns, 755.6701 us/op
+MainTarget 80: 1024 op, 849096458.00 ns, 829.1958 us/op
+MainTarget 81: 1024 op, 773868169.00 ns, 755.7306 us/op
+MainTarget 82: 1024 op, 783613442.00 ns, 765.2475 us/op
+MainTarget 83: 1024 op, 764519726.00 ns, 746.6013 us/op
+MainTarget 84: 1024 op, 794380732.00 ns, 775.7624 us/op
+MainTarget 85: 1024 op, 818503546.00 ns, 799.3199 us/op
+MainTarget 86: 1024 op, 786015748.00 ns, 767.5935 us/op
+MainTarget 87: 1024 op, 814000588.00 ns, 794.9224 us/op
+MainTarget 88: 1024 op, 783286513.00 ns, 764.9282 us/op
+MainTarget 89: 1024 op, 828708622.00 ns, 809.2858 us/op
+MainTarget 90: 1024 op, 776783597.00 ns, 758.5777 us/op
+MainTarget 91: 1024 op, 835637156.00 ns, 816.0519 us/op
+MainTarget 92: 1024 op, 780017997.00 ns, 761.7363 us/op
+MainTarget 93: 1024 op, 837865342.00 ns, 818.2279 us/op
+MainTarget 94: 1024 op, 774011425.00 ns, 755.8705 us/op
+MainTarget 95: 1024 op, 799462485.00 ns, 780.7251 us/op
+MainTarget 96: 1024 op, 829641852.00 ns, 810.1971 us/op
+MainTarget 97: 1024 op, 773478372.00 ns, 755.3500 us/op
+MainTarget 98: 1024 op, 834264786.00 ns, 814.7117 us/op
+MainTarget 99: 1024 op, 784773014.00 ns, 766.3799 us/op
+MainTarget 100: 1024 op, 826181827.00 ns, 806.8182 us/op
+
+// AfterMainRun
+Result  1: 1024 op, 910174875.53 ns, 888.8427 us/op
+Result  2: 1024 op, 953344570.53 ns, 931.0006 us/op
+Result  3: 1024 op, 970435063.53 ns, 947.6905 us/op
+Result  4: 1024 op, 847410713.53 ns, 827.5495 us/op
+Result  5: 1024 op, 1124716368.53 ns, 1.0984 ms/op
+Result  6: 1024 op, 1387726884.53 ns, 1.3552 ms/op
+Result  7: 1024 op, 1316919485.53 ns, 1.2861 ms/op
+Result  8: 1024 op, 1167290202.53 ns, 1.1399 ms/op
+Result  9: 1024 op, 1014909783.53 ns, 991.1228 us/op
+Result 10: 1024 op, 887987396.53 ns, 867.1752 us/op
+Result 11: 1024 op, 798118717.53 ns, 779.4128 us/op
+Result 12: 1024 op, 792450007.53 ns, 773.8770 us/op
+Result 13: 1024 op, 881103779.53 ns, 860.4529 us/op
+Result 14: 1024 op, 904801818.53 ns, 883.5955 us/op
+Result 15: 1024 op, 947573436.53 ns, 925.3647 us/op
+Result 16: 1024 op, 958086362.53 ns, 935.6312 us/op
+Result 17: 1024 op, 1147020579.53 ns, 1.1201 ms/op
+Result 18: 1024 op, 934752884.53 ns, 912.8446 us/op
+Result 19: 1024 op, 939947199.53 ns, 917.9172 us/op
+Result 20: 1024 op, 1029531273.53 ns, 1.0054 ms/op
+Result 21: 1024 op, 1329071875.53 ns, 1.2979 ms/op
+Result 22: 1024 op, 1155265921.53 ns, 1.1282 ms/op
+Result 23: 1024 op, 1317558964.53 ns, 1.2867 ms/op
+Result 24: 1024 op, 1262523366.53 ns, 1.2329 ms/op
+Result 25: 1024 op, 787430171.53 ns, 768.9748 us/op
+Result 26: 1024 op, 849061385.53 ns, 829.1615 us/op
+Result 27: 1024 op, 788971105.53 ns, 770.4796 us/op
+Result 28: 1024 op, 1144213330.53 ns, 1.1174 ms/op
+Result 29: 1024 op, 1162693234.53 ns, 1.1354 ms/op
+Result 30: 1024 op, 1138833675.53 ns, 1.1121 ms/op
+Result 31: 1024 op, 1126409987.53 ns, 1.1000 ms/op
+Result 32: 1024 op, 806397587.53 ns, 787.4976 us/op
+Result 33: 1024 op, 805338729.53 ns, 786.4636 us/op
+Result 34: 1024 op, 1208527783.53 ns, 1.1802 ms/op
+Result 35: 1024 op, 1079264206.53 ns, 1.0540 ms/op
+Result 36: 1024 op, 1283855360.53 ns, 1.2538 ms/op
+Result 37: 1024 op, 1419493033.53 ns, 1.3862 ms/op
+Result 38: 1024 op, 999043192.53 ns, 975.6281 us/op
+Result 39: 1024 op, 954774008.53 ns, 932.3965 us/op
+Result 40: 1024 op, 1023358547.53 ns, 999.3736 us/op
+Result 41: 1024 op, 940211040.53 ns, 918.1748 us/op
+Result 42: 1024 op, 992121246.53 ns, 968.8684 us/op
+Result 43: 1024 op, 1016892913.53 ns, 993.0595 us/op
+Result 44: 1024 op, 811048359.53 ns, 792.0394 us/op
+Result 45: 1024 op, 787322481.53 ns, 768.8696 us/op
+Result 46: 1024 op, 832957136.53 ns, 813.4347 us/op
+Result 47: 1024 op, 774589397.53 ns, 756.4350 us/op
+Result 48: 1024 op, 832586394.53 ns, 813.0727 us/op
+Result 49: 1024 op, 896392324.53 ns, 875.3831 us/op
+Result 50: 1024 op, 858352480.53 ns, 838.2348 us/op
+Result 51: 1024 op, 819261386.53 ns, 800.0599 us/op
+Result 52: 1024 op, 810932307.53 ns, 791.9261 us/op
+Result 53: 1024 op, 816021010.53 ns, 796.8955 us/op
+Result 54: 1024 op, 787128788.53 ns, 768.6805 us/op
+Result 55: 1024 op, 834018404.53 ns, 814.4711 us/op
+Result 56: 1024 op, 781275228.53 ns, 762.9641 us/op
+Result 57: 1024 op, 833397955.53 ns, 813.8652 us/op
+Result 58: 1024 op, 798865596.53 ns, 780.1422 us/op
+Result 59: 1024 op, 813588642.53 ns, 794.5202 us/op
+Result 60: 1024 op, 781156668.53 ns, 762.8483 us/op
+Result 61: 1024 op, 831208756.53 ns, 811.7273 us/op
+Result 62: 1024 op, 788214106.53 ns, 769.7403 us/op
+Result 63: 1024 op, 837396852.53 ns, 817.7704 us/op
+Result 64: 1024 op, 817128262.53 ns, 797.9768 us/op
+Result 65: 1024 op, 771695688.53 ns, 753.6091 us/op
+Result 66: 1024 op, 831964277.53 ns, 812.4651 us/op
+Result 67: 1024 op, 793089087.53 ns, 774.5011 us/op
+Result 68: 1024 op, 813802049.53 ns, 794.7286 us/op
+Result 69: 1024 op, 779832934.53 ns, 761.5556 us/op
+Result 70: 1024 op, 834283771.53 ns, 814.7302 us/op
+Result 71: 1024 op, 773800659.53 ns, 755.6647 us/op
+Result 72: 1024 op, 849090963.53 ns, 829.1904 us/op
+Result 73: 1024 op, 773862674.53 ns, 755.7253 us/op
+Result 74: 1024 op, 783607947.53 ns, 765.2421 us/op
+Result 75: 1024 op, 764514231.53 ns, 746.5959 us/op
+Result 76: 1024 op, 794375237.53 ns, 775.7571 us/op
+Result 77: 1024 op, 818498051.53 ns, 799.3145 us/op
+Result 78: 1024 op, 786010253.53 ns, 767.5881 us/op
+Result 79: 1024 op, 813995093.53 ns, 794.9171 us/op
+Result 80: 1024 op, 783281018.53 ns, 764.9229 us/op
+Result 81: 1024 op, 828703127.53 ns, 809.2804 us/op
+Result 82: 1024 op, 776778102.53 ns, 758.5724 us/op
+Result 83: 1024 op, 835631661.53 ns, 816.0465 us/op
+Result 84: 1024 op, 780012502.53 ns, 761.7310 us/op
+Result 85: 1024 op, 837859847.53 ns, 818.2225 us/op
+Result 86: 1024 op, 774005930.53 ns, 755.8652 us/op
+Result 87: 1024 op, 799456990.53 ns, 780.7197 us/op
+Result 88: 1024 op, 829636357.53 ns, 810.1918 us/op
+Result 89: 1024 op, 773472877.53 ns, 755.3446 us/op
+Result 90: 1024 op, 834259291.53 ns, 814.7063 us/op
+Result 91: 1024 op, 784767519.53 ns, 766.3745 us/op
+Result 92: 1024 op, 826176332.53 ns, 806.8128 us/op
+GC:  0 0 0 0 0
+
+// AfterAll
+Parse error in the following line:
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+
+Parse error in the following line:
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Mean = 892.6516 us, StdErr = 16.9940 us (1.90%); N = 92, StdDev = 163.0009 us
+Min = 746.5959 us, Q1 = 775.1291 us, Median = 814.1681 us, Q3 = 958.2794 us, Max = 1,386.2237 us
+IQR = 183.1504 us, LowerFence = 500.4035 us, UpperFence = 1,233.0050 us
+ConfidenceInterval = [834.8604 us; 950.4427 us] (CI 99.9%), Margin = 57.7911 us (6.47% of Mean)
+Skewness = 1.37, Kurtosis = 3.84
+
+
+// **************************
+// Benchmark: ClientBenchmarks.SimpleGetAsync: DefaultJob
+// *** Execute ***
+// Launch: 1 / 1
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT
+// GC=Concurrent Workstation
+// Job: DefaultJob
+
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+MethodName: GetAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+MethodName: GetByNameAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Pilot  1: 16 op, 12340984.00 ns, 771.3115 us/op
+Pilot  2: 32 op, 37000571.00 ns, 1.1563 ms/op
+Pilot  3: 64 op, 58394606.00 ns, 912.4157 us/op
+Pilot  4: 128 op, 123554065.00 ns, 965.2661 us/op
+Pilot  5: 256 op, 232524596.00 ns, 908.2992 us/op
+Pilot  6: 512 op, 460742074.00 ns, 899.8869 us/op
+Pilot  7: 1024 op, 962026583.00 ns, 939.4791 us/op
+
+IdleWarmup  1: 1024 op, 19812.00 ns, 19.3477 ns/op
+IdleWarmup  2: 1024 op, 5292.00 ns, 5.1680 ns/op
+IdleWarmup  3: 1024 op, 5256.00 ns, 5.1328 ns/op
+IdleWarmup  4: 1024 op, 5364.00 ns, 5.2383 ns/op
+IdleWarmup  5: 1024 op, 5292.00 ns, 5.1680 ns/op
+IdleWarmup  6: 1024 op, 5340.00 ns, 5.2148 ns/op
+IdleWarmup  7: 1024 op, 5364.00 ns, 5.2383 ns/op
+IdleWarmup  8: 1024 op, 5628.00 ns, 5.4961 ns/op
+IdleWarmup  9: 1024 op, 5556.00 ns, 5.4258 ns/op
+
+IdleTarget  1: 1024 op, 5568.00 ns, 5.4375 ns/op
+IdleTarget  2: 1024 op, 5904.00 ns, 5.7656 ns/op
+IdleTarget  3: 1024 op, 5772.00 ns, 5.6367 ns/op
+IdleTarget  4: 1024 op, 5184.00 ns, 5.0625 ns/op
+IdleTarget  5: 1024 op, 5364.00 ns, 5.2383 ns/op
+IdleTarget  6: 1024 op, 5580.00 ns, 5.4492 ns/op
+IdleTarget  7: 1024 op, 5376.00 ns, 5.2500 ns/op
+IdleTarget  8: 1024 op, 5520.00 ns, 5.3906 ns/op
+IdleTarget  9: 1024 op, 5316.00 ns, 5.1914 ns/op
+IdleTarget 10: 1024 op, 6576.00 ns, 6.4219 ns/op
+IdleTarget 11: 1024 op, 5280.00 ns, 5.1563 ns/op
+IdleTarget 12: 1024 op, 7224.00 ns, 7.0547 ns/op
+IdleTarget 13: 1024 op, 5256.00 ns, 5.1328 ns/op
+IdleTarget 14: 1024 op, 5376.00 ns, 5.2500 ns/op
+IdleTarget 15: 1024 op, 6720.00 ns, 6.5625 ns/op
+IdleTarget 16: 1024 op, 5161.00 ns, 5.0400 ns/op
+IdleTarget 17: 1024 op, 5640.00 ns, 5.5078 ns/op
+
+MainWarmup  1: 1024 op, 943048403.00 ns, 920.9457 us/op
+MainWarmup  2: 1024 op, 912757809.00 ns, 891.3650 us/op
+MainWarmup  3: 1024 op, 930771667.00 ns, 908.9567 us/op
+MainWarmup  4: 1024 op, 971580359.00 ns, 948.8089 us/op
+MainWarmup  5: 1024 op, 911523835.00 ns, 890.1600 us/op
+MainWarmup  6: 1024 op, 944398464.00 ns, 922.2641 us/op
+MainWarmup  7: 1024 op, 924207551.00 ns, 902.5464 us/op
+
+// BeforeMainRun
+MainTarget  1: 1024 op, 936183830.00 ns, 914.2420 us/op
+MainTarget  2: 1024 op, 953332619.00 ns, 930.9889 us/op
+MainTarget  3: 1024 op, 919202644.00 ns, 897.6588 us/op
+MainTarget  4: 1024 op, 926654953.00 ns, 904.9365 us/op
+MainTarget  5: 1024 op, 939673925.00 ns, 917.6503 us/op
+MainTarget  6: 1024 op, 930893886.00 ns, 909.0761 us/op
+MainTarget  7: 1024 op, 937328343.00 ns, 915.3597 us/op
+MainTarget  8: 1024 op, 926031469.00 ns, 904.3276 us/op
+MainTarget  9: 1024 op, 972268499.00 ns, 949.4810 us/op
+MainTarget 10: 1024 op, 962670490.00 ns, 940.1079 us/op
+MainTarget 11: 1024 op, 915414202.00 ns, 893.9592 us/op
+MainTarget 12: 1024 op, 923949057.00 ns, 902.2940 us/op
+MainTarget 13: 1024 op, 946733847.00 ns, 924.5448 us/op
+MainTarget 14: 1024 op, 905228410.00 ns, 884.0121 us/op
+MainTarget 15: 1024 op, 921413118.00 ns, 899.8175 us/op
+MainTarget 16: 1024 op, 945759601.00 ns, 923.5934 us/op
+
+// AfterMainRun
+Result  1: 1024 op, 936178134.88 ns, 914.2365 us/op
+Result  2: 1024 op, 953326923.88 ns, 930.9833 us/op
+Result  3: 1024 op, 919196948.88 ns, 897.6533 us/op
+Result  4: 1024 op, 926649257.88 ns, 904.9309 us/op
+Result  5: 1024 op, 939668229.88 ns, 917.6448 us/op
+Result  6: 1024 op, 930888190.88 ns, 909.0705 us/op
+Result  7: 1024 op, 937322647.88 ns, 915.3541 us/op
+Result  8: 1024 op, 926025773.88 ns, 904.3220 us/op
+Result  9: 1024 op, 972262803.88 ns, 949.4754 us/op
+Result 10: 1024 op, 962664794.88 ns, 940.1023 us/op
+Result 11: 1024 op, 915408506.88 ns, 893.9536 us/op
+Result 12: 1024 op, 923943361.88 ns, 902.2884 us/op
+Result 13: 1024 op, 946728151.88 ns, 924.5392 us/op
+Result 14: 1024 op, 905222714.88 ns, 884.0066 us/op
+Result 15: 1024 op, 921407422.88 ns, 899.8119 us/op
+Result 16: 1024 op, 945753905.88 ns, 923.5878 us/op
+GC:  0 0 0 0 0
+
+// AfterAll
+Parse error in the following line:
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByNameAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+
+Parse error in the following line:
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByNameAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Mean = 913.2475 us, StdErr = 4.3516 us (0.48%); N = 16, StdDev = 17.4064 us
+Min = 884.0066 us, Q1 = 901.0502 us, Median = 911.6535 us, Q3 = 924.0635 us, Max = 949.4754 us
+IQR = 23.0133 us, LowerFence = 866.5302 us, UpperFence = 958.5835 us
+ConfidenceInterval = [895.5245 us; 930.9706 us] (CI 99.9%), Margin = 17.7230 us (1.94% of Mean)
+Skewness = 0.4, Kurtosis = 2.29
+
+
+// **************************
+// Benchmark: ClientBenchmarks.SimpleGetByName: DefaultJob
+// *** Execute ***
+// Launch: 1 / 1
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT
+// GC=Concurrent Workstation
+// Job: DefaultJob
+
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Pilot  1: 16 op, 12637708.00 ns, 789.8568 us/op
+Pilot  2: 32 op, 34686368.00 ns, 1.0839 ms/op
+Pilot  3: 64 op, 63227792.00 ns, 987.9343 us/op
+Pilot  4: 128 op, 122404559.00 ns, 956.2856 us/op
+Pilot  5: 256 op, 206796503.00 ns, 807.7988 us/op
+Pilot  6: 512 op, 463495500.00 ns, 905.2646 us/op
+Pilot  7: 1024 op, 920876081.00 ns, 899.2930 us/op
+
+IdleWarmup  1: 1024 op, 54060.00 ns, 52.7930 ns/op
+IdleWarmup  2: 1024 op, 5640.00 ns, 5.5078 ns/op
+IdleWarmup  3: 1024 op, 5760.00 ns, 5.6250 ns/op
+IdleWarmup  4: 1024 op, 5604.00 ns, 5.4727 ns/op
+IdleWarmup  5: 1024 op, 5808.00 ns, 5.6719 ns/op
+IdleWarmup  6: 1024 op, 5364.00 ns, 5.2383 ns/op
+
+IdleTarget  1: 1024 op, 5400.00 ns, 5.2734 ns/op
+IdleTarget  2: 1024 op, 5508.00 ns, 5.3789 ns/op
+IdleTarget  3: 1024 op, 5328.00 ns, 5.2031 ns/op
+IdleTarget  4: 1024 op, 5232.00 ns, 5.1094 ns/op
+IdleTarget  5: 1024 op, 5556.00 ns, 5.4258 ns/op
+IdleTarget  6: 1024 op, 5580.00 ns, 5.4492 ns/op
+IdleTarget  7: 1024 op, 5124.00 ns, 5.0039 ns/op
+IdleTarget  8: 1024 op, 6168.00 ns, 6.0234 ns/op
+IdleTarget  9: 1024 op, 6324.00 ns, 6.1758 ns/op
+IdleTarget 10: 1024 op, 5364.00 ns, 5.2383 ns/op
+IdleTarget 11: 1024 op, 5376.00 ns, 5.2500 ns/op
+IdleTarget 12: 1024 op, 5316.00 ns, 5.1914 ns/op
+IdleTarget 13: 1024 op, 5280.00 ns, 5.1563 ns/op
+IdleTarget 14: 1024 op, 5580.00 ns, 5.4492 ns/op
+IdleTarget 15: 1024 op, 5364.00 ns, 5.2383 ns/op
+
+MainWarmup  1: 1024 op, 962655586.00 ns, 940.0933 us/op
+MainWarmup  2: 1024 op, 873337372.00 ns, 852.8685 us/op
+MainWarmup  3: 1024 op, 909246721.00 ns, 887.9363 us/op
+MainWarmup  4: 1024 op, 921374117.00 ns, 899.7794 us/op
+MainWarmup  5: 1024 op, 899445913.00 ns, 878.3651 us/op
+MainWarmup  6: 1024 op, 957944584.00 ns, 935.4928 us/op
+MainWarmup  7: 1024 op, 893825406.00 ns, 872.8764 us/op
+
+// BeforeMainRun
+MainTarget  1: 1024 op, 888374279.00 ns, 867.5530 us/op
+MainTarget  2: 1024 op, 931932234.00 ns, 910.0901 us/op
+MainTarget  3: 1024 op, 884618058.00 ns, 863.8848 us/op
+MainTarget  4: 1024 op, 919783455.00 ns, 898.2260 us/op
+MainTarget  5: 1024 op, 894962431.00 ns, 873.9867 us/op
+MainTarget  6: 1024 op, 884016329.00 ns, 863.2972 us/op
+MainTarget  7: 1024 op, 909075661.00 ns, 887.7692 us/op
+MainTarget  8: 1024 op, 869671451.00 ns, 849.2885 us/op
+MainTarget  9: 1024 op, 916026585.00 ns, 894.5572 us/op
+MainTarget 10: 1024 op, 901217523.00 ns, 880.0952 us/op
+MainTarget 11: 1024 op, 876341707.00 ns, 855.8024 us/op
+MainTarget 12: 1024 op, 938524190.00 ns, 916.5275 us/op
+MainTarget 13: 1024 op, 873774399.00 ns, 853.2953 us/op
+MainTarget 14: 1024 op, 903077201.00 ns, 881.9113 us/op
+MainTarget 15: 1024 op, 915974229.00 ns, 894.5061 us/op
+MainTarget 16: 1024 op, 882917319.00 ns, 862.2239 us/op
+MainTarget 17: 1024 op, 962931632.00 ns, 940.3629 us/op
+MainTarget 18: 1024 op, 879502030.00 ns, 858.8887 us/op
+MainTarget 19: 1024 op, 892901032.00 ns, 871.9737 us/op
+MainTarget 20: 1024 op, 943703731.00 ns, 921.5857 us/op
+MainTarget 21: 1024 op, 894693821.00 ns, 873.7244 us/op
+MainTarget 22: 1024 op, 933539071.00 ns, 911.6592 us/op
+MainTarget 23: 1024 op, 876377730.00 ns, 855.8376 us/op
+MainTarget 24: 1024 op, 879113265.00 ns, 858.5090 us/op
+MainTarget 25: 1024 op, 920312233.00 ns, 898.7424 us/op
+MainTarget 26: 1024 op, 885003845.00 ns, 864.2616 us/op
+MainTarget 27: 1024 op, 927100270.00 ns, 905.3714 us/op
+
+// AfterMainRun
+Result  1: 1024 op, 888368779.00 ns, 867.5476 us/op
+Result  2: 1024 op, 931926734.00 ns, 910.0847 us/op
+Result  3: 1024 op, 884612558.00 ns, 863.8795 us/op
+Result  4: 1024 op, 919777955.00 ns, 898.2207 us/op
+Result  5: 1024 op, 894956931.00 ns, 873.9814 us/op
+Result  6: 1024 op, 884010829.00 ns, 863.2918 us/op
+Result  7: 1024 op, 909070161.00 ns, 887.7638 us/op
+Result  8: 1024 op, 869665951.00 ns, 849.2832 us/op
+Result  9: 1024 op, 916021085.00 ns, 894.5518 us/op
+Result 10: 1024 op, 901212023.00 ns, 880.0899 us/op
+Result 11: 1024 op, 876336207.00 ns, 855.7971 us/op
+Result 12: 1024 op, 938518690.00 ns, 916.5222 us/op
+Result 13: 1024 op, 873768899.00 ns, 853.2899 us/op
+Result 14: 1024 op, 903071701.00 ns, 881.9060 us/op
+Result 15: 1024 op, 915968729.00 ns, 894.5007 us/op
+Result 16: 1024 op, 882911819.00 ns, 862.2186 us/op
+Result 17: 1024 op, 962926132.00 ns, 940.3576 us/op
+Result 18: 1024 op, 879496530.00 ns, 858.8833 us/op
+Result 19: 1024 op, 892895532.00 ns, 871.9683 us/op
+Result 20: 1024 op, 943698231.00 ns, 921.5803 us/op
+Result 21: 1024 op, 894688321.00 ns, 873.7191 us/op
+Result 22: 1024 op, 933533571.00 ns, 911.6539 us/op
+Result 23: 1024 op, 876372230.00 ns, 855.8323 us/op
+Result 24: 1024 op, 879107765.00 ns, 858.5037 us/op
+Result 25: 1024 op, 920306733.00 ns, 898.7370 us/op
+Result 26: 1024 op, 884998345.00 ns, 864.2562 us/op
+Result 27: 1024 op, 927094770.00 ns, 905.3660 us/op
+GC:  0 0 0 0 0
+
+// AfterAll
+Parse error in the following line:
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+
+Parse error in the following line:
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Mean = 881.9921 us, StdErr = 4.6915 us (0.53%); N = 27, StdDev = 24.3779 us
+Min = 849.2832 us, Q1 = 862.2186 us, Median = 873.9814 us, Q3 = 898.7370 us, Max = 940.3576 us
+IQR = 36.5185 us, LowerFence = 807.4409 us, UpperFence = 953.5148 us
+ConfidenceInterval = [864.6024 us; 899.3818 us] (CI 99.9%), Margin = 17.3897 us (1.97% of Mean)
+Skewness = 0.58, Kurtosis = 2.23
+
+
+// **************************
+// Benchmark: ClientBenchmarks.SimpleGetByNameAsync: DefaultJob
+// *** Execute ***
+// Launch: 1 / 1
+Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
+// BeforeAnythingElse
+
+// Benchmark Process Environment Information:
+// Runtime=.NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT
+// GC=Concurrent Workstation
+// Job: DefaultJob
+
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+MethodName: GetAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+MethodName: GetByNameAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Pilot  1: 16 op, 15507343.00 ns, 969.2089 us/op
+Pilot  2: 32 op, 37152239.00 ns, 1.1610 ms/op
+Pilot  3: 64 op, 65264111.00 ns, 1.0198 ms/op
+Pilot  4: 128 op, 137809014.00 ns, 1.0766 ms/op
+Pilot  5: 256 op, 273911038.00 ns, 1.0700 ms/op
+Pilot  6: 512 op, 557950643.00 ns, 1.0897 ms/op
+
+IdleWarmup  1: 512 op, 21264.00 ns, 41.5313 ns/op
+IdleWarmup  2: 512 op, 3780.00 ns, 7.3828 ns/op
+IdleWarmup  3: 512 op, 4224.00 ns, 8.2500 ns/op
+IdleWarmup  4: 512 op, 3564.00 ns, 6.9609 ns/op
+IdleWarmup  5: 512 op, 4404.00 ns, 8.6016 ns/op
+IdleWarmup  6: 512 op, 3936.00 ns, 7.6875 ns/op
+
+IdleTarget  1: 512 op, 3732.00 ns, 7.2891 ns/op
+IdleTarget  2: 512 op, 3552.00 ns, 6.9375 ns/op
+IdleTarget  3: 512 op, 3636.00 ns, 7.1016 ns/op
+IdleTarget  4: 512 op, 3420.00 ns, 6.6797 ns/op
+IdleTarget  5: 512 op, 3972.00 ns, 7.7578 ns/op
+IdleTarget  6: 512 op, 7608.00 ns, 14.8594 ns/op
+IdleTarget  7: 512 op, 3576.00 ns, 6.9844 ns/op
+IdleTarget  8: 512 op, 3552.00 ns, 6.9375 ns/op
+IdleTarget  9: 512 op, 4320.00 ns, 8.4375 ns/op
+IdleTarget 10: 512 op, 3780.00 ns, 7.3828 ns/op
+IdleTarget 11: 512 op, 4356.00 ns, 8.5078 ns/op
+IdleTarget 12: 512 op, 3564.00 ns, 6.9609 ns/op
+IdleTarget 13: 512 op, 3492.00 ns, 6.8203 ns/op
+IdleTarget 14: 512 op, 4620.00 ns, 9.0234 ns/op
+IdleTarget 15: 512 op, 3852.00 ns, 7.5234 ns/op
+IdleTarget 16: 512 op, 3720.00 ns, 7.2656 ns/op
+IdleTarget 17: 512 op, 3552.00 ns, 6.9375 ns/op
+IdleTarget 18: 512 op, 3936.00 ns, 7.6875 ns/op
+IdleTarget 19: 512 op, 3696.00 ns, 7.2188 ns/op
+IdleTarget 20: 512 op, 3636.00 ns, 7.1016 ns/op
+
+MainWarmup  1: 512 op, 517612305.00 ns, 1.0110 ms/op
+MainWarmup  2: 512 op, 558517634.00 ns, 1.0909 ms/op
+MainWarmup  3: 512 op, 517389249.00 ns, 1.0105 ms/op
+MainWarmup  4: 512 op, 546622487.00 ns, 1.0676 ms/op
+MainWarmup  5: 512 op, 560874149.00 ns, 1.0955 ms/op
+MainWarmup  6: 512 op, 499252329.00 ns, 975.1022 us/op
+
+// BeforeMainRun
+MainTarget  1: 512 op, 552557490.00 ns, 1.0792 ms/op
+MainTarget  2: 512 op, 551374168.00 ns, 1.0769 ms/op
+MainTarget  3: 512 op, 504856829.00 ns, 986.0485 us/op
+MainTarget  4: 512 op, 549693699.00 ns, 1.0736 ms/op
+MainTarget  5: 512 op, 535987401.00 ns, 1.0469 ms/op
+MainTarget  6: 512 op, 532478573.00 ns, 1.0400 ms/op
+MainTarget  7: 512 op, 557042364.00 ns, 1.0880 ms/op
+MainTarget  8: 512 op, 514591709.00 ns, 1.0051 ms/op
+MainTarget  9: 512 op, 556585871.00 ns, 1.0871 ms/op
+MainTarget 10: 512 op, 567294097.00 ns, 1.1080 ms/op
+MainTarget 11: 512 op, 499516221.00 ns, 975.6176 us/op
+MainTarget 12: 512 op, 551409868.00 ns, 1.0770 ms/op
+MainTarget 13: 512 op, 554152832.00 ns, 1.0823 ms/op
+MainTarget 14: 512 op, 531956187.00 ns, 1.0390 ms/op
+MainTarget 15: 512 op, 554977401.00 ns, 1.0839 ms/op
+MainTarget 16: 512 op, 525680839.00 ns, 1.0267 ms/op
+MainTarget 17: 512 op, 556180355.00 ns, 1.0863 ms/op
+MainTarget 18: 512 op, 576947449.00 ns, 1.1269 ms/op
+MainTarget 19: 512 op, 500194954.00 ns, 976.9433 us/op
+MainTarget 20: 512 op, 560866480.00 ns, 1.0954 ms/op
+MainTarget 21: 512 op, 552340109.00 ns, 1.0788 ms/op
+MainTarget 22: 512 op, 521058877.00 ns, 1.0177 ms/op
+MainTarget 23: 512 op, 548701225.00 ns, 1.0717 ms/op
+MainTarget 24: 512 op, 532959604.00 ns, 1.0409 ms/op
+MainTarget 25: 512 op, 538059023.00 ns, 1.0509 ms/op
+MainTarget 26: 512 op, 557029571.00 ns, 1.0879 ms/op
+MainTarget 27: 512 op, 512382769.00 ns, 1.0007 ms/op
+MainTarget 28: 512 op, 551010675.00 ns, 1.0762 ms/op
+MainTarget 29: 512 op, 562296594.00 ns, 1.0982 ms/op
+MainTarget 30: 512 op, 510317675.00 ns, 996.7142 us/op
+MainTarget 31: 512 op, 551148016.00 ns, 1.0765 ms/op
+MainTarget 32: 512 op, 552270689.00 ns, 1.0787 ms/op
+MainTarget 33: 512 op, 528063358.00 ns, 1.0314 ms/op
+MainTarget 34: 512 op, 559292006.00 ns, 1.0924 ms/op
+MainTarget 35: 512 op, 510444959.00 ns, 996.9628 us/op
+MainTarget 36: 512 op, 550305495.00 ns, 1.0748 ms/op
+MainTarget 37: 512 op, 576282072.00 ns, 1.1256 ms/op
+MainTarget 38: 512 op, 516127722.00 ns, 1.0081 ms/op
+MainTarget 39: 512 op, 540534014.00 ns, 1.0557 ms/op
+MainTarget 40: 512 op, 559174718.00 ns, 1.0921 ms/op
+MainTarget 41: 512 op, 530574481.00 ns, 1.0363 ms/op
+MainTarget 42: 512 op, 555001616.00 ns, 1.0840 ms/op
+MainTarget 43: 512 op, 526507927.00 ns, 1.0283 ms/op
+MainTarget 44: 512 op, 546607521.00 ns, 1.0676 ms/op
+
+// AfterMainRun
+Result  1: 512 op, 552553511.40 ns, 1.0792 ms/op
+Result  2: 512 op, 551370189.40 ns, 1.0769 ms/op
+Result  3: 512 op, 504852850.40 ns, 986.0407 us/op
+Result  4: 512 op, 549689720.40 ns, 1.0736 ms/op
+Result  5: 512 op, 535983422.40 ns, 1.0468 ms/op
+Result  6: 512 op, 532474594.40 ns, 1.0400 ms/op
+Result  7: 512 op, 557038385.40 ns, 1.0880 ms/op
+Result  8: 512 op, 514587730.40 ns, 1.0051 ms/op
+Result  9: 512 op, 556581892.40 ns, 1.0871 ms/op
+Result 10: 512 op, 567290118.40 ns, 1.1080 ms/op
+Result 11: 512 op, 499512242.40 ns, 975.6098 us/op
+Result 12: 512 op, 551405889.40 ns, 1.0770 ms/op
+Result 13: 512 op, 554148853.40 ns, 1.0823 ms/op
+Result 14: 512 op, 531952208.40 ns, 1.0390 ms/op
+Result 15: 512 op, 554973422.40 ns, 1.0839 ms/op
+Result 16: 512 op, 525676860.40 ns, 1.0267 ms/op
+Result 17: 512 op, 556176376.40 ns, 1.0863 ms/op
+Result 18: 512 op, 576943470.40 ns, 1.1268 ms/op
+Result 19: 512 op, 500190975.40 ns, 976.9355 us/op
+Result 20: 512 op, 560862501.40 ns, 1.0954 ms/op
+Result 21: 512 op, 552336130.40 ns, 1.0788 ms/op
+Result 22: 512 op, 521054898.40 ns, 1.0177 ms/op
+Result 23: 512 op, 548697246.40 ns, 1.0717 ms/op
+Result 24: 512 op, 532955625.40 ns, 1.0409 ms/op
+Result 25: 512 op, 538055044.40 ns, 1.0509 ms/op
+Result 26: 512 op, 557025592.40 ns, 1.0879 ms/op
+Result 27: 512 op, 512378790.40 ns, 1.0007 ms/op
+Result 28: 512 op, 551006696.40 ns, 1.0762 ms/op
+Result 29: 512 op, 562292615.40 ns, 1.0982 ms/op
+Result 30: 512 op, 510313696.40 ns, 996.7064 us/op
+Result 31: 512 op, 551144037.40 ns, 1.0765 ms/op
+Result 32: 512 op, 552266710.40 ns, 1.0786 ms/op
+Result 33: 512 op, 528059379.40 ns, 1.0314 ms/op
+Result 34: 512 op, 559288027.40 ns, 1.0924 ms/op
+Result 35: 512 op, 510440980.40 ns, 996.9550 us/op
+Result 36: 512 op, 550301516.40 ns, 1.0748 ms/op
+Result 37: 512 op, 576278093.40 ns, 1.1255 ms/op
+Result 38: 512 op, 516123743.40 ns, 1.0081 ms/op
+Result 39: 512 op, 540530035.40 ns, 1.0557 ms/op
+Result 40: 512 op, 559170739.40 ns, 1.0921 ms/op
+Result 41: 512 op, 530570502.40 ns, 1.0363 ms/op
+Result 42: 512 op, 554997637.40 ns, 1.0840 ms/op
+Result 43: 512 op, 526503948.40 ns, 1.0283 ms/op
+Result 44: 512 op, 546603542.40 ns, 1.0676 ms/op
+GC:  0 0 0 0 0
+
+// AfterAll
+Parse error in the following line:
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByNameAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+
+Parse error in the following line:
+MethodName: Get, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByName, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Parse error in the following line:
+MethodName: GetByNameAsync, Declaring Type: Benchmarks.Contracts.IClientBenchmarks
+Mean = 1.0575 ms, StdErr = 0.0059 ms (0.56%); N = 44, StdDev = 0.0393 ms
+Min = 0.9756 ms, Q1 = 1.0298 ms, Median = 1.0742 ms, Q3 = 1.0851 ms, Max = 1.1268 ms
+IQR = 0.0553 ms, LowerFence = 0.9469 ms, UpperFence = 1.1681 ms
+ConfidenceInterval = [1.0365 ms; 1.0784 ms] (CI 99.9%), Margin = 0.0209 ms (1.98% of Mean)
+Skewness = -0.48, Kurtosis = 2.23
+
+
+// ***** BenchmarkRunner: Finish  *****
+
+// * Export *
+  BenchmarkDotNet.Artifacts/results/Benchmarks.ClientBenchmarks-report.csv
+  BenchmarkDotNet.Artifacts/results/Benchmarks.ClientBenchmarks-report-github.md
+  BenchmarkDotNet.Artifacts/results/Benchmarks.ClientBenchmarks-report.html
+
+// * Detailed results *
+ClientBenchmarks.SimpleGet: DefaultJob
+Runtime = .NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT; GC = Concurrent Workstation
+Mean = 892.6516 us, StdErr = 16.9940 us (1.90%); N = 92, StdDev = 163.0009 us
+Min = 746.5959 us, Q1 = 775.1291 us, Median = 814.1681 us, Q3 = 958.2794 us, Max = 1,386.2237 us
+IQR = 183.1504 us, LowerFence = 500.4035 us, UpperFence = 1,233.0050 us
+ConfidenceInterval = [834.8604 us; 950.4427 us] (CI 99.9%), Margin = 57.7911 us (6.47% of Mean)
+Skewness = 1.37, Kurtosis = 3.84
+
+
+ClientBenchmarks.SimpleGetAsync: DefaultJob
+Runtime = .NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT; GC = Concurrent Workstation
+Mean = 913.2475 us, StdErr = 4.3516 us (0.48%); N = 16, StdDev = 17.4064 us
+Min = 884.0066 us, Q1 = 901.0502 us, Median = 911.6535 us, Q3 = 924.0635 us, Max = 949.4754 us
+IQR = 23.0133 us, LowerFence = 866.5302 us, UpperFence = 958.5835 us
+ConfidenceInterval = [895.5245 us; 930.9706 us] (CI 99.9%), Margin = 17.7230 us (1.94% of Mean)
+Skewness = 0.4, Kurtosis = 2.29
+
+
+ClientBenchmarks.SimpleGetByName: DefaultJob
+Runtime = .NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT; GC = Concurrent Workstation
+Mean = 881.9921 us, StdErr = 4.6915 us (0.53%); N = 27, StdDev = 24.3779 us
+Min = 849.2832 us, Q1 = 862.2186 us, Median = 873.9814 us, Q3 = 898.7370 us, Max = 940.3576 us
+IQR = 36.5185 us, LowerFence = 807.4409 us, UpperFence = 953.5148 us
+ConfidenceInterval = [864.6024 us; 899.3818 us] (CI 99.9%), Margin = 17.3897 us (1.97% of Mean)
+Skewness = 0.58, Kurtosis = 2.23
+
+
+ClientBenchmarks.SimpleGetByNameAsync: DefaultJob
+Runtime = .NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT; GC = Concurrent Workstation
+Mean = 1.0575 ms, StdErr = 0.0059 ms (0.56%); N = 44, StdDev = 0.0393 ms
+Min = 0.9756 ms, Q1 = 1.0298 ms, Median = 1.0742 ms, Q3 = 1.0851 ms, Max = 1.1268 ms
+IQR = 0.0553 ms, LowerFence = 0.9469 ms, UpperFence = 1.1681 ms
+ConfidenceInterval = [1.0365 ms; 1.0784 ms] (CI 99.9%), Margin = 0.0209 ms (1.98% of Mean)
+Skewness = -0.48, Kurtosis = 2.23
+
+
+Total time: 00:05:43 (343.15 sec)
+
+// * Summary *
+
+BenchmarkDotNet=v0.10.12, OS=galliumos 2.1
+Intel Celeron CPU N2840 2.16GHz, 1 CPU, 2 logical cores and 2 physical cores
+.NET Core SDK=2.0.0
+  [Host]     : .NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT DEBUG
+  DefaultJob : .NET Core 2.0.0 (Framework 4.6.00001.0), 64bit RyuJIT
+
+
+               Method |       Mean |    Error |    StdDev |     Median |
+--------------------- |-----------:|---------:|----------:|-----------:|
+            SimpleGet |   892.7 us | 57.79 us | 163.00 us |   814.2 us |
+       SimpleGetAsync |   913.2 us | 17.72 us |  17.41 us |   911.7 us |
+      SimpleGetByName |   882.0 us | 17.39 us |  24.38 us |   874.0 us |
+ SimpleGetByNameAsync | 1,057.5 us | 20.93 us |  39.31 us | 1,074.2 us |
+
+// * Legends *
+  Mean   : Arithmetic mean of all measurements
+  Error  : Half of 99.9% confidence interval
+  StdDev : Standard deviation of all measurements
+  Median : Value separating the higher half of all measurements (50th percentile)
+  1 us   : 1 Microsecond (0.000001 sec)
+
+// ***** BenchmarkRunner: End *****
+// * Artifacts cleanup *

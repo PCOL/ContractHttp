@@ -1,10 +1,10 @@
 namespace ContractHttpTests.Resources
 {
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Http;
-    using ContractHttpTests.Resources.Models;
     using System;
     using System.Collections.Generic;
+    using ContractHttpTests.Resources.Models;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Http;
 
     [Route("api/test")]
     public class TestController
