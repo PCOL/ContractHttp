@@ -9,24 +9,57 @@ namespace ContractHttp
     using Microsoft.AspNetCore.Mvc;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Represents a request call context.
+    /// </summary>
     internal class HttpRequestContext
     {
-        private MethodInfo methodInfo;
+        /// <summary>
+        /// A reference to the method.
+        /// </summary>
+        private readonly MethodInfo methodInfo;
 
-        private object[] arguments;
+        /// <summary>
+        /// A reference to the methods arguments.
+        /// </summary>
+        private readonly object[] arguments;
 
-        private string contentType;
+        /// <summary>
+        /// A reference to the requests content type.
+        /// </summary>
+        private readonly string contentType;
 
+        /// <summary>
+        /// The index of the response argument.
+        /// </summary>
         private int responseArg = -1;
 
+        /// <summary>
+        /// The index of the data argument.
+        /// </summary>
         private int dataArg = -1;
 
+        /// <summary>
+        /// The data argument type.
+        /// </summary>
         private Type dataArgType;
 
-        private int requestActionArg = -1;
+        /// <summary>
+        /// The request action.
+        /// </summary>
+        private Action<HttpRequestMessage> requestAction;
 
-        private int responseActionArg = -1;
+        /// <summary>
+        /// The response action.
+        /// </summary>
+        private Action<HttpResponseMessage> responseAction;
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="HttpRequestContext"/> class.
+        /// </summary>
+        /// <param name="methodInfo">The methods <see cref="MethodInfo"/>.</param>
+        /// <param name="arguments">The methods arguments.</param>
+        /// <param name="contentType">The content type.</param>
         public HttpRequestContext(MethodInfo methodInfo, object[] arguments, string contentType)
         {
             this.methodInfo = methodInfo;
@@ -37,21 +70,11 @@ namespace ContractHttp
         /// <summary>
         /// Checks the arguments for specific ones.
         /// </summary>
-        /// <param name="method">The method info.</param>
-        /// <param name="contentArg">The index of the content argument, or -1 if one is not found.</param>
-        /// <param name="responseArg">The index of the response argument, or -1 if one is not found.</param>
-        /// <param name="dataArg">The index of the data argument, or -1 if one is not found.</param>
-        /// <param name="dataArgType">The <see cref="Type"/> of the data argment, or null if one is not found.</param>
-        /// <returns>A array of argument names.</returns>
+        /// <param name="requestBuilder">A request builder.</param>
+        /// <returns>An array of argument names.</returns>
         public string[] CheckArgsAndBuildRequest(
             HttpRequestBuilder requestBuilder)
         {
-            this.responseArg = -1;
-            this.dataArg = -1;
-            this.dataArgType = null;
-            this.requestActionArg = -1;
-            this.responseActionArg = -1;
-
             var formUrlAttrs = this.methodInfo.GetCustomAttributes<AddFormUrlEncodedPropertyAttribute>();
             if (formUrlAttrs.Any() == true)
             {
@@ -89,13 +112,13 @@ namespace ContractHttp
 
                     if (parms[i].ParameterType == typeof(Action<HttpRequestMessage>))
                     {
-                        requestActionArg = i;
+                        this.requestAction = (Action<HttpRequestMessage>)this.arguments[i];
                         continue;
                     }
 
                     if (parms[i].ParameterType == typeof(Action<HttpRequestMessage>))
                     {
-                        responseActionArg = i;
+                        responseAction = (Action<HttpResponseMessage>)this.arguments[i];
                         continue;
                     }
 
@@ -178,6 +201,11 @@ namespace ContractHttp
             return names;
         }
 
+        /// <summary>
+        /// Checks if the type is a model object.
+        /// </summary>
+        /// <param name="type">The type</param>
+        /// <returns>True if the type is a model object; otherwise false.</returns>
         private bool IsModelObject(Type type)
         {
             return type.IsPrimitive == false &&
@@ -210,17 +238,12 @@ namespace ContractHttp
         /// <param name="method">The method.</param>
         /// <param name="response">A <see cref="HttpResponseMessage"/>.</param>
         /// <param name="returnType">The return type.</param>
-        /// <param name="inArgs">The in arguments.</param>
-        /// <param name="responseArg">The response argument index.</param>
-        /// <param name="dataArg">The data argument index.</param>
-        /// <param name="dataArgType">The data argument type.</param>
         /// <returns>The result.</returns>
         public object ProcessResult(
             HttpResponseMessage response,
             Type returnType)
         {
             object result = null;
-Console.WriteLine("Return Type: {0}", returnType);
             string content = response.Content.ReadAsStringAsync().Result;
             if (content.IsNullOrEmpty() == false)
             {
@@ -237,7 +260,8 @@ Console.WriteLine("Return Type: {0}", returnType);
                         result = JsonConvert.DeserializeObject(content, returnType);
                     }
                 }
-                else if (dataArg != -1)
+
+                if (this.dataArg != -1)
                 {
                     var dataFromJsonAttr = this.methodInfo.GetParameters()[this.dataArg].GetCustomAttribute<FromJsonAttribute>();
                     if (dataFromJsonAttr != null)
@@ -270,20 +294,22 @@ Console.WriteLine("Return Type: {0}", returnType);
             return result;
         }
 
+        /// <summary>
+        /// Invokes the request action if it has been defined.
+        /// </summary>
+        /// <param name="request">A <see cref="HttpRequestMessage"/>.</param>
         public void InvokeRequestAction(HttpRequestMessage request)
         {
-            if (this.requestActionArg != -1)
-            {
-                ((Action<HttpRequestMessage>)this.arguments[requestActionArg])?.Invoke(request);
-            }
+            this.requestAction?.Invoke(request);
         }
 
+        /// <summary>
+        /// Invokes the response action if it has been defined.
+        /// </summary>
+        /// <param name="response">A <see cref="HttpResponseMessage"/>.</param>
         public void InvokeResponseAction(HttpResponseMessage response)
         {
-            if (this.responseActionArg != -1)
-            {
-                ((Action<HttpResponseMessage>)this.arguments[responseActionArg])?.Invoke(response);
-            }
+            this.responseAction?.Invoke(response);
         }
     }
 }
