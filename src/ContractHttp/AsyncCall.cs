@@ -19,19 +19,19 @@ namespace ContractHttp
         private readonly HttpClient httpClient;
 
         /// <summary>
-        /// A reterence to the <see cref="MethodInfo"/>
+        /// A reterence to the <see cref="HttpRequestContext"/>
         /// </summary>
-        private readonly MethodInfo methodInfo;
+        private readonly HttpRequestContext httpContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AsyncCall{T}"/> class.
         /// </summary>
         /// <param name="httpClient">The <see cref="HttpClient"/> to use.</param>
-        /// <param name="methodInfo">A <see cref="MethodInfo"/></param>
-        public AsyncCall(HttpClient httpClient, MethodInfo methodInfo)
+        /// <param name="httpContext">A <see cref="HttpRequestContext"/></param>
+        public AsyncCall(HttpClient httpClient, HttpRequestContext httpContext)
         {
             this.httpClient = httpClient;
-            this.methodInfo = methodInfo;
+            this.httpContext = httpContext;
         }
 
         /// <summary>
@@ -41,54 +41,22 @@ namespace ContractHttp
         /// <returns>A <see cref="Task"/>.</returns>
         public Task<T> SendAsync(HttpRequestMessage request)
         {
-            Type dataType = typeof(T);
-            Task<HttpResponseMessage> task = this.httpClient.SendAsync(request);
-            if (dataType == typeof(HttpResponseMessage))
-            {
-                return (Task<T>)(object)task;
-            }
-
-            return task.ContinueWith<T>(
-                (t) =>
-                {
-                    if (t.IsFaulted == true)
+            return this.httpClient
+                .SendAsync(request)
+                .ContinueWith<T>(
+                    (t) =>
                     {
-                        throw t.Exception;
-                    }
-
-                    HttpResponseMessage response = ((Task<HttpResponseMessage>)t).Result;
-
-                    if (dataType != typeof(HttpResponseMessage))
-                    {
-                        response.EnsureSuccessStatusCode();
-                    }
-
-                    T result = default(T);
-                    if (dataType != typeof(void))
-                    {
-                        string content = response.Content.ReadAsStringAsync().Result;
-
-                        var fromJsonAttr = this.methodInfo.ReturnParameter.GetCustomAttribute<FromJsonAttribute>();
-                        if (fromJsonAttr != null)
+                        if (t.IsFaulted == true)
                         {
-                            result = (T) (object)fromJsonAttr.JsonToObject(content, dataType);
+                            throw t.Exception;
                         }
-                        else
-                        {
-                            if (dataType == typeof(string))
-                            {
-                                return (T)(object)content;
-                            }
 
-                            if (content.IsNullOrEmpty() == false)
-                            {
-                                result = JsonConvert.DeserializeObject<T>(content);
-                            }
-                        }
-                    }
+                        HttpResponseMessage response = ((Task<HttpResponseMessage>)t).Result;
 
-                    return result;
-                });
+                        this.httpContext.InvokeResponseAction(response);
+
+                        return (T) this.httpContext.ProcessResult(response, typeof(T));
+                    });
         }
     }
 }

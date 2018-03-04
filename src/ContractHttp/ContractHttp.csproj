@@ -70,5 +70,6 @@
     <Content Include="AddFormUrlEncodedPropertyAttribute.cs" />
     <Content Include="HttpRequestBuilder.cs" />
     <Content Include="FromJsonAttribute.cs" />
+    <Content Include="HttpRequestContext.cs" />
   </ItemGroup>
 </Project>

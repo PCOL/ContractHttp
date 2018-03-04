@@ -365,149 +365,6 @@
             return str;
         }
 
-        /// <summary>
-        /// Checks the arguments for specific ones.
-        /// </summary>
-        /// <param name="method">The method info.</param>
-        /// <param name="contentArg">The index of the content argument, or -1 if one is not found.</param>
-        /// <param name="responseArg">The index of the response argument, or -1 if one is not found.</param>
-        /// <param name="dataArg">The index of the data argument, or -1 if one is not found.</param>
-        /// <param name="dataArgType">The <see cref="Type"/> of the data argment, or null if one is not found.</param>
-        /// <returns>A array of argument names.</returns>
-        private string[] CheckArgsAndBuildRequest(
-            HttpRequestBuilder requestBuilder,
-            string contentType,
-            MethodInfo method,
-            object[] inArgs,
-            out int responseArg,
-            out int dataArg,
-            out Type dataArgType)
-        {
-            responseArg = -1;
-            dataArg = -1;
-            dataArgType = null;
-
-            var formUrlAttrs = method.GetCustomAttributes<AddFormUrlEncodedPropertyAttribute>();
-            if (formUrlAttrs.Any() == true)
-            {
-                foreach (var attr in formUrlAttrs)
-                {
-                    requestBuilder.AddFormUrlProperty(attr.Key, attr.Value);
-                }
-            }
-
-            bool formUrlContent = false;
-            ParameterInfo[] parms = method.GetParameters();
-            string[] names = new string[parms.Length];
-
-            if (parms != null)
-            {
-                for (int i = 0; i < parms.Length; i++)
-                {
-                    names[i] = parms[i].Name;
-
-                    if (parms[i].IsOut == true)
-                    {
-                        Type parmType = parms[i].ParameterType.GetElementType();
-                        if (parmType == typeof(HttpResponseMessage))
-                        {
-                            responseArg = i;
-                        }
-                        else
-                        {
-                            dataArg = i;
-                            dataArgType = parmType;
-                        }
-
-                        continue;
-                    }
-
-                    var attrs = parms[i].GetCustomAttributes();
-                    if (attrs != null &&
-                        attrs.Any() == true &&
-                        inArgs[i] != null)
-                    {
-                        if (requestBuilder.IsContentSet == false)
-                        {
-                            if (this.HasAttribute(attrs, typeof(SendAsContentAttribute), typeof(FromBodyAttribute)) == true)
-                            {
-                                requestBuilder.SetContent(new StringContent(
-                                    JsonConvert.SerializeObject(inArgs[i]),
-                                    Encoding.UTF8,
-                                    contentType));
-                            }
-
-                            var formUrlAttr = attrs.OfType<SendAsFormUrlAttribute>().FirstOrDefault();
-                            if (formUrlAttr != null)
-                            {
-                                formUrlContent = true;
-                                if (typeof(Dictionary<string, string>).IsAssignableFrom(inArgs[i].GetType()) == true)
-                                {
-                                    requestBuilder.SetContent(new FormUrlEncodedContent((Dictionary<string, string>)inArgs[i]));
-                                }
-                                else if (typeof(Dictionary<string, object>).IsAssignableFrom(inArgs[i].GetType()) == true)
-                                {
-                                    var list = ((Dictionary<string, object>)inArgs[i]).Select(kvp => new KeyValuePair<string, string>(kvp.Key, kvp.Value?.ToString()));
-                                    requestBuilder.SetContent(new FormUrlEncodedContent(list));
-                                }
-                                else if (this.IsModelObject(parms[i].ParameterType) == true)
-                                {
-                                    var list = new Dictionary<string, string>();
-                                    var properties = inArgs[i].GetType().GetProperties();
-                                    foreach (var property in properties)
-                                    {
-                                        list.Add(property.Name, property.GetValue(inArgs[i])?.ToString());
-                                    }
-
-                                    requestBuilder.SetContent(new FormUrlEncodedContent(list));
-                                }
-                                else
-                                {
-                                    requestBuilder.AddFormUrlProperty(formUrlAttr.Name ?? parms[i].Name, inArgs[i].ToString());
-                                }
-                            }
-                        }
-
-                        foreach (var query in attrs.OfType<SendAsQueryAttribute>().Select(a => a.Name))
-                        {
-                            requestBuilder.AddQueryString(query, inArgs[i].ToString());
-                        }
-
-                        foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
-                        {
-                            if (string.IsNullOrEmpty(attr.Format) == false)
-                            {
-                                requestBuilder.AddHeader(attr.Name, string.Format(attr.Format, inArgs[i].ToString()));
-                            }
-                            else
-                            {
-                                requestBuilder.AddHeader(attr.Name, inArgs[i].ToString());
-                            }
-                        }
-                    }
-
-                    if (formUrlContent == false &&
-                        requestBuilder.IsContentSet == false &&
-                        this.IsModelObject(parms[i].ParameterType) == true)
-                    {
-                        requestBuilder.SetContent(new StringContent(
-                            JsonConvert.SerializeObject(inArgs[i]),
-                            Encoding.UTF8,
-                            contentType));
-                    }
-                }
-            }
-
-            return names;
-        }
-
-        private bool IsModelObject(Type type)
-        {
-            return type.IsPrimitive == false &&
-                type.IsClass == true &&
-                type != typeof(string);
-        }
-
         private void AddMethodHeaders(HttpRequestBuilder requestBuilder, MethodInfo method, string[] names, object[] values)
         {
             var headerAttrs = method
@@ -554,17 +411,12 @@
             object[] inArgs,
             string contentType)
         {
+            var httpContext = new HttpRequestContext(method, inArgs, contentType);
+
             var requestBuilder = new HttpRequestBuilder()
                 .SetMethod(httpMethod);
 
-            var names = this.CheckArgsAndBuildRequest(
-                requestBuilder,
-                contentType,
-                method,
-                inArgs,
-                out int responseArg,
-                out int dataArg,
-                out Type dataArgType);
+            var names = httpContext.CheckArgsAndBuildRequest(requestBuilder);
 
             this.AddMethodHeaders(requestBuilder, method, names, inArgs);
 
@@ -596,95 +448,25 @@
             }
 
             var request = requestBuilder.Build();
+
+            httpContext.InvokeRequestAction(request);
+
             if (this.IsAsync(returnType) == true)
             {
                 var genericReturnTypes = returnType.GetGenericArguments();
-                if (genericReturnTypes[0] == typeof(HttpResponseMessage))
-                {
-                    return client.SendAsync(request);
-                }
-
                 Type asyncType = typeof(AsyncCall<>).MakeGenericType(genericReturnTypes[0]);
-                object obj = Activator.CreateInstance(asyncType, client, method);
+                object obj = Activator.CreateInstance(asyncType, client, httpContext);
                 var mi = asyncType.GetMethod("SendAsync", new Type[] { typeof(HttpRequestMessage) });
                 return mi.Invoke(obj, new object[] { request });
             }
 
-            Task<HttpResponseMessage> result = client.SendAsync(request);
+            HttpResponseMessage response = client.SendAsync(request).Result;
 
-            return this.ProcessResult(method, result, returnType, inArgs, responseArg, dataArg, dataArgType);
-        }
+            httpContext.InvokeResponseAction(response);
 
-        /// <summary>
-        /// Processes the result.
-        /// </summary>
-        /// <param name="method">The method.</param>
-        /// <param name="responseTask">A <see cref="Task"/> of type <see cref="HttpResponseMessage"/>.</param>
-        /// <param name="returnType">The return type.</param>
-        /// <param name="inArgs">The in arguments.</param>
-        /// <param name="responseArg">The response argument index.</param>
-        /// <param name="dataArg">The data argument index.</param>
-        /// <param name="dataArgType">The data argument type.</param>
-        /// <returns>The result.</returns>
-        private object ProcessResult(
-            MethodInfo method,
-            Task<HttpResponseMessage> responseTask,
-            Type returnType,
-            object[] inArgs,
-            int responseArg,
-            int dataArg,
-            Type dataArgType)
-        {
-            HttpResponseMessage response = responseTask.Result;
-            object result = null;
-
-            string content = response.Content.ReadAsStringAsync().Result;
-            if (content.IsNullOrEmpty() == false)
-            {
-                if (returnType != typeof(HttpResponseMessage) &&
-                    returnType != typeof(void))
-                {
-                    var fromJsonAttr = method.ReturnParameter.GetCustomAttribute<FromJsonAttribute>();
-                    if (fromJsonAttr != null)
-                    {
-                        result = fromJsonAttr.JsonToObject(content, returnType);
-                    }
-                    else
-                    {
-                        result = JsonConvert.DeserializeObject(content, returnType);
-                    }
-                }
-                else if (dataArg != -1)
-                {
-                    var dataFromJsonAttr = method.GetParameters()[dataArg].GetCustomAttribute<FromJsonAttribute>();
-                    if (dataFromJsonAttr != null)
-                    {
-                        inArgs[dataArg] = dataFromJsonAttr.JsonToObject(content, dataArgType);
-                    }
-                    else
-                    {
-                        inArgs[dataArg] = JsonConvert.DeserializeObject(content, dataArgType);
-                    }
-                }
-            }
-
-            if (responseArg == -1 &&
-                returnType != typeof(HttpResponseMessage))
-            {
-                response.EnsureSuccessStatusCode();
-            }
-
-            if (responseArg != -1)
-            {
-                inArgs[responseArg] = response;
-            }
-
-            if (returnType == typeof(HttpResponseMessage))
-            {
-                return response;
-            }
-
-            return result;
+            return httpContext.ProcessResult(
+                response,
+                returnType);
         }
 
         /// <summary>
