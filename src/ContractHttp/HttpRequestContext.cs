@@ -7,8 +7,7 @@ namespace ContractHttp
     using System.Reflection;
     using System.Text;
     using Microsoft.AspNetCore.Mvc;
-    using Newtonsoft.Json;
-
+    
     /// <summary>
     /// Represents a request call context.
     /// </summary>
@@ -25,9 +24,9 @@ namespace ContractHttp
         private readonly object[] arguments;
 
         /// <summary>
-        /// A reference to the requests content type.
+        /// A reference to the object serializer.
         /// </summary>
-        private readonly string contentType;
+        private readonly IObjectSerializer serializer;
 
         /// <summary>
         /// The index of the response argument.
@@ -59,12 +58,12 @@ namespace ContractHttp
         /// </summary>
         /// <param name="methodInfo">The methods <see cref="MethodInfo"/>.</param>
         /// <param name="arguments">The methods arguments.</param>
-        /// <param name="contentType">The content type.</param>
-        public HttpRequestContext(MethodInfo methodInfo, object[] arguments, string contentType)
+        /// <param name="serializer">The object serializer.</param>
+        public HttpRequestContext(MethodInfo methodInfo, object[] arguments, IObjectSerializer serializer)
         {
             this.methodInfo = methodInfo;
             this.arguments = arguments;
-            this.contentType = contentType;
+            this.serializer = serializer;
         }
 
         /// <summary>
@@ -132,9 +131,9 @@ namespace ContractHttp
                             if (this.HasAttribute(attrs, typeof(SendAsContentAttribute), typeof(FromBodyAttribute)) == true)
                             {
                                 requestBuilder.SetContent(new StringContent(
-                                    JsonConvert.SerializeObject(this.arguments[i]),
+                                    this.serializer.SerializeObject(this.arguments[i]),
                                     Encoding.UTF8,
-                                    contentType));
+                                    this.serializer.ContentType));
                             }
 
                             var formUrlAttr = attrs.OfType<SendAsFormUrlAttribute>().FirstOrDefault();
@@ -191,9 +190,9 @@ namespace ContractHttp
                         this.IsModelObject(parms[i].ParameterType) == true)
                     {
                         requestBuilder.SetContent(new StringContent(
-                            JsonConvert.SerializeObject(this.arguments[i]),
+                            this.serializer.SerializeObject(this.arguments[i]),
                             Encoding.UTF8,
-                            contentType));
+                            this.serializer.ContentType));
                     }
                 }
             }
@@ -257,7 +256,7 @@ namespace ContractHttp
                     }
                     else
                     {
-                        result = JsonConvert.DeserializeObject(content, returnType);
+                        result = this.serializer.DeserializeObject(content, returnType);
                     }
                 }
 
@@ -270,7 +269,7 @@ namespace ContractHttp
                     }
                     else
                     {
-                        this.arguments[dataArg] = JsonConvert.DeserializeObject(content, this.dataArgType);
+                        this.arguments[dataArg] = this.serializer.DeserializeObject(content, this.dataArgType);
                     }
                 }
             }

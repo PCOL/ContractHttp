@@ -23,82 +23,29 @@
         : Proxy<T>
     {
         /// <summary>
-        /// A reference to the services.
-        /// </summary>
-        private readonly IServiceProvider services;
-
-        /// <summary>
         /// The base uri.
         /// </summary>
         private string baseUri;
-
-        /// <summary>
-        /// The default timeout value.
-        /// </summary>
-        private TimeSpan timeout;
 
         /// <summary>
         /// The types client contract attribute.
         /// </summary>
         private HttpClientContractAttribute clientContractAttribute;
 
-        /// <summary>
-        /// The <see cref="HttpClient"/> to use.
-        /// </summary>
-        private HttpClient httpClient;
+        private HttpClientProxyOptions options;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClientProxy{T}"/> class.
         /// </summary>
         /// <param name="baseUri">The base uri.</param>
-        /// <param name="serviceProvider">The current dependency injection scope.</param>
-        public HttpClientProxy(string baseUri, IServiceProvider serviceProvider = null)
-            : this(baseUri, TimeSpan.FromMinutes(1), serviceProvider)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HttpClientProxy{T}"/> class.
-        /// </summary>
-        /// <param name="baseUri">The base uri.</param>
-        /// <param name="timeout">The default timeout value.</param>
-        /// <param name="serviceProvider">The current dependency injection scope.</param>
-        public HttpClientProxy(string baseUri, TimeSpan timeout, IServiceProvider serviceProvider = null)
+        /// <param name="options">Client proxy options.</param>
+        public HttpClientProxy(string baseUri, HttpClientProxyOptions options = null)
         {
             this.ThrowIfNotInterface(typeof(T), "T");
             Utility.ThrowIfArgumentNullOrEmpty(baseUri, nameof(baseUri));
 
             this.baseUri = baseUri;
-            this.timeout = timeout;
-            this.services = serviceProvider;
-
-            this.CheckContractAttribute();
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HttpClientProxy{T}"/> class.
-        /// </summary>
-        /// <param name="baseUri">The base uri.</param>
-        /// <param name="httpClient">The <see cref="HttpClient"/> to use.</param>
-        public HttpClientProxy(string baseUri, HttpClient httpClient = null)
-            : this(baseUri, TimeSpan.FromMinutes(1), httpClient)
-        {
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HttpClientProxy{T}"/> class.
-        /// </summary>
-        /// <param name="baseUri">The base uri.</param>
-        /// <param name="timeout">The default timeout value.</param>
-        /// <param name="httpClient">The <see cref="HttpClient"/> to use.</param>
-        public HttpClientProxy(string baseUri, TimeSpan timeout, HttpClient httpClient = null)
-        {
-            this.ThrowIfNotInterface(typeof(T), "T");
-            Utility.ThrowIfArgumentNullOrEmpty(baseUri, nameof(baseUri));
-
-            this.baseUri = baseUri;
-            this.timeout = timeout;
-            this.httpClient = httpClient;
+            this.options = options ?? new HttpClientProxyOptions();
 
             this.CheckContractAttribute();
         }
@@ -113,7 +60,7 @@
             {
                 if (this.clientContractAttribute.Timeout.HasValue == true)
                 {
-                    this.timeout = this.clientContractAttribute.Timeout.Value;
+                    this.options.Timeout = this.clientContractAttribute.Timeout.Value;
                 }
 
                 if (this.baseUri != null &&
@@ -184,7 +131,7 @@
             string localBaseUri = this.GetBaseUri();
             string uri = localBaseUri;
             string contentType = "application/json";
-            TimeSpan timeout = this.timeout;
+            TimeSpan? timeout = this.options.Timeout;
 
             // Gets the http call contract attribute from the method.
             var attr = method.GetCustomAttribute<HttpCallContractAttribute>(false);
@@ -208,7 +155,7 @@
                 uri = this.CombineUri(localBaseUri, route);
             }
 
-            var client = this.GetHttpClient();
+            var client = this.options.GetHttpClient();
             //client.Timeout = timeout;
 
             return this.BuildAndSendRequest(client, method, httpMethod, uri, arguments, contentType);
@@ -411,7 +358,13 @@
             object[] inArgs,
             string contentType)
         {
-            var httpContext = new HttpRequestContext(method, inArgs, contentType);
+            var serializer = this.options.GetObjectSerializer(contentType);
+            if (serializer == null)
+            {
+                throw new NotSupportedException($"Serializer for {contentType} not found");
+            }
+
+            var httpContext = new HttpRequestContext(method, inArgs, serializer);
 
             var requestBuilder = new HttpRequestBuilder()
                 .SetMethod(httpMethod);
@@ -437,7 +390,7 @@
                 else
                 {
                     var authFactoryType = authAttr.AuthorizationFactoryType ?? typeof(IAuthorizationHeaderFactory);
-                    var authFactory = this.services.GetService(authFactoryType) as IAuthorizationHeaderFactory;
+                    var authFactory = this.options.Services?.GetService(authFactoryType) as IAuthorizationHeaderFactory;
                     if (authFactory != null)
                     {
                         requestBuilder.AddAuthorizationHeader(
@@ -467,39 +420,6 @@
             return httpContext.ProcessResult(
                 response,
                 returnType);
-        }
-
-        /// <summary>
-        /// Gets a <see cref="HttpClient"/> instance.
-        /// </summary>
-        /// <returns>An <see cref="HttpClient"/> instance.</returns>
-        private HttpClient GetHttpClient()
-        {
-            if (this.httpClient != null)
-            {
-                return this.httpClient;
-            }
-
-            // Can we get a client?
-            var httpClient = this.services.GetService<HttpClient>();
-            if (httpClient != null)
-            {
-                return httpClient;
-            }
-
-            // Can we get a client factory?
-            var httpClientFactory = this.services.GetService<IHttpClientFactory>();
-            if (httpClientFactory != null)
-            {
-                httpClient = httpClientFactory.CreateClient();
-                if (httpClient != null)
-                {
-                    return httpClient;
-                }
-            }
-
-            // Create a client.
-            return new HttpClient();
         }
 
         /// <summary>

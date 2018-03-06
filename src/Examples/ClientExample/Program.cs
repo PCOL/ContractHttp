@@ -36,6 +36,7 @@
                 .ConfigureServices(
                     services =>
                     {
+                        services.AddJsonObjectSerializer();
                         services.AddHttpClient(new HttpClient());
                         services.AddHttpClientProxy<ICustomerClient>(url);
                     })

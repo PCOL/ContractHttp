@@ -35,7 +35,10 @@ namespace ContractHttpTests
             var httpClient = testServer.CreateClient();
             var testServiceProxy = new HttpClientProxy<ITestService>(
                 "http://localhost",
-                httpClient);
+                new HttpClientProxyOptions()
+                {
+                    HttpClient = httpClient
+                });
 
             this.testService = testServiceProxy.GetProxyObject();
         }
@@ -53,7 +56,7 @@ namespace ContractHttpTests
         [ExpectedException(typeof(ArgumentNullException))]
         public void CreateProxy_WithNullBaseUri_Throws()
         {
-            new HttpClientProxy<ITestService>(null, (HttpClient)null);
+            new HttpClientProxy<ITestService>(null, null);
         }
 
         [TestMethod]

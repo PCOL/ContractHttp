@@ -35,7 +35,11 @@ namespace ContractHttpTests
 
             var testServiceUsingMvcProxy = new HttpClientProxy<ITestServiceUsingMvcAttributes>(
                 "http://localhost",
-                httpClient);
+                new HttpClientProxyOptions()
+                {
+                    HttpClient = httpClient
+                });
+
 
             this.testService = testServiceUsingMvcProxy.GetProxyObject();
         }

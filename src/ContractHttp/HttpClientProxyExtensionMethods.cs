@@ -59,7 +59,10 @@ namespace ContractHttp
                 {
                     var proxy = new HttpClientProxy<T>(
                         baseUri,
-                        sp);
+                        new HttpClientProxyOptions()
+                        {
+                            Services = sp
+                        });
 
                     return proxy.GetProxyObject();
                 });
@@ -67,6 +70,13 @@ namespace ContractHttp
             return services;
         }
 
+        /// <summary>
+        /// Adds an authorization header factory.
+        /// </summary>
+        /// <param name="services">A <see cref="IServiceCollection"/> instance.</param>
+        /// <param name="scheme">The Authorization header scheme.</param>
+        /// <param name="getAuthHeaderValue">A function to get the authorization header value.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
         public static IServiceCollection AddAuthorizationHeaderFactory(
             this IServiceCollection services,
             string scheme,

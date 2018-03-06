@@ -26,7 +26,12 @@ namespace Benchmarks
                 });
 
             var httpClient = testServer.CreateClient();
-            this.benchmarkClient = new HttpClientProxy<IClientBenchmarks>("http://localhost", httpClient).GetProxyObject();
+            this.benchmarkClient = new HttpClientProxy<IClientBenchmarks>(
+                "http://localhost",
+                new HttpClientProxyOptions()
+                {
+                    HttpClient = httpClient
+                }).GetProxyObject();
         }
 
         [GlobalCleanup]
