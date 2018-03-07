@@ -2,10 +2,12 @@ namespace ContractHttp
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Net.Http;
     using System.Reflection;
     using System.Text;
+    using System.Threading;
     using Microsoft.AspNetCore.Mvc;
     
     /// <summary>
@@ -53,6 +55,8 @@ namespace ContractHttp
         /// </summary>
         private Action<HttpResponseMessage> responseAction;
 
+        private Dictionary<int, string> fromHeaders;
+
         /// <summary>
         /// Initialises a new instance of the <see cref="HttpRequestContext"/> class.
         /// </summary>
@@ -65,6 +69,11 @@ namespace ContractHttp
             this.arguments = arguments;
             this.serializer = serializer;
         }
+
+        /// <summary>
+        /// Gets or sets the cancellation token.
+        /// </summary>
+        public CancellationToken CancellationToken { get; set; }
 
         /// <summary>
         /// Checks the arguments for specific ones.
@@ -95,6 +104,14 @@ namespace ContractHttp
 
                     if (parms[i].IsOut == true)
                     {
+                        var fromHeader = parms[i].GetCustomAttribute<FromHeaderAttribute>();
+                        if (fromHeader != null)
+                        {
+                            this.fromHeaders = this.fromHeaders ?? new Dictionary<int, string>();
+                            this.fromHeaders.Add(i, fromHeader.Name);
+                            continue;
+                        }
+
                         Type parmType = parms[i].ParameterType.GetElementType();
                         if (parmType == typeof(HttpResponseMessage))
                         {
@@ -119,6 +136,11 @@ namespace ContractHttp
                     {
                         responseAction = (Action<HttpResponseMessage>)this.arguments[i];
                         continue;
+                    }
+
+                    if (parms[i].ParameterType == typeof(CancellationToken))
+                    {
+                        this.CancellationToken = (CancellationToken)this.arguments[i];
                     }
 
                     var attrs = parms[i].GetCustomAttributes();
@@ -167,9 +189,32 @@ namespace ContractHttp
                             }
                         }
 
-                        foreach (var query in attrs.OfType<SendAsQueryAttribute>().Select(a => a.Name))
+                        foreach (var query in attrs.OfType<SendAsQueryAttribute>())
                         {
-                            requestBuilder.AddQueryString(query, this.arguments[i].ToString());
+                            var name = query.Name.IsNullOrEmpty() == false ? query.Name : parms[i].Name;
+                            var value = this.arguments[i].ToString();
+                            if (query.Format.IsNullOrEmpty() == false)
+                            {
+                                if (parms[i].ParameterType == typeof(short))
+                                {
+                                    value = ((short)this.arguments[i]).ToString(query.Format);
+                                }
+                                else if (parms[i].ParameterType == typeof(int))
+                                {
+                                    value = ((int)this.arguments[i]).ToString(query.Format);
+                                }
+                                else if (parms[i].ParameterType == typeof(long))
+                                {
+                                    value = ((long)this.arguments[i]).ToString(query.Format);
+                                }
+                            }
+
+                            if (query.Base64 == true)
+                            {
+                                value = Convert.ToBase64String(query.Encoding.GetBytes(value));
+                            }
+
+                            requestBuilder.AddQueryString(name, value);
                         }
 
                         foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
@@ -283,6 +328,17 @@ namespace ContractHttp
             if (this.responseArg != -1)
             {
                 this.arguments[this.responseArg] = response;
+            }
+
+            if (this.fromHeaders != null)
+            {
+                foreach (var item in this.fromHeaders)
+                {
+                    if (response.Headers.TryGetValues(item.Value, out IEnumerable<string> values) == true)
+                    {
+                        this.arguments[item.Key] = values.FirstOrDefault();
+                    }
+                }
             }
 
             if (returnType == typeof(HttpResponseMessage))

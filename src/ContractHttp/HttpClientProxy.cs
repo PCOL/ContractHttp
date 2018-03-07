@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Net.Http;
     using System.Net.Http.Headers;
@@ -404,16 +405,27 @@
 
             httpContext.InvokeRequestAction(request);
 
+            HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead;
+            if (returnType == typeof(HttpResponseMessage) ||
+                returnType == typeof(Task<HttpResponseMessage>) ||
+                returnType == typeof(Task<Stream>))
+            {
+                completionOption = HttpCompletionOption.ResponseHeadersRead;
+            }
+
             if (this.IsAsync(returnType) == true)
             {
                 var genericReturnTypes = returnType.GetGenericArguments();
                 Type asyncType = typeof(AsyncCall<>).MakeGenericType(genericReturnTypes[0]);
                 object obj = Activator.CreateInstance(asyncType, client, httpContext);
-                var mi = asyncType.GetMethod("SendAsync", new Type[] { typeof(HttpRequestMessage) });
-                return mi.Invoke(obj, new object[] { request });
+                var mi = asyncType.GetMethod("SendAsync", new Type[] { typeof(HttpRequestMessage), typeof(HttpCompletionOption) });
+                return mi.Invoke(obj, new object[] { request, completionOption });
             }
 
-            HttpResponseMessage response = client.SendAsync(request).Result;
+            HttpResponseMessage response = client.SendAsync(
+                request,
+                completionOption,
+                httpContext.CancellationToken).Result;
 
             httpContext.InvokeResponseAction(response);
 

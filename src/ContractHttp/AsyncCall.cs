@@ -1,6 +1,7 @@
 namespace ContractHttp
 {
     using System;
+    using System.IO;
     using System.Net.Http;
     using System.Reflection;
     using System.Threading.Tasks;
@@ -38,12 +39,24 @@ namespace ContractHttp
         /// Sends a request.
         /// </summary>
         /// <param name="request">The request to send.</param>
+        /// <param name="completionOption">The completion option.</param>
         /// <returns>A <see cref="Task"/>.</returns>
-        public Task<T> SendAsync(HttpRequestMessage request)
+        public Task<T> SendAsync(HttpRequestMessage request, HttpCompletionOption completionOption)
         {
-            return this.httpClient
-                .SendAsync(request)
-                .ContinueWith<T>(
+            var dataType = typeof(T);
+            var task = this.httpClient
+                .SendAsync(request, completionOption, httpContext.CancellationToken);
+
+            if (dataType == typeof(Stream))
+            {
+                var response = task.Result;
+                response.EnsureSuccessStatusCode();
+
+                var result = response.Content.ReadAsStreamAsync();
+                return (Task<T>)(object)result;
+            }
+
+            return task.ContinueWith<T>(
                     (t) =>
                     {
                         if (t.IsFaulted == true)
