@@ -6,25 +6,48 @@ namespace ContractHttp
 
     public class HttpClientProxyOptions
     {
+        /// <summary>
+        /// Initialises a new instance of the <see cref="HttpClientProxyOptions"/> class.
+        /// </summary>
         public HttpClientProxyOptions()
         {
             this.ObjectSerializer = new JsonObjectSerializer();
         }
 
+        /// <summary>
+        /// Gets or sets the object serializer.
+        /// </summary>
         public IObjectSerializer ObjectSerializer { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="HttpClient"/>.
+        /// </summary>
         public HttpClient HttpClient { get; set; }
 
+        /// <summary>
+        /// Gets or sets the <see cref="IServiceProvider"/>
+        /// </summary>
         public IServiceProvider Services { get; set; }
 
+        /// <summary>
+        /// Gets or sets the timeout value.
+        /// </summary>
         public TimeSpan? Timeout { get; set; }
 
+        /// <summary>
+        /// Gets or sets the authorization scheme.
+        /// </summary>
         public string AuthorzationScheme { get; set; }
 
+        /// <summary>
+        /// Gets or sets the authorization value.
+        /// </summary>
         public Func<IServiceProvider, string> GetAuthorzationValue { get; set; }
 
+        /// <summary>
+        /// Gets or sets the function to get a correlation id.
+        /// </summary>
         public Func<IServiceProvider, string> GetCorrelationId { get; set; }
-
 
         /// <summary>
         /// Gets a <see cref="HttpClient"/> instance.
@@ -62,8 +85,8 @@ namespace ContractHttp
         /// <summary>
         /// Gets the object serializer.
         /// </summary>
-        /// <param name="contentType"></param>
-        /// <returns></returns>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>The object serializer.</returns>
         internal IObjectSerializer GetObjectSerializer(string contentType)
         {
             var serializerFactory = this.Services?.GetService<Func<string, IObjectSerializer>>();

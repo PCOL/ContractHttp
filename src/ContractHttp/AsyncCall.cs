@@ -41,35 +41,25 @@ namespace ContractHttp
         /// <param name="request">The request to send.</param>
         /// <param name="completionOption">The completion option.</param>
         /// <returns>A <see cref="Task"/>.</returns>
-        public Task<T> SendAsync(HttpRequestMessage request, HttpCompletionOption completionOption)
+        public async Task<T> SendAsync(HttpRequestMessage request, HttpCompletionOption completionOption)
         {
             var dataType = typeof(T);
-            var task = this.httpClient
+            var response = await this.httpClient
                 .SendAsync(request, completionOption, httpContext.CancellationToken);
 
             if (dataType == typeof(Stream))
             {
-                var response = task.Result;
                 response.EnsureSuccessStatusCode();
 
-                var result = response.Content.ReadAsStreamAsync();
-                return (Task<T>)(object)result;
+                var result = await response.Content.ReadAsStreamAsync();
+                return (T)(object)result;
             }
 
-            return task.ContinueWith<T>(
-                    (t) =>
-                    {
-                        if (t.IsFaulted == true)
-                        {
-                            throw t.Exception;
-                        }
+            this.httpContext.InvokeResponseAction(response);
 
-                        HttpResponseMessage response = ((Task<HttpResponseMessage>)t).Result;
+            var content = await response.Content.ReadAsStringAsync();
 
-                        this.httpContext.InvokeResponseAction(response);
-
-                        return (T) this.httpContext.ProcessResult(response, typeof(T));
-                    });
+            return (T) this.httpContext.ProcessResult(response, content, typeof(T));
         }
     }
 }

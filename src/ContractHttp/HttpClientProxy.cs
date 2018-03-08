@@ -159,7 +159,20 @@
             var client = this.options.GetHttpClient();
             //client.Timeout = timeout;
 
-            return this.BuildAndSendRequest(client, method, httpMethod, uri, arguments, contentType);
+            try
+            {
+                return this.BuildAndSendRequestAsync(
+                    client,
+                    method,
+                    httpMethod,
+                    uri,
+                    arguments,
+                    contentType).Result;
+            }
+            catch (AggregateException ex)
+            {
+                throw ex.Flatten().InnerException;
+            }
         }
 
         /// <summary>
@@ -313,7 +326,18 @@
             return str;
         }
 
-        private void AddMethodHeaders(HttpRequestBuilder requestBuilder, MethodInfo method, string[] names, object[] values)
+        /// <summary>
+        /// Adds the method headers to a <see cref="RequestBuilder"/>.
+        /// </summary>
+        /// <param name="requestBuilder">THe <see cref=""/>RequestBuilder.</param>
+        /// <param name="method">The <see cref="MethodInfo"/>.</param>
+        /// <param name="names">An array of names.</param>
+        /// <param name="values">An array of values.</param>
+        private void AddMethodHeaders(
+            HttpRequestBuilder requestBuilder,
+            MethodInfo method,
+            string[] names,
+            object[] values)
         {
             var headerAttrs = method
                 .GetCustomAttributes<AddHeaderAttribute>()
@@ -351,7 +375,7 @@
         /// <param name="inArgs">The method calls arguments.</param>
         /// <param name="contentType">The content type.</param>
         /// <returns>The result of the request.</returns>
-        private object BuildAndSendRequest(
+        private async Task<object> BuildAndSendRequestAsync(
             HttpClient client,
             MethodInfo method,
             HttpMethod httpMethod,
@@ -422,15 +446,22 @@
                 return mi.Invoke(obj, new object[] { request, completionOption });
             }
 
-            HttpResponseMessage response = client.SendAsync(
+            HttpResponseMessage response = await client.SendAsync(
                 request,
                 completionOption,
-                httpContext.CancellationToken).Result;
+                httpContext.CancellationToken);
 
             httpContext.InvokeResponseAction(response);
 
+            string content = null;
+            if (httpContext.IsContentExpected == true)
+            {
+                content = await response.Content.ReadAsStringAsync();
+            }
+
             return httpContext.ProcessResult(
                 response,
+                content,
                 returnType);
         }
 

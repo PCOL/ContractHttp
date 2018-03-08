@@ -75,5 +75,6 @@
     <Content Include="JsonObjectSerializer.cs" />
     <Content Include="SerializationExtensionMethods.cs" />
     <Content Include="HttpClientProxyOptions.cs" />
+    <Content Include="FromModelAttribute.cs" />
   </ItemGroup>
 </Project>

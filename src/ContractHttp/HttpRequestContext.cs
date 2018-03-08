@@ -55,6 +55,9 @@ namespace ContractHttp
         /// </summary>
         private Action<HttpResponseMessage> responseAction;
 
+        /// <summary>
+        /// A dictionary of from headers.
+        /// </summary>
         private Dictionary<int, string> fromHeaders;
 
         /// <summary>
@@ -74,6 +77,19 @@ namespace ContractHttp
         /// Gets or sets the cancellation token.
         /// </summary>
         public CancellationToken CancellationToken { get; set; }
+
+        /// <summary>
+        /// Gets a value indicating whether or not content is expected.
+        /// </summary>
+        public bool IsContentExpected
+        {
+            get
+            {
+                return (this.methodInfo.ReturnType != typeof(HttpResponseMessage) &&
+                    this.methodInfo.ReturnType != typeof(void)) ||
+                    this.dataArg != -1;
+            }
+        }
 
         /// <summary>
         /// Checks the arguments for specific ones.
@@ -101,6 +117,7 @@ namespace ContractHttp
                 for (int i = 0; i < parms.Length; i++)
                 {
                     names[i] = parms[i].Name;
+                    Type parmType = parms[i].ParameterType;
 
                     if (parms[i].IsOut == true)
                     {
@@ -109,11 +126,10 @@ namespace ContractHttp
                         {
                             this.fromHeaders = this.fromHeaders ?? new Dictionary<int, string>();
                             this.fromHeaders.Add(i, fromHeader.Name);
-                            continue;
                         }
 
-                        Type parmType = parms[i].ParameterType.GetElementType();
-                        if (parmType == typeof(HttpResponseMessage))
+                        var elemParmType = parms[i].ParameterType.GetElementType();
+                        if (elemParmType == typeof(HttpResponseMessage))
                         {
                             responseArg = i;
                         }
@@ -126,19 +142,19 @@ namespace ContractHttp
                         continue;
                     }
 
-                    if (parms[i].ParameterType == typeof(Action<HttpRequestMessage>))
+                    if (parmType == typeof(Action<HttpRequestMessage>))
                     {
                         this.requestAction = (Action<HttpRequestMessage>)this.arguments[i];
                         continue;
                     }
 
-                    if (parms[i].ParameterType == typeof(Action<HttpRequestMessage>))
+                    if (parmType == typeof(Action<HttpRequestMessage>))
                     {
                         responseAction = (Action<HttpResponseMessage>)this.arguments[i];
                         continue;
                     }
 
-                    if (parms[i].ParameterType == typeof(CancellationToken))
+                    if (parmType == typeof(CancellationToken))
                     {
                         this.CancellationToken = (CancellationToken)this.arguments[i];
                     }
@@ -162,29 +178,34 @@ namespace ContractHttp
                             if (formUrlAttr != null)
                             {
                                 formUrlContent = true;
-                                if (typeof(Dictionary<string, string>).IsAssignableFrom(this.arguments[i].GetType()) == true)
+                                var argType = this.arguments[i].GetType();
+                                if (typeof(Dictionary<string, string>).IsAssignableFrom(argType) == true)
                                 {
                                     requestBuilder.SetContent(new FormUrlEncodedContent((Dictionary<string, string>)this.arguments[i]));
                                 }
-                                else if (typeof(Dictionary<string, object>).IsAssignableFrom(this.arguments[i].GetType()) == true)
+                                else if (typeof(Dictionary<string, object>).IsAssignableFrom(argType) == true)
                                 {
                                     var list = ((Dictionary<string, object>)this.arguments[i]).Select(kvp => new KeyValuePair<string, string>(kvp.Key, kvp.Value?.ToString()));
                                     requestBuilder.SetContent(new FormUrlEncodedContent(list));
                                 }
-                                else if (this.IsModelObject(parms[i].ParameterType) == true)
+                                else if (this.IsModelObject(parmType) == true)
                                 {
                                     var list = new Dictionary<string, string>();
                                     var properties = this.arguments[i].GetType().GetProperties();
                                     foreach (var property in properties)
                                     {
-                                        list.Add(property.Name, property.GetValue(this.arguments[i])?.ToString());
+                                        list.Add(
+                                            property.Name,
+                                            property.GetValue(this.arguments[i])?.ToString());
                                     }
 
                                     requestBuilder.SetContent(new FormUrlEncodedContent(list));
                                 }
                                 else
                                 {
-                                    requestBuilder.AddFormUrlProperty(formUrlAttr.Name ?? parms[i].Name, this.arguments[i].ToString());
+                                    requestBuilder.AddFormUrlProperty(
+                                        formUrlAttr.Name ?? parms[i].Name,
+                                        this.arguments[i].ToString());
                                 }
                             }
                         }
@@ -195,15 +216,15 @@ namespace ContractHttp
                             var value = this.arguments[i].ToString();
                             if (query.Format.IsNullOrEmpty() == false)
                             {
-                                if (parms[i].ParameterType == typeof(short))
+                                if (parmType == typeof(short))
                                 {
                                     value = ((short)this.arguments[i]).ToString(query.Format);
                                 }
-                                else if (parms[i].ParameterType == typeof(int))
+                                else if (parmType == typeof(int))
                                 {
                                     value = ((int)this.arguments[i]).ToString(query.Format);
                                 }
-                                else if (parms[i].ParameterType == typeof(long))
+                                else if (parmType == typeof(long))
                                 {
                                     value = ((long)this.arguments[i]).ToString(query.Format);
                                 }
@@ -221,11 +242,15 @@ namespace ContractHttp
                         {
                             if (string.IsNullOrEmpty(attr.Format) == false)
                             {
-                                requestBuilder.AddHeader(attr.Name, string.Format(attr.Format, this.arguments[i].ToString()));
+                                requestBuilder.AddHeader(
+                                    attr.Name,
+                                    string.Format(attr.Format, this.arguments[i].ToString()));
                             }
                             else
                             {
-                                requestBuilder.AddHeader(attr.Name, this.arguments[i].ToString());
+                                requestBuilder.AddHeader(
+                                    attr.Name,
+                                    this.arguments[i].ToString());
                             }
                         }
                     }
@@ -279,43 +304,33 @@ namespace ContractHttp
         /// <summary>
         /// Processes the result.
         /// </summary>
-        /// <param name="method">The method.</param>
         /// <param name="response">A <see cref="HttpResponseMessage"/>.</param>
         /// <param name="returnType">The return type.</param>
         /// <returns>The result.</returns>
         public object ProcessResult(
             HttpResponseMessage response,
+            string content,
             Type returnType)
         {
             object result = null;
-            string content = response.Content.ReadAsStringAsync().Result;
+            // string content = response.Content.ReadAsStringAsync().Result;
             if (content.IsNullOrEmpty() == false)
             {
                 if (returnType != typeof(HttpResponseMessage) &&
                     returnType != typeof(void))
                 {
-                    var fromJsonAttr = this.methodInfo.ReturnParameter.GetCustomAttribute<FromJsonAttribute>();
-                    if (fromJsonAttr != null)
-                    {
-                        result = fromJsonAttr.JsonToObject(content, returnType);
-                    }
-                    else
-                    {
-                        result = this.serializer.DeserializeObject(content, returnType);
-                    }
+                    result = this.DeserialiseObject(
+                        content,
+                        returnType,
+                        this.methodInfo.ReturnParameter);
                 }
 
                 if (this.dataArg != -1)
                 {
-                    var dataFromJsonAttr = this.methodInfo.GetParameters()[this.dataArg].GetCustomAttribute<FromJsonAttribute>();
-                    if (dataFromJsonAttr != null)
-                    {
-                        this.arguments[dataArg] = dataFromJsonAttr.JsonToObject(content, this.dataArgType);
-                    }
-                    else
-                    {
-                        this.arguments[dataArg] = this.serializer.DeserializeObject(content, this.dataArgType);
-                    }
+                    this.arguments[this.dataArg] = this.DeserialiseObject(
+                        content,
+                        this.dataArgType,
+                        this.methodInfo.GetParameters()[this.dataArg]);
                 }
             }
 
@@ -347,6 +362,35 @@ namespace ContractHttp
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Deserializes an object.
+        /// </summary>
+        /// <param name="content">The request content.</param>
+        /// <param name="dataType">The return data type.</param>
+        /// <param name="parameterInfo">The parameter that the content is to returned via.</param>
+        /// <returns></returns>
+        private object DeserialiseObject(string content, Type dataType, ParameterInfo parameterInfo)
+        {
+            if (parameterInfo != null)
+            {
+                var fromJsonAttr = parameterInfo.GetCustomAttribute<FromJsonAttribute>();
+                if (fromJsonAttr != null)
+                {
+                    return fromJsonAttr.JsonToObject(content, dataType);
+                }
+
+                var fromModelAttr = parameterInfo.GetCustomAttribute<FromModelAttribute>();
+                if (fromModelAttr != null)
+                {
+                    var model = this.serializer.DeserializeObject(content, fromModelAttr.ModelType);
+                    var property = fromModelAttr.ModelType.GetProperty(fromModelAttr.PropertyName);
+                    return property.GetValue(model);
+                }
+            }
+
+            return this.serializer.DeserializeObject(content, dataType);
         }
 
         /// <summary>
