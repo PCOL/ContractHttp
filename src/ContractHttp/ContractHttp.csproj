@@ -76,5 +76,11 @@
     <Content Include="SerializationExtensionMethods.cs" />
     <Content Include="HttpClientProxyOptions.cs" />
     <Content Include="FromModelAttribute.cs" />
+    <Content Include="PostAttribute.cs" />
+    <Content Include="MethodAtribute.cs" />
+    <Content Include="GetAttribute.cs" />
+    <Content Include="PutAttribute.cs" />
+    <Content Include="PatchAttribute.cs" />
+    <Content Include="DeleteAttribute.cs" />
   </ItemGroup>
 </Project>

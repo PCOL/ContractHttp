@@ -149,7 +149,15 @@
             }
 
             // Check for a http method attribute.
-            HttpMethodAttribute methodAttr = method.GetCustomAttribute<HttpMethodAttribute>(false);
+            HttpMethodAttribute httpMethodAttr = method.GetCustomAttribute<HttpMethodAttribute>(false);
+            if (httpMethodAttr != null)
+            {
+                string route = this.GetMethodAndTemplateFromAttribute(httpMethodAttr, ref httpMethod);
+                uri = this.CombineUri(localBaseUri, route);
+            }
+
+            // Check for a method attribute.
+            MethodAttribute methodAttr = method.GetCustomAttribute<MethodAttribute>(false);
             if (methodAttr != null)
             {
                 string route = this.GetMethodAndTemplateFromAttribute(methodAttr, ref httpMethod);
@@ -198,6 +206,40 @@
             }
 
             return HttpMethod.Get;
+        }
+
+        /// <summary>
+        /// Gets the Http method and the template from a <see cref="MethodAttribute"/>.
+        /// </summary>
+        /// <param name="attr">The <see cref="MethodAttribute"/> instance.</param>
+        /// <param name="httpMethod">A variable to receive the <see cref="HttpMethod"/>.</param>
+        /// <returns>The attribute template.</returns>
+        private string GetMethodAndTemplateFromAttribute(
+            MethodAttribute attr,
+            ref HttpMethod httpMethod)
+        {
+            if (attr is GetAttribute)
+            {
+                httpMethod = HttpMethod.Get;
+            }
+            else if (attr is PostAttribute)
+            {
+                httpMethod = HttpMethod.Post;
+            }
+            else if (attr is PutAttribute)
+            {
+                httpMethod = HttpMethod.Put;
+            }
+            else if (attr is PatchAttribute)
+            {
+                httpMethod = new HttpMethod("Patch");
+            }
+            else if (attr is DeleteAttribute)
+            {
+                httpMethod = HttpMethod.Delete;
+            }
+
+            return ((MethodAttribute)attr).Template;
         }
 
         /// <summary>
@@ -356,16 +398,6 @@
         }
 
         /// <summary>
-        /// Checks if the return type is a task.
-        /// </summary>
-        /// <param name="returnType">The return type.</param>
-        /// <returns>True if the return type is a <see cref="Task"/> and therefore asynchronous; otherwise false.</returns>
-        private bool IsAsync(Type returnType)
-        {
-            return typeof(Task).IsAssignableFrom(returnType);
-        }
-
-        /// <summary>
         /// Builds a request, sends it, and proecesses the response.
         /// </summary>
         /// <param name="client">The <see cref="HttpClient"/> to use.</param>
@@ -437,7 +469,7 @@
                 completionOption = HttpCompletionOption.ResponseHeadersRead;
             }
 
-            if (this.IsAsync(returnType) == true)
+            if (httpContext.IsAsync(returnType) == true)
             {
                 var genericReturnTypes = returnType.GetGenericArguments();
                 Type asyncType = typeof(AsyncCall<>).MakeGenericType(genericReturnTypes[0]);

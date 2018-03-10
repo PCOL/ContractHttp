@@ -8,8 +8,9 @@ namespace ContractHttp
     using System.Reflection;
     using System.Text;
     using System.Threading;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
-    
+
     /// <summary>
     /// Represents a request call context.
     /// </summary>
@@ -54,6 +55,8 @@ namespace ContractHttp
         /// The response action.
         /// </summary>
         private Action<HttpResponseMessage> responseAction;
+
+        private int responseFuncArg = -1;
 
         /// <summary>
         /// A dictionary of from headers.
@@ -108,6 +111,12 @@ namespace ContractHttp
                 }
             }
 
+            Type returnType = this.methodInfo.ReturnType;
+            if (this.IsAsync(returnType) == true)
+            {
+                returnType = returnType.GetGenericArguments()[0];
+            }
+
             bool formUrlContent = false;
             ParameterInfo[] parms = this.methodInfo.GetParameters();
             string[] names = new string[parms.Length];
@@ -139,6 +148,12 @@ namespace ContractHttp
                             dataArgType = parmType;
                         }
 
+                        continue;
+                    }
+
+                    if (parmType == typeof(Func<,>).MakeGenericType(typeof(HttpResponseMessage), returnType))
+                    {
+                        this.responseFuncArg = i;
                         continue;
                     }
 
@@ -283,6 +298,16 @@ namespace ContractHttp
         }
 
         /// <summary>
+        /// Checks if the return type is a task.
+        /// </summary>
+        /// <param name="returnType">The return type.</param>
+        /// <returns>True if the return type is a <see cref="Task"/> and therefore asynchronous; otherwise false.</returns>
+        public bool IsAsync(Type returnType)
+        {
+            return typeof(Task).IsAssignableFrom(returnType);
+        }
+
+        /// <summary>
         /// Checks if a list of attributes contains any of a provided list.
         /// </summary>
         /// <param name="attrs">The attribute listto check.</param>
@@ -313,7 +338,6 @@ namespace ContractHttp
             Type returnType)
         {
             object result = null;
-            // string content = response.Content.ReadAsStringAsync().Result;
             if (content.IsNullOrEmpty() == false)
             {
                 if (returnType != typeof(HttpResponseMessage) &&
@@ -359,6 +383,14 @@ namespace ContractHttp
             if (returnType == typeof(HttpResponseMessage))
             {
                 return response;
+            }
+
+            if (this.responseFuncArg != -1 &&
+                this.arguments[this.responseFuncArg] != null)
+            {
+                var interceptorType = typeof(Func<,>).MakeGenericType(typeof(HttpResponseMessage), returnType);
+                var interceptorMethod = interceptorType.GetMethod("Invoke", new[] { typeof(HttpResponseMessage) });
+                result = interceptorMethod.Invoke(this.arguments[this.responseFuncArg], new object[] {response });
             }
 
             return result;

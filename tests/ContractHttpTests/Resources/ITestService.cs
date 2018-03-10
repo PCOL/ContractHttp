@@ -5,34 +5,32 @@ namespace ContractHttpTests.Resources
     using System.Threading.Tasks;
     using ContractHttp;
     using ContractHttpTests.Resources.Models;
-    using Microsoft.AspNetCore.Mvc;
 
     [HttpClientContract(Route = "api/test")]
     public interface ITestService
     {
-        [HttpCallContract(HttpCallMethod.HttpGet, "")]
+        [Get("")]
         HttpResponseMessage Get();
 
-        [HttpCallContract(HttpCallMethod.HttpGet, "{name}")]
+        [Get("{name}")]
         TestData Get(string name);
 
-        [HttpCallContract(HttpCallMethod.HttpPost, "")]
+        [Post("")]
         HttpResponseMessage Create(CreateModel model);
 
-
-        [HttpCallContract(HttpCallMethod.HttpPost, "form")]
+        [Post("form")]
         HttpResponseMessage CreateFormUrlEncoded(
             [SendAsFormUrl]Dictionary<string, string> parms);
 
-        [HttpCallContract(HttpCallMethod.HttpPost, "form")]
+        [Post("form")]
         HttpResponseMessage CreateFormUrlEncoded(
             [SendAsFormUrl(Name = "Name")]string name,
             [SendAsFormUrl(Name = "Value")]string value);
 
-        [HttpCallContract(HttpCallMethod.HttpDelete, "{name}")]
+        [Delete("{name}")]
         HttpResponseMessage Delete(string name);
 
-        [HttpCallContract(HttpCallMethod.HttpDelete, "")]
+        [Delete("")]
         HttpResponseMessage DeleteUsingQueryString([SendAsQuery("name")] string name);
     }
 }
