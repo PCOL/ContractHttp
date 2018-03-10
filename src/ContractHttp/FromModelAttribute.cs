@@ -6,7 +6,7 @@ namespace ContractHttp
     /// A return value attribute that allows the return value to be extracted from
     /// a model property.
     /// </summary>
-    [AttributeUsage(AttributeTargets.ReturnValue)]
+    [AttributeUsage(AttributeTargets.ReturnValue | AttributeTargets.Parameter)]
     public class FromModelAttribute
         : Attribute
     {

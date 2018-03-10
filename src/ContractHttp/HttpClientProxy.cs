@@ -415,13 +415,7 @@
             object[] inArgs,
             string contentType)
         {
-            var serializer = this.options.GetObjectSerializer(contentType);
-            if (serializer == null)
-            {
-                throw new NotSupportedException($"Serializer for {contentType} not found");
-            }
-
-            var httpContext = new HttpRequestContext(method, inArgs, serializer);
+            var httpContext = new HttpRequestContext(method, inArgs, contentType, this.options);
 
             var requestBuilder = new HttpRequestBuilder()
                 .SetMethod(httpMethod);

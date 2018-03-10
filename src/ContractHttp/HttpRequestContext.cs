@@ -27,9 +27,14 @@ namespace ContractHttp
         private readonly object[] arguments;
 
         /// <summary>
-        /// A reference to the object serializer.
+        /// A reference to the client proxy options.
         /// </summary>
-        private readonly IObjectSerializer serializer;
+        private readonly HttpClientProxyOptions options;
+
+        /// <summary>
+        /// A reference to the content type.
+        /// </summary>
+        private readonly string contentType;
 
         /// <summary>
         /// The index of the response argument.
@@ -64,16 +69,27 @@ namespace ContractHttp
         private Dictionary<int, string> fromHeaders;
 
         /// <summary>
+        /// A dictionary of from model parameters.
+        /// </summary>
+        private Dictionary<int, Tuple<string, Type>> fromModels;
+
+        /// <summary>
         /// Initialises a new instance of the <see cref="HttpRequestContext"/> class.
         /// </summary>
         /// <param name="methodInfo">The methods <see cref="MethodInfo"/>.</param>
         /// <param name="arguments">The methods arguments.</param>
-        /// <param name="serializer">The object serializer.</param>
-        public HttpRequestContext(MethodInfo methodInfo, object[] arguments, IObjectSerializer serializer)
+        /// <param name="contentType">The content type.</param>
+        /// <param name="options">The proxy options.</param>
+        public HttpRequestContext(
+            MethodInfo methodInfo,
+            object[] arguments,
+            string contentType,
+            HttpClientProxyOptions options)
         {
             this.methodInfo = methodInfo;
             this.arguments = arguments;
-            this.serializer = serializer;
+            this.contentType = contentType;
+            this.options = options;
         }
 
         /// <summary>
@@ -137,6 +153,13 @@ namespace ContractHttp
                             this.fromHeaders.Add(i, fromHeader.Name);
                         }
 
+                        var fromModel = parms[i].GetCustomAttribute<FromModelAttribute>();
+                        if (fromModel != null)
+                        {
+                            this.fromModels = this.fromModels ?? new Dictionary<int, Tuple<string, Type>>();
+                            this.fromModels.Add(i, Tuple.Create(fromModel.PropertyName, fromModel.ModelType));
+                        }
+
                         var elemParmType = parms[i].ParameterType.GetElementType();
                         if (elemParmType == typeof(HttpResponseMessage))
                         {
@@ -181,12 +204,22 @@ namespace ContractHttp
                     {
                         if (requestBuilder.IsContentSet == false)
                         {
-                            if (this.HasAttribute(attrs, typeof(SendAsContentAttribute), typeof(FromBodyAttribute)) == true)
+                            //if (this.HasAttribute(attrs, typeof(SendAsContentAttribute), typeof(FromBodyAttribute)) == true)
+
+                            var sendAsAttr = attrs.OfType<SendAsContentAttribute>().FirstOrDefault();
+                            if (sendAsAttr != null)
                             {
+                                string contType = sendAsAttr.ContentType ?? this.contentType;
+                                var serializer = this.options.GetObjectSerializer(contType);
+                                if (serializer == null)
+                                {
+                                    throw new NotSupportedException($"Serializer for {contType} not found");
+                                }
+
                                 requestBuilder.SetContent(new StringContent(
-                                    this.serializer.SerializeObject(this.arguments[i]),
-                                    Encoding.UTF8,
-                                    this.serializer.ContentType));
+                                    serializer.SerializeObject(this.arguments[i]),
+                                    sendAsAttr.Encoding ?? Encoding.UTF8,
+                                    serializer.ContentType));
                             }
 
                             var formUrlAttr = attrs.OfType<SendAsFormUrlAttribute>().FirstOrDefault();
@@ -274,10 +307,16 @@ namespace ContractHttp
                         requestBuilder.IsContentSet == false &&
                         this.IsModelObject(parms[i].ParameterType) == true)
                     {
+                        var serializer = this.options.GetObjectSerializer(this.contentType);
+                        if (serializer == null)
+                        {
+                            throw new NotSupportedException($"Serializer for {this.contentType} not found");
+                        }
+
                         requestBuilder.SetContent(new StringContent(
-                            this.serializer.SerializeObject(this.arguments[i]),
+                            serializer.SerializeObject(this.arguments[i]),
                             Encoding.UTF8,
-                            this.serializer.ContentType));
+                            this.contentType));
                     }
                 }
             }
@@ -345,6 +384,7 @@ namespace ContractHttp
                 {
                     result = this.DeserialiseObject(
                         content,
+                        this.contentType,
                         returnType,
                         this.methodInfo.ReturnParameter);
                 }
@@ -353,6 +393,7 @@ namespace ContractHttp
                 {
                     this.arguments[this.dataArg] = this.DeserialiseObject(
                         content,
+                        this.contentType,
                         this.dataArgType,
                         this.methodInfo.GetParameters()[this.dataArg]);
                 }
@@ -380,6 +421,19 @@ namespace ContractHttp
                 }
             }
 
+            if (this.fromModels != null &&
+                content.IsNullOrEmpty() == false)
+            {
+                foreach (var item in this.fromModels)
+                {
+                    if (result != null &&
+                        result.GetType() == item.Value.Item2)
+                    {
+                        arguments[item.Key] = this.GetModelProperty(result, item.Value.Item2, item.Value.Item1);
+                    }
+                }
+            }
+
             if (returnType == typeof(HttpResponseMessage))
             {
                 return response;
@@ -400,11 +454,18 @@ namespace ContractHttp
         /// Deserializes an object.
         /// </summary>
         /// <param name="content">The request content.</param>
+        /// <param name="contType">The content Type.</param>
         /// <param name="dataType">The return data type.</param>
         /// <param name="parameterInfo">The parameter that the content is to returned via.</param>
         /// <returns></returns>
-        private object DeserialiseObject(string content, Type dataType, ParameterInfo parameterInfo)
+        private object DeserialiseObject(string content, string contType, Type dataType, ParameterInfo parameterInfo)
         {
+            var serializer = this.options.GetObjectSerializer(contType);
+            if (serializer == null)
+            {
+                throw new NotSupportedException($"Serializer for {contType} not found");
+            }
+
             if (parameterInfo != null)
             {
                 var fromJsonAttr = parameterInfo.GetCustomAttribute<FromJsonAttribute>();
@@ -416,13 +477,18 @@ namespace ContractHttp
                 var fromModelAttr = parameterInfo.GetCustomAttribute<FromModelAttribute>();
                 if (fromModelAttr != null)
                 {
-                    var model = this.serializer.DeserializeObject(content, fromModelAttr.ModelType);
-                    var property = fromModelAttr.ModelType.GetProperty(fromModelAttr.PropertyName);
-                    return property.GetValue(model);
+                    var model = serializer.DeserializeObject(content, fromModelAttr.ModelType);
+                    return this.GetModelProperty(model, fromModelAttr.ModelType, fromModelAttr.PropertyName);
                 }
             }
 
-            return this.serializer.DeserializeObject(content, dataType);
+            return serializer.DeserializeObject(content, dataType);
+        }
+
+        private object GetModelProperty(object model, Type modelType, string propertyName)
+        {
+            var property = modelType.GetProperty(propertyName);
+            return property?.GetValue(model);
         }
 
         /// <summary>
