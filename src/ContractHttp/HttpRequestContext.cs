@@ -186,9 +186,9 @@ namespace ContractHttp
                         continue;
                     }
 
-                    if (parmType == typeof(Action<HttpRequestMessage>))
+                    if (parmType == typeof(Action<HttpResponseMessage>))
                     {
-                        responseAction = (Action<HttpResponseMessage>)this.arguments[i];
+                        this.responseAction = (Action<HttpResponseMessage>)this.arguments[i];
                         continue;
                     }
 

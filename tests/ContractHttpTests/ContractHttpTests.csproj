@@ -30,5 +30,7 @@
     <Content Include="ControllerServiceUnitTests.cs" />
     <Content Include="Resources\ITestServiceUsingMvcAttributes.cs" />
     <Content Include="TestServiceUsingMvcAttributesProxyUnitTests.cs" />
+    <Content Include="Resources\ITestServiceWithInterception.cs" />
+    <Content Include="InterceptionTests.cs" />
   </ItemGroup>
 </Project>
