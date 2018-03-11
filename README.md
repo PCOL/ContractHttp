@@ -42,33 +42,33 @@ FromModelAttribute can be used to return a property from response content deseri
 
 The methods parameters can be used to define content, query parameters, or headers, and attributes are used to determine their use.
 
-SendAsContentAttribute - Specifies that a parameter is to be used as the requests content.
+* SendAsContentAttribute - Specifies that a parameter is to be used as the requests content.
 
-SendAsQueryAttribute - Specifies that a parameter is to be used as a query parameter.
+* SendAsQueryAttribute - Specifies that a parameter is to be used as a query parameter.
 
-SendAsHeaderAttribute - Specfies that a parameter is to be used as a request header.
+* SendAsHeaderAttribute - Specfies that a parameter is to be used as a request header.
 
-SendAsFormUrlAttribute - Specifies that a paremeter is to be used as a form url content property.
+* SendAsFormUrlAttribute - Specifies that a paremeter is to be used as a form url content property.
 
 #### Out Parameters
 
-Out parameters are supported for returning data on synchronous methods.
+Out parameters are supported for returning data on synchronous methods:
 
-An out parameter with no attribute that is also not defined a "special" parameter can be used to return data from the response content.
+* An out parameter with no attribute that is also not defined a "special" parameter can be used to return data from the response content.
 
-An out parameter decorated with FromHeaderAttribute can be used to return data from a response header.
+* An out parameter decorated with FromHeaderAttribute can be used to return data from a response header.
 
-An out parameter decorated with FromModelAttribute can be used to return a property from a model that was deserialised from the requests content.
+* An out parameter decorated with FromModelAttribute can be used to return a property from a model that was deserialised from the requests content.
 
 #### Special Parameters
 
-As mentioned earlier "special" parameter types are supported.
+Special parameter types are also supported:
 
-A parameter of type Action\<HttpRequestMessage> will be called just before the request is sent.
+* A parameter of type Action\<HttpRequestMessage> will be called just before the request is sent.
 
-A parameter of type Action\<HttpResponseMessage> will be called just after the response has been received.
+* A parameter of type Action\<HttpResponseMessage> will be called just after the response has been received.
 
-A parameter of type Func\<HttpResponseMessage, *ReturnType*> will be called just before the method returns.
+* A parameter of type Func\<HttpResponseMessage, *ReturnType*> will be called just before the method returns.
 
 ### Attributes
 
@@ -78,17 +78,17 @@ The http method attributes from Microsoft.AspNetCore.Mvc such as [HttpGet], [Htt
 
 ContractHttp also provides its own set of attributes as well:
 
-PostAttribute - Specifies that the request has a POST method.
-GetAttribute - Specifies that the request has a GET method.
-PutAttribute - Specifies that the request has a PUT method.
-PatchAttribute - Specifies that the request has a PATCH method.
-DeleteAttribute - Specifies that the request has a DELETE method.
+* PostAttribute - Specifies that the request has a POST method.
+* GetAttribute - Specifies that the request has a GET method.
+* PutAttribute - Specifies that the request has a PUT method.
+* PatchAttribute - Specifies that the request has a PATCH method.
+* DeleteAttribute - Specifies that the request has a DELETE method.
 
-AddHeaderAttribute can be applied to a method or an interface to add a header value to the request or all requests.
+AddHeaderAttribute can be applied to a method or an interface to add a header value to the request or all requests:
 
-AddFormUrlEncodedPropertyAttribute can be used to add a form url property to a request content.
+* AddFormUrlEncodedPropertyAttribute can be used to add a form url property to a request content.
 
-AddAuthorizationHeaderAttribute can be applied to a method or an interface to add an authorization header to the request or all requests.
+* AddAuthorizationHeaderAttribute can be applied to a method or an interface to add an authorization header to the request or all requests.
 
 ### Example synchronous client
 
