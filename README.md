@@ -2,18 +2,6 @@
 
 A .Net library for contract based Http clients and controllers
 
-## Why ContractHttp
-
-When writing client REST calls you tend to write methods for each of the REST methods with
-very similar code in them, or perhaps you generate classes using a tool such as autorest
-which are fine in themselves, but maybe they then need to be wrapped in methods to make them
-feel like simple method calls.
-
-This is where ContractHttp comes in. It allows you to define an interface containing methods that describe how you would like to call a REST endpoint and then generate an impletation of it allowing
-you to use it just like a normal class, taking away the need to write the actual REST client methods.
-
-ContractHttp also lets you define dynamic controllers to aid server side developement. This allows an API controller to be generated automatically from a service interace (more on that later).
-
 ## Installation
 
 [ContractHttp is available on Nuget](https://www.nuget.org/packages/ContractHttp)

@@ -4,12 +4,11 @@ namespace ClientExample
     using System.Collections.Generic;
     using ClientExample.Models;
     using ContractHttp;
-    using Microsoft.AspNetCore.Mvc;
 
     [HttpClientContract(Route = "api/customers")]
     public interface ICustomerClient
     {
-        [HttpGet]
+        [Get]
         IEnumerable<CustomerModel> GetCustomers();
     }
 }

@@ -5,21 +5,20 @@ namespace Benchmarks.Contracts
     using System.Threading.Tasks;
     using Benchmarks.Contracts.Models;
     using ContractHttp;
-    using Microsoft.AspNetCore.Mvc;
 
     [HttpClientContract(Route = "api")]
     public interface IClientBenchmarks
     {
-        [HttpGet("")]
+        [Get("")]
         IEnumerable<SimpleModel> Get();
 
-        [HttpGet("")]
+        [Get("")]
         Task<IEnumerable<SimpleModel>> GetAsync();
 
-        [HttpGet("{name}")]
+        [Get("{name}")]
         SimpleModel GetByName(string name);
 
-        [HttpGet("{name}")]
+        [Get("{name}")]
         Task<SimpleModel> GetByNameAsync(string name);
     }
 }
