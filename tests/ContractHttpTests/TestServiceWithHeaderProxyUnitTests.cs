@@ -59,5 +59,15 @@ namespace ContractHttpTests
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.AreEqual(HeaderValue, response.Content.ReadAsStringAsync().Result.Trim('\"'));
         }
+
+        [TestMethod]
+        public void GetByName_ReturnsHeader()
+        {
+            const string HeaderValue = "header value";
+            var response = this.testService.GetByName("TEST", out string header);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HeaderValue, header);
+        }
     }
 }

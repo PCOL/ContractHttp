@@ -135,171 +135,73 @@ namespace ContractHttp
 
             bool formUrlContent = false;
             ParameterInfo[] parms = this.methodInfo.GetParameters();
-            string[] names = new string[parms.Length];
-
-            if (parms != null)
+            if (parms == null)
             {
-                for (int i = 0; i < parms.Length; i++)
+                return new string[0];
+            }
+
+            string[] names = new string[parms.Length];
+            for (int i = 0; i < parms.Length; i++)
+            {
+                names[i] = parms[i].Name;
+                Type parmType = parms[i].ParameterType;
+
+                if (parms[i].IsOut == true)
                 {
-                    names[i] = parms[i].Name;
-                    Type parmType = parms[i].ParameterType;
-
-                    if (parms[i].IsOut == true)
+                    var fromHeader = parms[i].GetCustomAttribute<FromHeaderAttribute>();
+                    if (fromHeader != null)
                     {
-                        var fromHeader = parms[i].GetCustomAttribute<FromHeaderAttribute>();
-                        if (fromHeader != null)
-                        {
-                            this.fromHeaders = this.fromHeaders ?? new Dictionary<int, string>();
-                            this.fromHeaders.Add(i, fromHeader.Name);
-                        }
-
+                        this.fromHeaders = this.fromHeaders ?? new Dictionary<int, string>();
+                        this.fromHeaders.Add(i, fromHeader.Name);
+                    }
+                    else
+                    {
                         var fromModel = parms[i].GetCustomAttribute<FromModelAttribute>();
                         if (fromModel != null)
                         {
                             this.fromModels = this.fromModels ?? new Dictionary<int, Tuple<string, Type>>();
                             this.fromModels.Add(i, Tuple.Create(fromModel.PropertyName, fromModel.ModelType));
                         }
-
-                        var elemParmType = parms[i].ParameterType.GetElementType();
-                        if (elemParmType == typeof(HttpResponseMessage))
-                        {
-                            responseArg = i;
-                        }
                         else
                         {
-                            dataArg = i;
-                            dataArgType = parmType;
-                        }
-
-                        continue;
-                    }
-
-                    if (parmType == typeof(Func<,>).MakeGenericType(typeof(HttpResponseMessage), returnType))
-                    {
-                        this.responseFuncArg = i;
-                        continue;
-                    }
-
-                    if (parmType == typeof(Action<HttpRequestMessage>))
-                    {
-                        this.requestAction = (Action<HttpRequestMessage>)this.arguments[i];
-                        continue;
-                    }
-
-                    if (parmType == typeof(Action<HttpResponseMessage>))
-                    {
-                        this.responseAction = (Action<HttpResponseMessage>)this.arguments[i];
-                        continue;
-                    }
-
-                    if (parmType == typeof(CancellationToken))
-                    {
-                        this.CancellationToken = (CancellationToken)this.arguments[i];
-                    }
-
-                    var attrs = parms[i].GetCustomAttributes();
-                    if (attrs != null &&
-                        attrs.Any() == true &&
-                        this.arguments[i] != null)
-                    {
-                        if (requestBuilder.IsContentSet == false)
-                        {
-                            var sendAsAttr = attrs.OfType<SendAsContentAttribute>().FirstOrDefault();
-                            if (sendAsAttr != null)
+                            var elemParmType = parms[i].ParameterType.GetElementType();
+                            if (elemParmType == typeof(HttpResponseMessage))
                             {
-                                string contType = sendAsAttr.ContentType ?? this.contentType;
-                                var serializer = this.options.GetObjectSerializer(contType);
-                                if (serializer == null)
-                                {
-                                    throw new NotSupportedException($"Serializer for {contType} not found");
-                                }
-
-                                requestBuilder.SetContent(new StringContent(
-                                    serializer.SerializeObject(this.arguments[i]),
-                                    sendAsAttr.Encoding ?? Encoding.UTF8,
-                                    serializer.ContentType));
-                            }
-
-                            var formUrlAttr = attrs.OfType<SendAsFormUrlAttribute>().FirstOrDefault();
-                            if (formUrlAttr != null)
-                            {
-                                formUrlContent = true;
-                                var argType = this.arguments[i].GetType();
-                                if (typeof(Dictionary<string, string>).IsAssignableFrom(argType) == true)
-                                {
-                                    requestBuilder.SetContent(new FormUrlEncodedContent((Dictionary<string, string>)this.arguments[i]));
-                                }
-                                else if (typeof(Dictionary<string, object>).IsAssignableFrom(argType) == true)
-                                {
-                                    var list = ((Dictionary<string, object>)this.arguments[i]).Select(kvp => new KeyValuePair<string, string>(kvp.Key, kvp.Value?.ToString()));
-                                    requestBuilder.SetContent(new FormUrlEncodedContent(list));
-                                }
-                                else if (this.IsModelObject(parmType) == true)
-                                {
-                                    var list = new Dictionary<string, string>();
-                                    var properties = this.arguments[i].GetType().GetProperties();
-                                    foreach (var property in properties)
-                                    {
-                                        list.Add(
-                                            property.Name,
-                                            property.GetValue(this.arguments[i])?.ToString());
-                                    }
-
-                                    requestBuilder.SetContent(new FormUrlEncodedContent(list));
-                                }
-                                else
-                                {
-                                    requestBuilder.AddFormUrlProperty(
-                                        formUrlAttr.Name ?? parms[i].Name,
-                                        this.arguments[i].ToString());
-                                }
-                            }
-                        }
-
-                        foreach (var query in attrs.OfType<SendAsQueryAttribute>())
-                        {
-                            var name = query.Name.IsNullOrEmpty() == false ? query.Name : parms[i].Name;
-                            var value = this.arguments[i].ToString();
-                            if (query.Format.IsNullOrEmpty() == false)
-                            {
-                                if (parmType == typeof(short))
-                                {
-                                    value = ((short)this.arguments[i]).ToString(query.Format);
-                                }
-                                else if (parmType == typeof(int))
-                                {
-                                    value = ((int)this.arguments[i]).ToString(query.Format);
-                                }
-                                else if (parmType == typeof(long))
-                                {
-                                    value = ((long)this.arguments[i]).ToString(query.Format);
-                                }
-                            }
-
-                            if (query.Base64 == true)
-                            {
-                                value = Convert.ToBase64String(query.Encoding.GetBytes(value));
-                            }
-
-                            requestBuilder.AddQueryString(name, value);
-                        }
-
-                        foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
-                        {
-                            if (string.IsNullOrEmpty(attr.Format) == false)
-                            {
-                                requestBuilder.AddHeader(
-                                    attr.Name,
-                                    string.Format(attr.Format, this.arguments[i].ToString()));
+                                responseArg = i;
                             }
                             else
                             {
-                                requestBuilder.AddHeader(
-                                    attr.Name,
-                                    this.arguments[i].ToString());
+                                dataArg = i;
+                                dataArgType = parmType;
                             }
                         }
                     }
+
+                    continue;
+                }
+
+                if (parmType == typeof(Func<,>).MakeGenericType(typeof(HttpResponseMessage), returnType))
+                {
+                    this.responseFuncArg = i;
+                }
+                else if (parmType == typeof(Action<HttpRequestMessage>))
+                {
+                    this.requestAction = (Action<HttpRequestMessage>)this.arguments[i];
+                }
+                else if (parmType == typeof(Action<HttpResponseMessage>))
+                {
+                    this.responseAction = (Action<HttpResponseMessage>)this.arguments[i];
+                }
+                else if (parmType == typeof(CancellationToken))
+                {
+                    this.CancellationToken = (CancellationToken)this.arguments[i];
+                }
+                else
+                {
+                    formUrlContent = this.CheckParameterAttributes(
+                        requestBuilder,
+                        parms[i],
+                        this.arguments[i]);
 
                     if (formUrlContent == false &&
                         requestBuilder.IsContentSet == false &&
@@ -320,6 +222,138 @@ namespace ContractHttp
             }
 
             return names;
+        }
+
+        /// <summary>
+        /// Checks a parameter for attributes.
+        /// </summary>
+        /// <param name="requestBuilder">The request builder.</param>
+        /// <param name="parm">The parameter.</param>
+        /// <param name="argument">The parameters value.</param>
+        /// <returns>A value indicating whether or not there is form url content.</returns>
+        private bool CheckParameterAttributes(
+            HttpRequestBuilder requestBuilder,
+            ParameterInfo parm,
+            object argument)
+        {
+            bool formUrlContent = false;
+            var attrs = parm.GetCustomAttributes();
+            if (attrs != null &&
+                attrs.Any() == true &&
+                argument != null)
+            {
+                if (requestBuilder.IsContentSet == false)
+                {
+                    var sendAsAttr = attrs.OfType<SendAsContentAttribute>().FirstOrDefault();
+                    if (sendAsAttr != null)
+                    {
+                        string contType = sendAsAttr.ContentType ?? this.contentType;
+                        var serializer = this.options.GetObjectSerializer(contType);
+                        if (serializer == null)
+                        {
+                            throw new NotSupportedException($"Serializer for {contType} not found");
+                        }
+
+                        requestBuilder.SetContent(new StringContent(
+                            serializer.SerializeObject(argument),
+                            sendAsAttr.Encoding ?? Encoding.UTF8,
+                            serializer.ContentType));
+                    }
+                    else
+                    {
+                        var formUrlAttr = attrs.OfType<SendAsFormUrlAttribute>().FirstOrDefault();
+                        if (formUrlAttr != null)
+                        {
+                            formUrlContent = true;
+                            var argType = argument.GetType();
+                            if (typeof(Dictionary<string, string>).IsAssignableFrom(argType) == true)
+                            {
+                                requestBuilder.SetContent(
+                                    new FormUrlEncodedContent(
+                                        (Dictionary<string, string>)argument));
+                            }
+                            else if (typeof(Dictionary<string, object>).IsAssignableFrom(argType) == true)
+                            {
+                                requestBuilder.SetContent(
+                                    new FormUrlEncodedContent(
+                                        ((Dictionary<string, object>)argument)
+                                            .Select(
+                                                kvp =>
+                                                {
+                                                    return new KeyValuePair<string, string>(
+                                                        kvp.Key,
+                                                        kvp.Value?.ToString());
+                                                })));
+                            }
+                            else if (this.IsModelObject(parm.ParameterType) == true)
+                            {
+                                var list = new Dictionary<string, string>();
+                                var properties = argument.GetType().GetProperties();
+                                foreach (var property in properties)
+                                {
+                                    list.Add(
+                                        property.Name,
+                                        property.GetValue(argument)?.ToString());
+                                }
+
+                                requestBuilder.SetContent(new FormUrlEncodedContent(list));
+                            }
+                            else
+                            {
+                                requestBuilder.AddFormUrlProperty(
+                                    formUrlAttr.Name ?? parm.Name,
+                                    argument.ToString());
+                            }
+                        }
+                    }
+                }
+
+                foreach (var query in attrs.OfType<SendAsQueryAttribute>())
+                {
+                    var name = query.Name.IsNullOrEmpty() == false ? query.Name : parm.Name;
+                    var value = argument.ToString();
+                    if (query.Format.IsNullOrEmpty() == false)
+                    {
+                        if (parm.ParameterType == typeof(short))
+                        {
+                            value = ((short)argument).ToString(query.Format);
+                        }
+                        else if (parm.ParameterType == typeof(int))
+                        {
+                            value = ((int)argument).ToString(query.Format);
+                        }
+                        else if (parm.ParameterType == typeof(long))
+                        {
+                            value = ((long)argument).ToString(query.Format);
+                        }
+                    }
+
+                    if (query.Base64 == true)
+                    {
+                        value = Convert.ToBase64String(query.Encoding.GetBytes(value));
+                    }
+
+                    requestBuilder.AddQueryString(name, value);
+                }
+
+                foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
+                {
+                    if (string.IsNullOrEmpty(attr.Format) == false)
+                    {
+                        requestBuilder.AddHeader(
+                            attr.Name,
+                            string.Format(attr.Format, argument.ToString()));
+                    }
+                    else
+                    {
+                        requestBuilder.AddHeader(
+                            attr.Name,
+                            argument.ToString());
+                    }
+                }
+            }
+
+            return formUrlContent;
         }
 
         /// <summary>
