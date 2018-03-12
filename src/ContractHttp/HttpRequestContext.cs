@@ -204,8 +204,6 @@ namespace ContractHttp
                     {
                         if (requestBuilder.IsContentSet == false)
                         {
-                            //if (this.HasAttribute(attrs, typeof(SendAsContentAttribute), typeof(FromBodyAttribute)) == true)
-
                             var sendAsAttr = attrs.OfType<SendAsContentAttribute>().FirstOrDefault();
                             if (sendAsAttr != null)
                             {
