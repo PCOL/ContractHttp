@@ -8,6 +8,7 @@
     using System.Net.Http.Headers;
     using System.Reflection;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using DynProxy;
     using Microsoft.AspNetCore.Mvc;
@@ -38,6 +39,21 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpClientProxy{T}"/> class.
         /// </summary>
+        /// <param name="options">Client proxy options.</param>
+        public HttpClientProxy(HttpClientProxyOptions options)
+        {
+            this.ThrowIfNotInterface(typeof(T), "T");
+            Utility.ThrowIfArgumentNull(options, nameof(options));
+
+            this.options = options ?? new HttpClientProxyOptions();
+            this.baseUri = options.BaseUri;
+
+            this.CheckContractAttribute();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HttpClientProxy{T}"/> class.
+        /// </summary>
         /// <param name="baseUri">The base uri.</param>
         /// <param name="options">Client proxy options.</param>
         public HttpClientProxy(string baseUri, HttpClientProxyOptions options = null)
@@ -45,8 +61,8 @@
             this.ThrowIfNotInterface(typeof(T), "T");
             Utility.ThrowIfArgumentNullOrEmpty(baseUri, nameof(baseUri));
 
-            this.baseUri = baseUri;
             this.options = options ?? new HttpClientProxyOptions();
+            this.baseUri = baseUri ?? options.BaseUri;
 
             this.CheckContractAttribute();
         }
@@ -95,8 +111,7 @@
             HttpMethod method,
             string uri,
             HttpContent content,
-            string contentType,
-            string correlationId = null)
+            string contentType)
         {
             var request = new HttpRequestMessage(method, uri);
 
@@ -108,11 +123,6 @@
             if (contentType.IsNullOrEmpty() == false)
             {
                 request.Headers.Add("Accept", contentType);
-            }
-
-            if (correlationId.IsNullOrEmpty() == false)
-            {
-                request.Headers.Add("X-Log-Correlation-Id", correlationId);
             }
 
             return request;
@@ -165,7 +175,6 @@
             }
 
             var client = this.options.GetHttpClient();
-            //client.Timeout = timeout;
 
             try
             {
@@ -175,7 +184,8 @@
                     httpMethod,
                     uri,
                     arguments,
-                    contentType).Result;
+                    contentType,
+                    timeout).Result;
             }
             catch (AggregateException ex)
             {
@@ -413,7 +423,8 @@
             HttpMethod httpMethod,
             string uri,
             object[] inArgs,
-            string contentType)
+            string contentType,
+            TimeSpan? timeout)
         {
             var httpContext = new HttpRequestContext(method, inArgs, contentType, this.options);
 
@@ -463,6 +474,11 @@
                 completionOption = HttpCompletionOption.ResponseHeadersRead;
             }
 
+            if (timeout.HasValue == true)
+            {
+                httpContext.SetTimeout(timeout.Value);
+            }
+
             if (httpContext.IsAsync(returnType) == true)
             {
                 var genericReturnTypes = returnType.GetGenericArguments();
@@ -475,7 +491,7 @@
             HttpResponseMessage response = await client.SendAsync(
                 request,
                 completionOption,
-                httpContext.CancellationToken);
+                httpContext.GetCancellationToken());
 
             httpContext.InvokeResponseAction(response);
 

@@ -15,6 +15,11 @@ namespace ContractHttp
         }
 
         /// <summary>
+        /// Gets or sets the base uri.
+        /// </summary>
+        public string BaseUri { get; set; }
+
+        /// <summary>
         /// Gets or sets the object serializer.
         /// </summary>
         public IObjectSerializer ObjectSerializer { get; set; }

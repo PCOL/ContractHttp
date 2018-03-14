@@ -71,6 +71,34 @@ namespace ContractHttp
         }
 
         /// <summary>
+        /// Adds a <see cref="HttpClientProxy{T}"/> instance to a <see cref="IServiceCollection"/>.
+        /// </summary>
+        /// <param name="services">A <see cref="IServiceCollection"/> instance.</param>
+        /// <param name="baseUriFunc">A function to return the base uri.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
+        public static IServiceCollection AddHttpClientProxy<T>(
+            this IServiceCollection services,
+            Func<IServiceProvider, string> baseUrlFunc)
+            where T : class
+        {
+            services.AddSingleton<T>(
+                sp =>
+                {
+                    var baseUri = baseUrlFunc(sp);
+                    var proxy = new HttpClientProxy<T>(
+                        baseUri,
+                        new HttpClientProxyOptions()
+                        {
+                            Services = sp
+                        });
+
+                    return proxy.GetProxyObject();
+                });
+
+            return services;
+        }
+
+        /// <summary>
         /// Adds an authorization header factory.
         /// </summary>
         /// <param name="services">A <see cref="IServiceCollection"/> instance.</param>

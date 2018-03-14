@@ -82,5 +82,6 @@
     <Content Include="PutAttribute.cs" />
     <Content Include="PatchAttribute.cs" />
     <Content Include="DeleteAttribute.cs" />
+    <Content Include="IHttpClientProxy.cs" />
   </ItemGroup>
 </Project>

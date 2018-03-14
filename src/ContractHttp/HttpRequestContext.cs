@@ -74,6 +74,11 @@ namespace ContractHttp
         private Dictionary<int, Tuple<string, Type>> fromModels;
 
         /// <summary>
+        /// A cancellation token source.
+        /// </summary>
+        private CancellationTokenSource cancellationTokenSource;
+
+        /// <summary>
         /// Initialises a new instance of the <see cref="HttpRequestContext"/> class.
         /// </summary>
         /// <param name="methodInfo">The methods <see cref="MethodInfo"/>.</param>
@@ -91,11 +96,6 @@ namespace ContractHttp
             this.contentType = contentType;
             this.options = options;
         }
-
-        /// <summary>
-        /// Gets or sets the cancellation token.
-        /// </summary>
-        public CancellationToken CancellationToken { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether or not content is expected.
@@ -192,9 +192,9 @@ namespace ContractHttp
                 {
                     this.responseAction = (Action<HttpResponseMessage>)this.arguments[i];
                 }
-                else if (parmType == typeof(CancellationToken))
+                else if (parmType == typeof(CancellationTokenSource))
                 {
-                    this.CancellationToken = (CancellationToken)this.arguments[i];
+                    this.cancellationTokenSource = (CancellationTokenSource)this.arguments[i];
                 }
                 else
                 {
@@ -539,6 +539,30 @@ namespace ContractHttp
         public void InvokeResponseAction(HttpResponseMessage response)
         {
             this.responseAction?.Invoke(response);
+        }
+
+        /// <summary>
+        /// Sets the call timeout
+        /// </summary>
+        /// <param name="timeout">The timeout value.</param>
+        public void SetTimeout(TimeSpan timeout)
+        {
+            cancellationTokenSource = cancellationTokenSource ?? new CancellationTokenSource();
+            cancellationTokenSource.CancelAfter(timeout);
+        }
+
+        /// <summary>
+        /// Gets a cancellation token.
+        /// </summary>
+        /// <returns>The cancellation token.</returns>
+        public CancellationToken GetCancellationToken()
+        {
+            if (this.cancellationTokenSource != null)
+            {
+                return this.cancellationTokenSource.Token;
+            }
+
+            return CancellationToken.None;
         }
     }
 }
