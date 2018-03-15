@@ -530,6 +530,8 @@ namespace ContractHttp
         public void InvokeRequestAction(HttpRequestMessage request)
         {
             this.requestAction?.Invoke(request);
+
+            this.options.RequestModifier?.ModifyRequest(request);
         }
 
         /// <summary>

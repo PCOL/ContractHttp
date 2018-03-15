@@ -55,6 +55,11 @@ namespace ContractHttp
         public Func<IServiceProvider, string> GetCorrelationId { get; set; }
 
         /// <summary>
+        /// Gets or sets a request modifier.
+        /// </summary>
+        public IHttpRequestModifier RequestModifier { get; set; }
+
+        /// <summary>
         /// Gets a <see cref="HttpClient"/> instance.
         /// </summary>
         /// <returns>An <see cref="HttpClient"/> instance.</returns>
