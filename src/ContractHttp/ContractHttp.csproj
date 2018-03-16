@@ -83,6 +83,8 @@
     <Content Include="PatchAttribute.cs" />
     <Content Include="DeleteAttribute.cs" />
     <Content Include="IHttpClientProxy.cs" />
+    <Content Include="RetryAttribute.cs" />
+    <Content Include="RetryHandler.cs" />
     <Content Include="IHttpRequestModifier.cs" />
   </ItemGroup>
 </Project>

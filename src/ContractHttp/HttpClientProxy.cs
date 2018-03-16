@@ -488,7 +488,8 @@
                 return mi.Invoke(obj, new object[] { request, completionOption });
             }
 
-            HttpResponseMessage response = await client.SendAsync(
+            var response = await httpContext.SendAsync(
+                client,
                 request,
                 completionOption,
                 httpContext.GetCancellationToken());

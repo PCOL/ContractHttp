@@ -44,8 +44,11 @@ namespace ContractHttp
         public async Task<T> SendAsync(HttpRequestMessage request, HttpCompletionOption completionOption)
         {
             var dataType = typeof(T);
-            var response = await this.httpClient
-                .SendAsync(request, completionOption, httpContext.GetCancellationToken());
+            var response = await httpContext.SendAsync(
+                this.httpClient,
+                request,
+                completionOption,
+                httpContext.GetCancellationToken());
 
             if (dataType == typeof(Stream))
             {

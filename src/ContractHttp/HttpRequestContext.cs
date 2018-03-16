@@ -523,6 +523,43 @@ namespace ContractHttp
             return property?.GetValue(model);
         }
 
+        public async Task<HttpResponseMessage> SendAsync(
+            HttpClient httpClient,
+            HttpRequestMessage requestMessage,
+            HttpCompletionOption completionOption,
+            CancellationToken cancellationToken)
+        {
+            var retryAttribute = methodInfo.GetCustomAttribute<RetryAttribute>() ??
+                methodInfo.DeclaringType.GetCustomAttribute<RetryAttribute>();
+
+            if (retryAttribute != null)
+            {
+                RetryHandler retry = new RetryHandler()
+                    .RetryCount(retryAttribute.RetryCount)
+                    .WaitTime(retryAttribute.WaitTime)
+                    .MaxWaitTime(retryAttribute.MaxWaitTime)
+                    .DoubleWaitTimeOnRetry(retryAttribute.DoubleWaitTimeOnRetry);
+
+                return await retry.RetryAsync<HttpResponseMessage>(
+                    () =>
+                    {
+                        return httpClient.SendAsync(
+                            requestMessage,
+                            completionOption,
+                            cancellationToken);
+                    },
+                    (r) =>
+                    {
+                        return retryAttribute.HttpStatusCodeToRetry.Contains(r.StatusCode);
+                    });
+            }
+
+            return await httpClient.SendAsync(
+                requestMessage,
+                completionOption,
+                cancellationToken);
+        }
+
         /// <summary>
         /// Invokes the request action if it has been defined.
         /// </summary>
