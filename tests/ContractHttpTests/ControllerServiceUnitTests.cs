@@ -82,14 +82,11 @@ namespace ContractHttpTests
 
             using (var request = new HttpRequestMessage(HttpMethod.Get, $"http://localhost/api/data/{CustomerName}"))
             {
-                Console.WriteLine("Request: {0}", request.RequestUri);
                 var response = await this.testClient.SendAsync(request);
                 Assert.IsNotNull(response);
-                Console.WriteLine("StatusCode: {0}", response.StatusCode);
                 Assert.IsTrue(response.IsSuccessStatusCode);
 
                 var content = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(content);
                 var testData = JsonConvert.DeserializeObject<TestData>(content);
 
                 Assert.IsNotNull(testData);

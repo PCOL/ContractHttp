@@ -36,5 +36,6 @@
     <Content Include="Resources\TestControllerForRetry.cs" />
     <Content Include="Resources\ITestServiceWithRetry.cs" />
     <Content Include="Resources\TestRetryCounts.cs" />
+    <Content Include="RetryHandlerUnitTests.cs" />
   </ItemGroup>
 </Project>

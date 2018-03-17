@@ -25,11 +25,11 @@ namespace ContractHttp
         /// </summary>
         /// <typeparam name="T">The type of exception</typeparam>
         /// <returns>The <see cref="RetryHandler"/> instance.</returns>
-        public RetryHandler Exception<T>()
+        public RetryHandler RetryOnException<T>()
             where T : Exception
         {
             this.exceptions = this.exceptions ?? new List<Type>();
-            this.exceptions.Add(typeof(Exception));
+            this.exceptions.Add(typeof(T));
             return this;
         }
 
@@ -85,7 +85,8 @@ namespace ContractHttp
         /// <returns></returns>
         public async Task<T> RetryAsync<T>(Func<Task<T>> function, Func<T, bool> responseHandler)
         {
-            T result = default(T);
+            T lastResult = default(T);
+            Exception lastEx = null;
 
             int retry = 0;
             TimeSpan wait = this.waitTime;;
@@ -93,40 +94,45 @@ namespace ContractHttp
             {
                 try
                 {
-                    Console.WriteLine("Retry: {0}", retry);
-
-                    result = await function();
-                    if (responseHandler(result) == true)
+                    lastResult = await function();
+                    if (responseHandler(lastResult) == true)
                     {
-                        return result;
+                        return lastResult;
                     }
                 }
                 catch (Exception ex)
                 {
-                    if (this.exceptions != null &&
-                        this.exceptions.Contains(ex.GetType()) == true)
+                    lastEx = ex;
+
+                    if (this.exceptions == null ||
+                        this.exceptions.Contains(ex.GetType()) == false)
                     {
-                        break;
-                    }
-
-                    throw;
-                }
-
-                await Task.Delay(wait);
-
-                if (this.doubleWaitTime == true)
-                {
-                    wait = TimeSpan.FromTicks(wait.Ticks * 2);
-                    if (wait > this.maxWaitTime)
-                    {
-                        wait = this.maxWaitTime;
+                        throw;
                     }
                 }
 
                 retry++;
+                if (retry < this.retryCount)
+                {
+                    await Task.Delay(wait);
+
+                    if (this.doubleWaitTime == true)
+                    {
+                        wait = TimeSpan.FromTicks(wait.Ticks * 2);
+                        if (wait > this.maxWaitTime)
+                        {
+                            wait = this.maxWaitTime;
+                        }
+                    }
+                }
             }
 
-            return result;
+            if (lastEx != null)
+            {
+                throw lastEx;
+            }
+
+            return lastResult;
         }
     }
 }
