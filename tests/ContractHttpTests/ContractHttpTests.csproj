@@ -32,5 +32,9 @@
     <Content Include="TestServiceUsingMvcAttributesProxyUnitTests.cs" />
     <Content Include="Resources\ITestServiceWithInterception.cs" />
     <Content Include="InterceptionTests.cs" />
+    <Content Include="TestServiceProxyWithRetryUnitTests.cs" />
+    <Content Include="Resources\TestControllerForRetry.cs" />
+    <Content Include="Resources\ITestServiceWithRetry.cs" />
+    <Content Include="Resources\TestRetryCounts.cs" />
   </ItemGroup>
 </Project>

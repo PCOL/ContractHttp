@@ -128,9 +128,9 @@ namespace ContractHttp
             }
 
             Type returnType = this.methodInfo.ReturnType;
-            if (this.IsAsync(returnType) == true)
+            if (this.IsAsync(returnType, out Type taskType) == true)
             {
-                returnType = returnType.GetGenericArguments()[0];
+                returnType = taskType;
             }
 
             bool formUrlContent = false;
@@ -180,7 +180,8 @@ namespace ContractHttp
                     continue;
                 }
 
-                if (parmType == typeof(Func<,>).MakeGenericType(typeof(HttpResponseMessage), returnType))
+                if (returnType != typeof(void) &&
+                    parmType == typeof(Func<,>).MakeGenericType(typeof(HttpResponseMessage), returnType))
                 {
                     this.responseFuncArg = i;
                 }
@@ -373,9 +374,16 @@ namespace ContractHttp
         /// </summary>
         /// <param name="returnType">The return type.</param>
         /// <returns>True if the return type is a <see cref="Task"/> and therefore asynchronous; otherwise false.</returns>
-        public bool IsAsync(Type returnType)
+        public bool IsAsync(Type returnType, out Type taskType)
         {
-            return typeof(Task).IsAssignableFrom(returnType);
+            taskType = null;
+            if (typeof(Task).IsAssignableFrom(returnType) == true)
+            {
+                taskType = returnType.GetGenericArguments().FirstOrDefault() ?? typeof(void);
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -517,17 +525,30 @@ namespace ContractHttp
             return serializer.DeserializeObject(content, dataType);
         }
 
+        /// <summary>
+        /// Gets a model property.
+        /// </summary>
+        /// <param name="model">The model.</param>
+        /// <param name="modelType">The model type.</param>
+        /// <param name="propertyName">The property name.</param>
+        /// <returns></returns>
         private object GetModelProperty(object model, Type modelType, string propertyName)
         {
             var property = modelType.GetProperty(propertyName);
             return property?.GetValue(model);
         }
 
+        /// <summary>
+        /// Sends the request with retry if configured.
+        /// </summary>
+        /// <param name="httpClient">The http client to use.</param>
+        /// <param name="requestBuilder">The http request builder.</param>
+        /// <param name="completionOption">The completion option.</param>
+        /// <returns></returns>
         public async Task<HttpResponseMessage> SendAsync(
             HttpClient httpClient,
-            HttpRequestMessage requestMessage,
-            HttpCompletionOption completionOption,
-            CancellationToken cancellationToken)
+            HttpRequestBuilder requestBuilder,
+            HttpCompletionOption completionOption)
         {
             var retryAttribute = methodInfo.GetCustomAttribute<RetryAttribute>() ??
                 methodInfo.DeclaringType.GetCustomAttribute<RetryAttribute>();
@@ -536,28 +557,58 @@ namespace ContractHttp
             {
                 RetryHandler retry = new RetryHandler()
                     .RetryCount(retryAttribute.RetryCount)
-                    .WaitTime(retryAttribute.WaitTime)
-                    .MaxWaitTime(retryAttribute.MaxWaitTime)
+                    .WaitTime(TimeSpan.FromMilliseconds(retryAttribute.WaitTime))
+                    .MaxWaitTime(TimeSpan.FromMilliseconds(retryAttribute.MaxWaitTime))
                     .DoubleWaitTimeOnRetry(retryAttribute.DoubleWaitTimeOnRetry);
 
                 return await retry.RetryAsync<HttpResponseMessage>(
                     () =>
                     {
-                        return httpClient.SendAsync(
-                            requestMessage,
-                            completionOption,
-                            cancellationToken);
+                        return this.SendAsync(
+                            httpClient,
+                            requestBuilder.Build(),
+                            completionOption);
                     },
                     (r) =>
                     {
-                        return retryAttribute.HttpStatusCodeToRetry.Contains(r.StatusCode);
+                        if (retryAttribute.HttpStatusCodesToRetry != null)
+                        {
+                            return retryAttribute.HttpStatusCodesToRetry.Contains(r.StatusCode);
+                        }
+
+                        return false;
                     });
             }
 
-            return await httpClient.SendAsync(
-                requestMessage,
+            return await this.SendAsync(
+                httpClient,
+                requestBuilder.Build(),
+                completionOption);
+        }
+
+        /// <summary>
+        /// Sends the request to the service calling pre and post actions if they are configured. 
+        /// </summary>
+        /// <param name="httpClient">The http client to use.</param>
+        /// <param name="request">The http request to send.</param>
+        /// <param name="completionOption">The completion option.</param>
+        /// <returns>A <see cref="HttpResponseMessage"/>.</returns>
+        private async Task<HttpResponseMessage> SendAsync(
+            HttpClient httpClient,
+            HttpRequestMessage request,
+            HttpCompletionOption completionOption)
+        {
+
+            this.InvokeRequestAction(request);
+
+            var response = await httpClient.SendAsync(
+                request,
                 completionOption,
-                cancellationToken);
+                this.GetCancellationToken());
+
+            this.InvokeResponseAction(response);
+
+            return response;
         }
 
         /// <summary>
@@ -594,7 +645,7 @@ namespace ContractHttp
         /// Gets a cancellation token.
         /// </summary>
         /// <returns>The cancellation token.</returns>
-        public CancellationToken GetCancellationToken()
+        private CancellationToken GetCancellationToken()
         {
             if (this.cancellationTokenSource != null)
             {

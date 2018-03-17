@@ -38,17 +38,16 @@ namespace ContractHttp
         /// <summary>
         /// Sends a request.
         /// </summary>
-        /// <param name="request">The request to send.</param>
+        /// <param name="requestBuilder">The request builder.</param>
         /// <param name="completionOption">The completion option.</param>
         /// <returns>A <see cref="Task"/>.</returns>
-        public async Task<T> SendAsync(HttpRequestMessage request, HttpCompletionOption completionOption)
+        public async Task<T> SendAsync(HttpRequestBuilder requestBuilder, HttpCompletionOption completionOption)
         {
             var dataType = typeof(T);
             var response = await httpContext.SendAsync(
                 this.httpClient,
-                request,
-                completionOption,
-                httpContext.GetCancellationToken());
+                requestBuilder,
+                completionOption);
 
             if (dataType == typeof(Stream))
             {

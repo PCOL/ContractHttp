@@ -7,7 +7,9 @@ namespace ContractHttp
     public class RetryAttribute
         : Attribute
     {
-        public HttpStatusCode[] HttpStatusCodeToRetry { get; set; }
+        public HttpStatusCode[] HttpStatusCodesToRetry { get; set; }
+
+        public Exception[] ExceptionsToRetry { get; set; }
 
         public int RetryCount { get; set; }
 

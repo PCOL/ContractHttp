@@ -189,6 +189,11 @@
             }
             catch (AggregateException ex)
             {
+                foreach (var e in ex.Flatten().InnerExceptions)
+                {
+                    Console.WriteLine(e.ToString());
+                }
+
                 throw ex.Flatten().InnerException;
             }
         }
@@ -462,10 +467,6 @@
                 }
             }
 
-            var request = requestBuilder.Build();
-
-            httpContext.InvokeRequestAction(request);
-
             HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead;
             if (returnType == typeof(HttpResponseMessage) ||
                 returnType == typeof(Task<HttpResponseMessage>) ||
@@ -479,27 +480,30 @@
                 httpContext.SetTimeout(timeout.Value);
             }
 
-            if (httpContext.IsAsync(returnType) == true)
+            if (httpContext.IsAsync(returnType, out Type taskType) == true &&
+                taskType != typeof(void))
             {
-                var genericReturnTypes = returnType.GetGenericArguments();
-                Type asyncType = typeof(AsyncCall<>).MakeGenericType(genericReturnTypes[0]);
+                Type asyncType = typeof(AsyncCall<>).MakeGenericType(taskType);
                 object obj = Activator.CreateInstance(asyncType, client, httpContext);
-                var mi = asyncType.GetMethod("SendAsync", new Type[] { typeof(HttpRequestMessage), typeof(HttpCompletionOption) });
-                return mi.Invoke(obj, new object[] { request, completionOption });
+                var mi = asyncType.GetMethod("SendAsync", new Type[] { typeof(HttpRequestBuilder), typeof(HttpCompletionOption) });
+                return mi.Invoke(obj, new object[] { requestBuilder, completionOption });
             }
+
+            // var request = requestBuilder.Build();
+
+            // httpContext.InvokeRequestAction(request);
 
             var response = await httpContext.SendAsync(
                 client,
-                request,
-                completionOption,
-                httpContext.GetCancellationToken());
+                requestBuilder,
+                completionOption);
 
-            httpContext.InvokeResponseAction(response);
+            //httpContext.InvokeResponseAction(response);
 
             string content = null;
             if (httpContext.IsContentExpected == true)
             {
-                content = await response.Content.ReadAsStringAsync();
+                content = await response.Content?.ReadAsStringAsync();
             }
 
             return httpContext.ProcessResult(
