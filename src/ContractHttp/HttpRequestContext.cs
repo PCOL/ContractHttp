@@ -15,17 +15,8 @@ namespace ContractHttp
     /// Represents a request call context.
     /// </summary>
     internal class HttpRequestContext
+        : IHttpRequestContext
     {
-        /// <summary>
-        /// A reference to the method.
-        /// </summary>
-        private readonly MethodInfo methodInfo;
-
-        /// <summary>
-        /// A reference to the methods arguments.
-        /// </summary>
-        private readonly object[] arguments;
-
         /// <summary>
         /// A reference to the client proxy options.
         /// </summary>
@@ -61,6 +52,9 @@ namespace ContractHttp
         /// </summary>
         private Action<HttpResponseMessage> responseAction;
 
+        /// <summary>
+        /// The response function argument.
+        /// </summary>
         private int responseFuncArg = -1;
 
         /// <summary>
@@ -91,11 +85,22 @@ namespace ContractHttp
             string contentType,
             HttpClientProxyOptions options)
         {
-            this.methodInfo = methodInfo;
-            this.arguments = arguments;
+            this.MethodInfo = methodInfo;
+            this.Arguments = arguments;
             this.contentType = contentType;
             this.options = options;
         }
+
+        /// <summary>
+        /// A reference to the method.
+        /// </summary>
+        public MethodInfo MethodInfo { get; }
+
+        /// <summary>
+        /// A reference to the methods arguments.
+        /// </summary>
+        public object[] Arguments { get; }
+
 
         /// <summary>
         /// Gets a value indicating whether or not content is expected.
@@ -104,21 +109,113 @@ namespace ContractHttp
         {
             get
             {
-                return (this.methodInfo.ReturnType != typeof(HttpResponseMessage) &&
-                    this.methodInfo.ReturnType != typeof(void)) ||
+                return (this.MethodInfo.ReturnType != typeof(HttpResponseMessage) &&
+                    this.MethodInfo.ReturnType != typeof(void)) ||
                     this.dataArg != -1;
             }
         }
+
+        /// <summary>
+        /// Builds a request, sends it, and proecesses the response.
+        /// </summary>
+        /// <param name="method">The method info.</param>
+        /// <param name="httpMethod">The http method.</param>
+        /// <param name="uri">The request Uri.</param>
+        /// <param name="inArgs">The method calls arguments.</param>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>The result of the request.</returns>
+        public async Task<object> BuildAndSendRequestAsync(
+            HttpMethod httpMethod,
+            string uri,
+            string contentType,
+            TimeSpan? timeout)
+        {
+            var requestBuilder = new HttpRequestBuilder()
+                .SetMethod(httpMethod);
+
+            var names = this.CheckArgsAndBuildRequest(requestBuilder);
+
+            requestBuilder
+                .AddMethodHeaders(this.MethodInfo, names, this.Arguments)
+                .SetUri(uri.ExpandString(names, this.Arguments));
+
+            Type returnType = this.MethodInfo.ReturnType;
+            var authAttr = this.MethodInfo.GetCustomAttribute<AddAuthorizationHeaderAttribute>() ??
+                this.MethodInfo.DeclaringType.GetCustomAttribute<AddAuthorizationHeaderAttribute>();
+
+            if (authAttr != null)
+            {
+                if (authAttr.HeaderValue != null)
+                {
+                    requestBuilder.AddHeader(
+                        "Authorization",
+                        authAttr.HeaderValue.ExpandString(names, this.Arguments));
+                }
+                else
+                {
+                    var authFactoryType = authAttr.AuthorizationFactoryType ?? typeof(IAuthorizationHeaderFactory);
+                    var authFactory = this.options.Services?.GetService(authFactoryType) as IAuthorizationHeaderFactory;
+                    if (authFactory != null)
+                    {
+                        requestBuilder.AddAuthorizationHeader(
+                            authFactory.GetAuthorizationHeaderScheme(),
+                            authFactory.GetAuthorizationHeaderValue());
+                    }
+                }
+            }
+
+            HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead;
+            if (returnType == typeof(HttpResponseMessage) ||
+                returnType == typeof(Task<HttpResponseMessage>) ||
+                returnType == typeof(Task<Stream>))
+            {
+                completionOption = HttpCompletionOption.ResponseHeadersRead;
+            }
+
+            if (timeout.HasValue == true)
+            {
+                this.SetTimeout(timeout.Value);
+            }
+
+            var requestSender = new HttpRequestSender(
+                this.options.GetHttpClient(),
+                this);
+
+            if (this.IsAsync(returnType, out Type taskType) == true &&
+                taskType != typeof(void))
+            {
+                Type asyncType = typeof(AsyncCall<>).MakeGenericType(taskType);
+                object obj = Activator.CreateInstance(asyncType, requestSender, this);
+                var mi = asyncType.GetMethod("SendAsync", new Type[] { typeof(HttpRequestBuilder), typeof(HttpCompletionOption) });
+                return mi.Invoke(obj, new object[] { requestBuilder, completionOption });
+            }
+
+            var response = await requestSender.SendAsync(
+                requestBuilder,
+                completionOption);
+
+            string content = null;
+            if (this.IsContentExpected == true)
+            {
+                content = await response.Content?.ReadAsStringAsync();
+            }
+
+            return this.ProcessResult(
+                response,
+                content,
+                returnType);
+        }
+
 
         /// <summary>
         /// Checks the arguments for specific ones.
         /// </summary>
         /// <param name="requestBuilder">A request builder.</param>
         /// <returns>An array of argument names.</returns>
-        public string[] CheckArgsAndBuildRequest(
+        private string[] CheckArgsAndBuildRequest(
             HttpRequestBuilder requestBuilder)
         {
-            var formUrlAttrs = this.methodInfo.GetCustomAttributes<AddFormUrlEncodedPropertyAttribute>();
+            var formUrlAttrs = this.MethodInfo.GetCustomAttributes<AddFormUrlEncodedPropertyAttribute>();
             if (formUrlAttrs.Any() == true)
             {
                 foreach (var attr in formUrlAttrs)
@@ -127,14 +224,14 @@ namespace ContractHttp
                 }
             }
 
-            Type returnType = this.methodInfo.ReturnType;
+            Type returnType = this.MethodInfo.ReturnType;
             if (this.IsAsync(returnType, out Type taskType) == true)
             {
                 returnType = taskType;
             }
 
             bool formUrlContent = false;
-            ParameterInfo[] parms = this.methodInfo.GetParameters();
+            ParameterInfo[] parms = this.MethodInfo.GetParameters();
             if (parms == null)
             {
                 return new string[0];
@@ -187,22 +284,22 @@ namespace ContractHttp
                 }
                 else if (parmType == typeof(Action<HttpRequestMessage>))
                 {
-                    this.requestAction = (Action<HttpRequestMessage>)this.arguments[i];
+                    this.requestAction = (Action<HttpRequestMessage>)this.Arguments[i];
                 }
                 else if (parmType == typeof(Action<HttpResponseMessage>))
                 {
-                    this.responseAction = (Action<HttpResponseMessage>)this.arguments[i];
+                    this.responseAction = (Action<HttpResponseMessage>)this.Arguments[i];
                 }
                 else if (parmType == typeof(CancellationTokenSource))
                 {
-                    this.cancellationTokenSource = (CancellationTokenSource)this.arguments[i];
+                    this.cancellationTokenSource = (CancellationTokenSource)this.Arguments[i];
                 }
                 else
                 {
                     formUrlContent = this.CheckParameterAttributes(
                         requestBuilder,
                         parms[i],
-                        this.arguments[i]);
+                        this.Arguments[i]);
 
                     if (formUrlContent == false &&
                         requestBuilder.IsContentSet == false &&
@@ -215,7 +312,7 @@ namespace ContractHttp
                         }
 
                         requestBuilder.SetContent(new StringContent(
-                            serializer.SerializeObject(this.arguments[i]),
+                            serializer.SerializeObject(this.Arguments[i]),
                             Encoding.UTF8,
                             this.contentType));
                     }
@@ -374,7 +471,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="returnType">The return type.</param>
         /// <returns>True if the return type is a <see cref="Task"/> and therefore asynchronous; otherwise false.</returns>
-        public bool IsAsync(Type returnType, out Type taskType)
+        private bool IsAsync(Type returnType, out Type taskType)
         {
             taskType = null;
             if (typeof(Task).IsAssignableFrom(returnType) == true)
@@ -411,7 +508,7 @@ namespace ContractHttp
         /// <param name="response">A <see cref="HttpResponseMessage"/>.</param>
         /// <param name="returnType">The return type.</param>
         /// <returns>The result.</returns>
-        public object ProcessResult(
+        internal object ProcessResult(
             HttpResponseMessage response,
             string content,
             Type returnType)
@@ -426,16 +523,16 @@ namespace ContractHttp
                         content,
                         this.contentType,
                         returnType,
-                        this.methodInfo.ReturnParameter);
+                        this.MethodInfo.ReturnParameter);
                 }
 
                 if (this.dataArg != -1)
                 {
-                    this.arguments[this.dataArg] = this.DeserialiseObject(
+                    this.Arguments[this.dataArg] = this.DeserialiseObject(
                         content,
                         this.contentType,
                         this.dataArgType,
-                        this.methodInfo.GetParameters()[this.dataArg]);
+                        this.MethodInfo.GetParameters()[this.dataArg]);
                 }
             }
 
@@ -447,7 +544,7 @@ namespace ContractHttp
 
             if (this.responseArg != -1)
             {
-                this.arguments[this.responseArg] = response;
+                this.Arguments[this.responseArg] = response;
             }
 
             if (this.fromHeaders != null)
@@ -456,7 +553,7 @@ namespace ContractHttp
                 {
                     if (response.Headers.TryGetValues(item.Value, out IEnumerable<string> values) == true)
                     {
-                        this.arguments[item.Key] = values.FirstOrDefault();
+                        this.Arguments[item.Key] = values.FirstOrDefault();
                     }
                 }
             }
@@ -469,7 +566,7 @@ namespace ContractHttp
                     if (result != null &&
                         result.GetType() == item.Value.Item2)
                     {
-                        arguments[item.Key] = this.GetModelProperty(result, item.Value.Item2, item.Value.Item1);
+                        this.Arguments[item.Key] = this.GetModelProperty(result, item.Value.Item2, item.Value.Item1);
                     }
                 }
             }
@@ -480,11 +577,11 @@ namespace ContractHttp
             }
 
             if (this.responseFuncArg != -1 &&
-                this.arguments[this.responseFuncArg] != null)
+                this.Arguments[this.responseFuncArg] != null)
             {
                 var interceptorType = typeof(Func<,>).MakeGenericType(typeof(HttpResponseMessage), returnType);
                 var interceptorMethod = interceptorType.GetMethod("Invoke", new[] { typeof(HttpResponseMessage) });
-                result = interceptorMethod.Invoke(this.arguments[this.responseFuncArg], new object[] {response });
+                result = interceptorMethod.Invoke(this.Arguments[this.responseFuncArg], new object[] {response });
             }
 
             return result;
@@ -545,13 +642,14 @@ namespace ContractHttp
         /// <param name="requestBuilder">The http request builder.</param>
         /// <param name="completionOption">The completion option.</param>
         /// <returns></returns>
-        public async Task<HttpResponseMessage> SendAsync(
-            HttpClient httpClient,
+        internal async Task<HttpResponseMessage> SendAsync(
             HttpRequestBuilder requestBuilder,
             HttpCompletionOption completionOption)
         {
-            var retryAttribute = methodInfo.GetCustomAttribute<RetryAttribute>() ??
-                methodInfo.DeclaringType.GetCustomAttribute<RetryAttribute>();
+            var httpClient = this.options.GetHttpClient();
+
+            var retryAttribute = this.MethodInfo.GetCustomAttribute<RetryAttribute>() ??
+                this.MethodInfo.DeclaringType.GetCustomAttribute<RetryAttribute>();
 
             if (retryAttribute != null)
             {
@@ -635,7 +733,7 @@ namespace ContractHttp
         /// Sets the call timeout
         /// </summary>
         /// <param name="timeout">The timeout value.</param>
-        public void SetTimeout(TimeSpan timeout)
+        private void SetTimeout(TimeSpan timeout)
         {
             cancellationTokenSource = cancellationTokenSource ?? new CancellationTokenSource();
             cancellationTokenSource.CancelAfter(timeout);
@@ -645,7 +743,7 @@ namespace ContractHttp
         /// Gets a cancellation token.
         /// </summary>
         /// <returns>The cancellation token.</returns>
-        private CancellationToken GetCancellationToken()
+        public CancellationToken GetCancellationToken()
         {
             if (this.cancellationTokenSource != null)
             {

@@ -34,6 +34,9 @@
         /// </summary>
         private HttpClientContractAttribute clientContractAttribute;
 
+        /// <summary>
+        /// The client proxy options.
+        /// </summary>
         private HttpClientProxyOptions options;
 
         /// <summary>
@@ -100,35 +103,6 @@
         }
 
         /// <summary>
-        /// Creates a <see cref="HttpRequestMessage"/> and adds headers for the correlation id and source id.
-        /// </summary>
-        /// <param name="method">The http method.</param>
-        /// <param name="uri">The request uri.</param>
-        /// <param name="content">The content.</param>
-        /// <param name="contentType">The content type.</param>
-        /// <returns>A <see cref="HttpRequestMessage"/>.</returns>
-        internal static HttpRequestMessage CreateRequest(
-            HttpMethod method,
-            string uri,
-            HttpContent content,
-            string contentType)
-        {
-            var request = new HttpRequestMessage(method, uri);
-
-            if (content != null)
-            {
-                request.Content = content;
-            }
-
-            if (contentType.IsNullOrEmpty() == false)
-            {
-                request.Headers.Add("Accept", contentType);
-            }
-
-            return request;
-        }
-
-        /// <summary>
         /// The proxy agnostic implementation of the invoke method.
         /// </summary>
         /// <param name="method">The method beign invoked.</param>
@@ -174,12 +148,9 @@
                 uri = this.CombineUri(localBaseUri, route);
             }
 
-            var client = this.options.GetHttpClient();
-
             try
             {
                 return this.BuildAndSendRequestAsync(
-                    client,
                     method,
                     httpMethod,
                     uri,
@@ -287,25 +258,6 @@
         }
 
         /// <summary>
-        /// Checks if a list of attributes contains any of a provided list.
-        /// </summary>
-        /// <param name="attrs">The attribute listto check.</param>
-        /// <param name="attrTypes">The attributes to check for.</param>
-        /// <returns>True if any are found; otherwise false.</returns>
-        private bool HasAttribute(IEnumerable<Attribute> attrs, params Type[] attrTypes)
-        {
-            foreach (var attr in attrs)
-            {
-                if (attrTypes.FirstOrDefault(t => t == attr.GetType()) != null)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Gets the base uri.
         /// </summary>
         /// <returns></returns>
@@ -326,99 +278,15 @@
         }
 
         /// <summary>
-        /// Expands a string from a name/value list.
-        /// </summary>
-        /// <param name="str">The str to expand.</param>
-        /// <param name="names">An array of names.</param>
-        /// <param name="values">A matching array of values.</param>
-        /// <returns>The expanded <see cref="string"/>.</returns>
-        private string ExpandString(string str, string[] names, object[] values)
-        {
-            Utility.ThrowIfArgumentNullOrEmpty(str, nameof(str));
-
-            int end = 0;
-            int start = str.IndexOf('{');
-            if (start != -1)
-            {
-                string result = string.Empty;
-                while (start != -1)
-                {
-                    result += str.Substring(end, start - end);
-
-                    end = str.IndexOf('}', start);
-                    if (end == -1)
-                    {
-                        throw new Exception();
-                    }
-
-                    object value = null;
-                    string name = str.Substring(start + 1, end - start - 1);
-
-                    for (int i = 0; i < names.Length; i++)
-                    {
-                        if (names[i] == name)
-                        {
-                            value = values[i];
-                            break;
-                        }
-                    }
-
-                    if (value != null)
-                    {
-                        result += value.ToString();
-                    }
-
-                    start = str.IndexOf('{', ++end);
-                }
-
-                result += str.Substring(end);
-                return result;
-            }
-
-            return str;
-        }
-
-        /// <summary>
-        /// Adds the method headers to a <see cref="RequestBuilder"/>.
-        /// </summary>
-        /// <param name="requestBuilder">THe <see cref=""/>RequestBuilder.</param>
-        /// <param name="method">The <see cref="MethodInfo"/>.</param>
-        /// <param name="names">An array of names.</param>
-        /// <param name="values">An array of values.</param>
-        private void AddMethodHeaders(
-            HttpRequestBuilder requestBuilder,
-            MethodInfo method,
-            string[] names,
-            object[] values)
-        {
-            var headerAttrs = method
-                .GetCustomAttributes<AddHeaderAttribute>()
-                .Union(
-                    method.DeclaringType.GetCustomAttributes<AddHeaderAttribute>());
-
-            if (headerAttrs.Any() == true)
-            {
-                foreach (var attr in headerAttrs)
-                {
-                    requestBuilder.AddHeader(
-                        attr.Header,
-                        this.ExpandString(attr.Value, names, values));
-                }
-            }
-        }
-
-        /// <summary>
         /// Builds a request, sends it, and proecesses the response.
         /// </summary>
-        /// <param name="client">The <see cref="HttpClient"/> to use.</param>
         /// <param name="method">The method info.</param>
         /// <param name="httpMethod">The http method.</param>
         /// <param name="uri">The request Uri.</param>
         /// <param name="inArgs">The method calls arguments.</param>
         /// <param name="contentType">The content type.</param>
         /// <returns>The result of the request.</returns>
-        private async Task<object> BuildAndSendRequestAsync(
-            HttpClient client,
+        private Task<object> BuildAndSendRequestAsync(
             MethodInfo method,
             HttpMethod httpMethod,
             string uri,
@@ -428,83 +296,11 @@
         {
             var httpContext = new HttpRequestContext(method, inArgs, contentType, this.options);
 
-            var requestBuilder = new HttpRequestBuilder()
-                .SetMethod(httpMethod);
-
-            var names = httpContext.CheckArgsAndBuildRequest(requestBuilder);
-
-            this.AddMethodHeaders(requestBuilder, method, names, inArgs);
-
-            requestBuilder.SetUri(this.ExpandString(uri, names, inArgs));
-
-            Type returnType = method.ReturnType;
-            var authAttr = method.GetCustomAttribute<AddAuthorizationHeaderAttribute>() ??
-                method.DeclaringType.GetCustomAttribute<AddAuthorizationHeaderAttribute>();
-
-            if (authAttr != null)
-            {
-                if (authAttr.HeaderValue != null)
-                {
-                    requestBuilder.AddHeader(
-                        "Authorization",
-                        this.ExpandString(authAttr.HeaderValue, names, inArgs));
-                }
-                else
-                {
-                    var authFactoryType = authAttr.AuthorizationFactoryType ?? typeof(IAuthorizationHeaderFactory);
-                    var authFactory = this.options.Services?.GetService(authFactoryType) as IAuthorizationHeaderFactory;
-                    if (authFactory != null)
-                    {
-                        requestBuilder.AddAuthorizationHeader(
-                            authFactory.GetAuthorizationHeaderScheme(),
-                            authFactory.GetAuthorizationHeaderValue());
-                    }
-                }
-            }
-
-            HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead;
-            if (returnType == typeof(HttpResponseMessage) ||
-                returnType == typeof(Task<HttpResponseMessage>) ||
-                returnType == typeof(Task<Stream>))
-            {
-                completionOption = HttpCompletionOption.ResponseHeadersRead;
-            }
-
-            if (timeout.HasValue == true)
-            {
-                httpContext.SetTimeout(timeout.Value);
-            }
-
-            if (httpContext.IsAsync(returnType, out Type taskType) == true &&
-                taskType != typeof(void))
-            {
-                Type asyncType = typeof(AsyncCall<>).MakeGenericType(taskType);
-                object obj = Activator.CreateInstance(asyncType, client, httpContext);
-                var mi = asyncType.GetMethod("SendAsync", new Type[] { typeof(HttpRequestBuilder), typeof(HttpCompletionOption) });
-                return mi.Invoke(obj, new object[] { requestBuilder, completionOption });
-            }
-
-            // var request = requestBuilder.Build();
-
-            // httpContext.InvokeRequestAction(request);
-
-            var response = await httpContext.SendAsync(
-                client,
-                requestBuilder,
-                completionOption);
-
-            //httpContext.InvokeResponseAction(response);
-
-            string content = null;
-            if (httpContext.IsContentExpected == true)
-            {
-                content = await response.Content?.ReadAsStringAsync();
-            }
-
-            return httpContext.ProcessResult(
-                response,
-                content,
-                returnType);
+            return httpContext.BuildAndSendRequestAsync(
+                httpMethod,
+                uri,
+                contentType,
+                timeout);
         }
 
         /// <summary>

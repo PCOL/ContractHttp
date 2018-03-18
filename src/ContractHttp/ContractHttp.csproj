@@ -85,5 +85,11 @@
     <Content Include="IHttpClientProxy.cs" />
     <Content Include="IHttpRequestModifier.cs" />
     <Content Include="RetryHandler.cs" />
+    <Content Include="IResponseIntercepter.cs" />
+    <Content Include="IHttpRequestBuilder.cs" />
+    <Content Include="HttpRequestBuilderExtensions.cs" />
+    <Content Include="IHttpRequestSender.cs" />
+    <Content Include="HttpRequestSender.cs" />
+    <Content Include="IHttpRequestContext.cs" />
   </ItemGroup>
 </Project>

@@ -15,23 +15,21 @@ namespace ContractHttp
     internal class AsyncCall<T>
     {
         /// <summary>
-        /// A reference to the client.
+        /// A reterence to the <see cref="IHttpRequestSender"/>
         /// </summary>
-        private readonly HttpClient httpClient;
+        private readonly IHttpRequestSender requestSender;
 
-        /// <summary>
-        /// A reterence to the <see cref="HttpRequestContext"/>
-        /// </summary>
         private readonly HttpRequestContext httpContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AsyncCall{T}"/> class.
         /// </summary>
-        /// <param name="httpClient">The <see cref="HttpClient"/> to use.</param>
-        /// <param name="httpContext">A <see cref="HttpRequestContext"/></param>
-        public AsyncCall(HttpClient httpClient, HttpRequestContext httpContext)
+        /// <param name="requestSender">A <see cref="IHttpRequestSender"/></param>
+        public AsyncCall(
+            IHttpRequestSender requestSender,
+            HttpRequestContext httpContext)
         {
-            this.httpClient = httpClient;
+            this.requestSender = requestSender;
             this.httpContext = httpContext;
         }
 
@@ -44,8 +42,7 @@ namespace ContractHttp
         public async Task<T> SendAsync(HttpRequestBuilder requestBuilder, HttpCompletionOption completionOption)
         {
             var dataType = typeof(T);
-            var response = await httpContext.SendAsync(
-                this.httpClient,
+            var response = await this.requestSender.SendAsync(
                 requestBuilder,
                 completionOption);
 
@@ -56,8 +53,6 @@ namespace ContractHttp
                 var result = await response.Content.ReadAsStreamAsync();
                 return (T)(object)result;
             }
-
-            this.httpContext.InvokeResponseAction(response);
 
             var content = await response.Content.ReadAsStringAsync();
 

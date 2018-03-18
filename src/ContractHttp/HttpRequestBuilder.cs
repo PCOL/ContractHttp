@@ -1,11 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-
 namespace ContractHttp
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Net.Http;
+
+    /// <summary>
+    /// Builds a <see cref="HttpRequestMessage"/>.
+    /// </summary>
     internal class HttpRequestBuilder
+        : IHttpRequestBuilder
     {
         private HttpMethod httpMethod = HttpMethod.Get;
 
@@ -49,23 +53,45 @@ namespace ContractHttp
             return this;
         }
 
+        /// <summary>
+        /// Sets the requests Uri.
+        /// </summary>
+        /// <param name="uri">The Uri.</param>
+        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
         public HttpRequestBuilder SetUri(string uri)
         {
             this.uri = uri;
             return this;
         }
 
+        /// <summary>
+        /// Sets the requests content.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
         public HttpRequestBuilder SetContent(HttpContent content)
         {
             this.content = content;
             return this;
         }
 
+        /// <summary>
+        /// Adds an authorization header.
+        /// </summary>
+        /// <param name="scheme">The authorization scheme.</param>
+        /// <param name="value">The authorization value.</param>
+        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
         public HttpRequestBuilder AddAuthorizationHeader(string scheme, string value)
         {
             return this.AddHeader("Authorization", $"{scheme} {value}");
         }
 
+        /// <summary>
+        /// Adds a header.
+        /// </summary>
+        /// <param name="key">The header key.</param>
+        /// <param name="value">The header value.</param>
+        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
         public HttpRequestBuilder AddHeader(string key, string value)
         {
             this.headers = this.headers ?? new Dictionary<string, string>();
@@ -73,6 +99,12 @@ namespace ContractHttp
             return this;
         }
 
+        /// <summary>
+        /// Adds a query string.
+        /// </summary>
+        /// <param name="key">The query key.</param>
+        /// <param name="value">The query value.</param>
+        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
         public HttpRequestBuilder AddQueryString(string key, string value)
         {
             this.queryStrings = this.queryStrings ?? new Dictionary<string, string>();
@@ -80,6 +112,12 @@ namespace ContractHttp
             return this;
         }
 
+        /// <summary>
+        /// Adds a form url property.
+        /// </summary>
+        /// <param name="key">The property key.</param>
+        /// <param name="value">The property value.</param>
+        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
         public HttpRequestBuilder AddFormUrlProperty(string key, string value)
         {
             this.formUrlProperties = this.formUrlProperties ?? new List<KeyValuePair<string, string>>();
@@ -87,6 +125,11 @@ namespace ContractHttp
             return this;
         }
 
+        /// <summary>
+        /// Adds a list of form url properties.
+        /// </summary>
+        /// <param name="properties">The properties.</param>
+        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
         public HttpRequestBuilder AddFormUrlProperties(IEnumerable<KeyValuePair<string, string>> properties)
         {
             this.formUrlProperties = this.formUrlProperties ?? new List<KeyValuePair<string, string>>();
