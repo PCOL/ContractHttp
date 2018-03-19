@@ -1,6 +1,7 @@
 namespace ContractHttp
 {
     using System;
+    using System.Net.Http;
 
     /// <summary>
     /// A return value attribute that allows the return value to be extracted from
@@ -8,7 +9,7 @@ namespace ContractHttp
     /// </summary>
     [AttributeUsage(AttributeTargets.ReturnValue | AttributeTargets.Parameter)]
     public class FromModelAttribute
-        : Attribute
+        : HttpResponseIntercepterAttribute
     {
         /// <summary>
         /// Initialises a new instance of the <see cref="FromModelAttribute"/> class.
@@ -30,5 +31,21 @@ namespace ContractHttp
         /// Gets the property name.
         /// </summary>
         public string PropertyName { get; }
+
+        public override object ToObject(HttpContent httpContent, Type dataType)
+        {
+            return this.ToObject(
+                httpContent.ReadAsStringAsync().Result,
+                dataType);
+        }
+
+        public override object ToObject(string content, Type dataType)
+        {
+            if (content.IsNullOrEmpty() == false)
+            {
+            }
+
+            return null;
+        }
     }
 }

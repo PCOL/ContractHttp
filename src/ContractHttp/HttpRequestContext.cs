@@ -118,10 +118,8 @@ namespace ContractHttp
         /// <summary>
         /// Builds a request, sends it, and proecesses the response.
         /// </summary>
-        /// <param name="method">The method info.</param>
         /// <param name="httpMethod">The http method.</param>
         /// <param name="uri">The request Uri.</param>
-        /// <param name="inArgs">The method calls arguments.</param>
         /// <param name="contentType">The content type.</param>
         /// <returns>The result of the request.</returns>
         public async Task<object> BuildAndSendRequestAsync(
@@ -484,28 +482,10 @@ namespace ContractHttp
         }
 
         /// <summary>
-        /// Checks if a list of attributes contains any of a provided list.
-        /// </summary>
-        /// <param name="attrs">The attribute listto check.</param>
-        /// <param name="attrTypes">The attributes to check for.</param>
-        /// <returns>True if any are found; otherwise false.</returns>
-        private bool HasAttribute(IEnumerable<Attribute> attrs, params Type[] attrTypes)
-        {
-            foreach (var attr in attrs)
-            {
-                if (attrTypes.FirstOrDefault(t => t == attr.GetType()) != null)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Processes the result.
         /// </summary>
         /// <param name="response">A <see cref="HttpResponseMessage"/>.</param>
+        /// <param name="content">The response content.</param>
         /// <param name="returnType">The return type.</param>
         /// <returns>The result.</returns>
         internal object ProcessResult(
@@ -608,7 +588,7 @@ namespace ContractHttp
                 var fromJsonAttr = parameterInfo.GetCustomAttribute<FromJsonAttribute>();
                 if (fromJsonAttr != null)
                 {
-                    return fromJsonAttr.JsonToObject(content, dataType);
+                    return fromJsonAttr.ToObject(content, dataType);
                 }
 
                 var fromModelAttr = parameterInfo.GetCustomAttribute<FromModelAttribute>();
