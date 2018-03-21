@@ -7,17 +7,17 @@ namespace ContractHttp
     using System.Threading;
     using System.Threading.Tasks;
 
-    public class HttpRequestSender
+    internal class HttpRequestSender
         : IHttpRequestSender
     {
         private readonly HttpClient httpClient;
 
-        private readonly IHttpRequestContext requestContext;
+        private readonly HttpRequestContext requestContext;
 
-        public HttpRequestSender(HttpClient httpClient, IHttpRequestContext requestContext)
+        public HttpRequestSender(HttpClient httpClient, HttpRequestContext methodContext)
         {
             this.httpClient = httpClient;
-            this.requestContext = requestContext;
+            this.requestContext = methodContext;
         }
 
         public async Task<HttpResponseMessage> SendAsync(

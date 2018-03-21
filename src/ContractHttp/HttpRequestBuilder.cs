@@ -132,8 +132,12 @@ namespace ContractHttp
         /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
         public HttpRequestBuilder AddFormUrlProperties(IEnumerable<KeyValuePair<string, string>> properties)
         {
-            this.formUrlProperties = this.formUrlProperties ?? new List<KeyValuePair<string, string>>();
-            this.formUrlProperties.AddRange(properties);
+            if (properties != null)
+            {
+                this.formUrlProperties = this.formUrlProperties ?? new List<KeyValuePair<string, string>>();
+                this.formUrlProperties.AddRange(properties);
+            }
+
             return this;
         }
 

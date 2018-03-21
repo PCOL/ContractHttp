@@ -10,8 +10,6 @@ namespace ContractHttp
         {
         }
 
-        public abstract object ToObject(HttpContent content, Type dataType);
-
-        public abstract object ToObject(string content, Type dataType);
+        public abstract object ToObject(HttpResponseMessage content, Type dataType);
     }
 }

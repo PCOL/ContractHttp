@@ -92,5 +92,6 @@
     <Content Include="HttpRequestSender.cs" />
     <Content Include="IHttpRequestContext.cs" />
     <Content Include="ResponseIntercepterAttribute.cs" />
+    <Content Include="MethodArgType.cs" />
   </ItemGroup>
 </Project>

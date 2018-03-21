@@ -32,17 +32,17 @@ namespace ContractHttp
         /// </summary>
         public string PropertyName { get; }
 
-        public override object ToObject(HttpContent httpContent, Type dataType)
+        public override object ToObject(HttpResponseMessage response, Type dataType)
         {
-            return this.ToObject(
-                httpContent.ReadAsStringAsync().Result,
-                dataType);
-        }
-
-        public override object ToObject(string content, Type dataType)
-        {
+            var content = response.Content.ReadAsStringAsync().Result;
             if (content.IsNullOrEmpty() == false)
             {
+                object model = null; //serializer.DeserializeObject(content, this.ModelType);
+                if (model != null)
+                {
+                    var property = this.ModelType.GetProperty(this.PropertyName);
+                    return property?.GetValue(model);
+                }
             }
 
             return null;

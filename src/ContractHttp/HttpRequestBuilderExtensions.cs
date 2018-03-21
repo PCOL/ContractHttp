@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -31,6 +32,40 @@ namespace ContractHttp
                     requestBuilder.AddHeader(
                         attr.Header,
                         attr.Value.ExpandString(names, values));
+                }
+            }
+
+            return requestBuilder;
+        }
+
+        public static HttpRequestBuilder AddAuthorizationHeader(
+            this HttpRequestBuilder requestBuilder,
+            MethodInfo methodInfo,
+            IEnumerable<string> names,
+            IEnumerable<object> arguments,
+            IServiceProvider serviceProvider)
+        {
+            var authAttr = methodInfo.GetCustomAttribute<AddAuthorizationHeaderAttribute>() ??
+                methodInfo.DeclaringType.GetCustomAttribute<AddAuthorizationHeaderAttribute>();
+
+            if (authAttr != null)
+            {
+                if (authAttr.HeaderValue != null)
+                {
+                    requestBuilder.AddHeader(
+                        "Authorization",
+                        authAttr.HeaderValue.ExpandString(names, arguments));
+                }
+                else
+                {
+                    var authFactoryType = authAttr.AuthorizationFactoryType ?? typeof(IAuthorizationHeaderFactory);
+                    var authFactory = serviceProvider?.GetService(authFactoryType) as IAuthorizationHeaderFactory;
+                    if (authFactory != null)
+                    {
+                        requestBuilder.AddAuthorizationHeader(
+                            authFactory.GetAuthorizationHeaderScheme(),
+                            authFactory.GetAuthorizationHeaderValue());
+                    }
                 }
             }
 

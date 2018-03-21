@@ -54,9 +54,7 @@ namespace ContractHttp
                 return (T)(object)result;
             }
 
-            var content = await response.Content.ReadAsStringAsync();
-
-            return (T) this.httpContext.ProcessResult(response, content, typeof(T));
+            return (T) this.httpContext.ProcessResult(response, typeof(T));
         }
     }
 }

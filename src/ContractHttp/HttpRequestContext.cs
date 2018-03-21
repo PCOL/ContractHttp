@@ -138,29 +138,12 @@ namespace ContractHttp
                 .SetUri(uri.ExpandString(names, this.Arguments));
 
             Type returnType = this.MethodInfo.ReturnType;
-            var authAttr = this.MethodInfo.GetCustomAttribute<AddAuthorizationHeaderAttribute>() ??
-                this.MethodInfo.DeclaringType.GetCustomAttribute<AddAuthorizationHeaderAttribute>();
 
-            if (authAttr != null)
-            {
-                if (authAttr.HeaderValue != null)
-                {
-                    requestBuilder.AddHeader(
-                        "Authorization",
-                        authAttr.HeaderValue.ExpandString(names, this.Arguments));
-                }
-                else
-                {
-                    var authFactoryType = authAttr.AuthorizationFactoryType ?? typeof(IAuthorizationHeaderFactory);
-                    var authFactory = this.options.Services?.GetService(authFactoryType) as IAuthorizationHeaderFactory;
-                    if (authFactory != null)
-                    {
-                        requestBuilder.AddAuthorizationHeader(
-                            authFactory.GetAuthorizationHeaderScheme(),
-                            authFactory.GetAuthorizationHeaderValue());
-                    }
-                }
-            }
+            requestBuilder.AddAuthorizationHeader(
+                this.MethodInfo,
+                names,
+                this.Arguments,
+                this.options.Services);
 
             HttpCompletionOption completionOption = HttpCompletionOption.ResponseContentRead;
             if (returnType == typeof(HttpResponseMessage) ||
@@ -179,7 +162,7 @@ namespace ContractHttp
                 this.options.GetHttpClient(),
                 this);
 
-            if (this.IsAsync(returnType, out Type taskType) == true &&
+            if (returnType.IsAsync(out Type taskType) == true &&
                 taskType != typeof(void))
             {
                 Type asyncType = typeof(AsyncCall<>).MakeGenericType(taskType);
@@ -192,15 +175,8 @@ namespace ContractHttp
                 requestBuilder,
                 completionOption);
 
-            string content = null;
-            if (this.IsContentExpected == true)
-            {
-                content = await response.Content?.ReadAsStringAsync();
-            }
-
             return this.ProcessResult(
                 response,
-                content,
                 returnType);
         }
 
@@ -223,7 +199,7 @@ namespace ContractHttp
             }
 
             Type returnType = this.MethodInfo.ReturnType;
-            if (this.IsAsync(returnType, out Type taskType) == true)
+            if (returnType.IsAsync(out Type taskType) == true)
             {
                 returnType = taskType;
             }
@@ -327,7 +303,7 @@ namespace ContractHttp
         /// <param name="parm">The parameter.</param>
         /// <param name="argument">The parameters value.</param>
         /// <returns>A value indicating whether or not there is form url content.</returns>
-        private bool CheckParameterAttributes(
+        internal bool CheckParameterAttributes(
             HttpRequestBuilder requestBuilder,
             ParameterInfo parm,
             object argument)
@@ -457,28 +433,11 @@ namespace ContractHttp
         /// </summary>
         /// <param name="type">The type</param>
         /// <returns>True if the type is a model object; otherwise false.</returns>
-        private bool IsModelObject(Type type)
+        internal bool IsModelObject(Type type)
         {
             return type.IsPrimitive == false &&
                 type.IsClass == true &&
                 type != typeof(string);
-        }
-
-        /// <summary>
-        /// Checks if the return type is a task.
-        /// </summary>
-        /// <param name="returnType">The return type.</param>
-        /// <returns>True if the return type is a <see cref="Task"/> and therefore asynchronous; otherwise false.</returns>
-        private bool IsAsync(Type returnType, out Type taskType)
-        {
-            taskType = null;
-            if (typeof(Task).IsAssignableFrom(returnType) == true)
-            {
-                taskType = returnType.GetGenericArguments().FirstOrDefault() ?? typeof(void);
-                return true;
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -490,18 +449,17 @@ namespace ContractHttp
         /// <returns>The result.</returns>
         internal object ProcessResult(
             HttpResponseMessage response,
-            string content,
             Type returnType)
         {
             object result = null;
+            string content = response.Content.ReadAsStringAsync().Result;
             if (content.IsNullOrEmpty() == false)
             {
                 if (returnType != typeof(HttpResponseMessage) &&
                     returnType != typeof(void))
                 {
                     result = this.DeserialiseObject(
-                        content,
-                        this.contentType,
+                        response,
                         returnType,
                         this.MethodInfo.ReturnParameter);
                 }
@@ -509,8 +467,7 @@ namespace ContractHttp
                 if (this.dataArg != -1)
                 {
                     this.Arguments[this.dataArg] = this.DeserialiseObject(
-                        content,
-                        this.contentType,
+                        response,
                         this.dataArgType,
                         this.MethodInfo.GetParameters()[this.dataArg]);
                 }
@@ -575,22 +532,32 @@ namespace ContractHttp
         /// <param name="dataType">The return data type.</param>
         /// <param name="parameterInfo">The parameter that the content is to returned via.</param>
         /// <returns></returns>
-        private object DeserialiseObject(string content, string contType, Type dataType, ParameterInfo parameterInfo)
+        private object DeserialiseObject(
+            HttpResponseMessage response,
+            Type dataType,
+            ParameterInfo parameterInfo)
         {
+            var contType = response.Content.Headers.ContentType.MediaType;
+
+            if (parameterInfo != null &&
+                contentType == "application/json")
+            {
+                var fromJsonAttr = parameterInfo.GetCustomAttribute<FromJsonAttribute>();
+                if (fromJsonAttr != null)
+                {
+                    return fromJsonAttr.ToObject(response, dataType);
+                }
+            }
+
             var serializer = this.options.GetObjectSerializer(contType);
             if (serializer == null)
             {
                 throw new NotSupportedException($"Serializer for {contType} not found");
             }
 
+            var content = response.Content.ReadAsStringAsync().Result;
             if (parameterInfo != null)
             {
-                var fromJsonAttr = parameterInfo.GetCustomAttribute<FromJsonAttribute>();
-                if (fromJsonAttr != null)
-                {
-                    return fromJsonAttr.ToObject(content, dataType);
-                }
-
                 var fromModelAttr = parameterInfo.GetCustomAttribute<FromModelAttribute>();
                 if (fromModelAttr != null)
                 {

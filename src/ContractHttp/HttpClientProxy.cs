@@ -45,7 +45,7 @@
         /// <param name="options">Client proxy options.</param>
         public HttpClientProxy(HttpClientProxyOptions options)
         {
-            this.ThrowIfNotInterface(typeof(T), "T");
+            Utility.ThrowIfNotInterface(typeof(T), "T");
             Utility.ThrowIfArgumentNull(options, nameof(options));
 
             this.options = options ?? new HttpClientProxyOptions();
@@ -61,7 +61,7 @@
         /// <param name="options">Client proxy options.</param>
         public HttpClientProxy(string baseUri, HttpClientProxyOptions options = null)
         {
-            this.ThrowIfNotInterface(typeof(T), "T");
+            Utility.ThrowIfNotInterface(typeof(T), "T");
             Utility.ThrowIfArgumentNullOrEmpty(baseUri, nameof(baseUri));
 
             this.options = options ?? new HttpClientProxyOptions();
@@ -301,19 +301,6 @@
                 uri,
                 contentType,
                 timeout);
-        }
-
-        /// <summary>
-        /// Throws an <see cref="InvalidOperationException"/> if the type is not an interface.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <param name="name">The types name.</param>
-        private void ThrowIfNotInterface(Type type, string name)
-        {
-            if (type.IsInterface == false)
-            {
-                throw new InvalidOperationException(string.Format("{0} must be an interface", name));
-            }
         }
 
         /// <summary>

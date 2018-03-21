@@ -3,6 +3,8 @@ namespace ContractHttp
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// Various utility methods.
@@ -49,6 +51,19 @@ namespace ContractHttp
             if (argument.IndexOf(' ') != -1)
             {
                 throw new ArgumentException("Argument contains whitespace", argumentName);
+            }
+        }
+
+        /// <summary>
+        /// Throws an <see cref="InvalidOperationException"/> if the type is not an interface.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="name">The types name.</param>
+        public static void ThrowIfNotInterface(Type type, string name)
+        {
+            if (type.IsInterface == false)
+            {
+                throw new InvalidOperationException(string.Format("{0} must be an interface", name));
             }
         }
 
@@ -144,6 +159,80 @@ namespace ContractHttp
 
                 yield return new KeyValuePair<TKey, TValue>(keyEnumerator.Current, value);
             }
+        }
+
+        /// <summary>
+        /// Checks if the return type is a task.
+        /// </summary>
+        /// <param name="returnType">The return type.</param>
+        /// <returns>True if the return type is a <see cref="Task"/> and therefore asynchronous; otherwise false.</returns>
+        public static bool IsAsync(this Type returnType, out Type taskType)
+        {
+            taskType = null;
+            if (typeof(Task).IsAssignableFrom(returnType) == true)
+            {
+                taskType = returnType.GetGenericArguments().FirstOrDefault() ?? typeof(void);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Gets a service implemtation or default.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider.</param>
+        /// <returns>A service implementation or default</returns>
+        public static T GetServiceOrDefault<T, TDefault>(this IServiceProvider serviceProvider)
+            where T : class
+            where TDefault : T
+        {
+            return (T)serviceProvider.GetServiceOrDefault(typeof(T), typeof(TDefault));
+        }
+
+        /// <summary>
+        /// Gets a service implemtation or default.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider.</param>
+        /// <param name="serviceType">The service type.</param>
+        /// <param name="defaultType">The default service type.</param>
+        /// <returns>A service implementation or default</returns>
+        public static object GetServiceOrDefault(this IServiceProvider serviceProvider, Type serviceType, Type defaultType)
+        {
+            if (serviceType.IsAssignableFrom(defaultType) == false)
+            {
+                throw new ArgumentException("Argument is not of type", nameof(defaultType));
+            }
+
+            var service = serviceProvider.GetService(serviceType);
+            if (service != null)
+            {
+                return service;
+            }
+
+            service = serviceProvider.GetService(defaultType);
+            if (service != null)
+            {
+                return service;
+            }
+
+            var ctor = defaultType.GetConstructors().FirstOrDefault();
+            if (ctor != null)
+            {
+                var parms = ctor.GetParameters();
+                if (parms.Any() == true)
+                {
+                    object[] args = new object[parms.Length];
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        args[i] = serviceProvider.GetRequiredService(parms[i].ParameterType);
+                    }
+
+                    return ctor.Invoke(args);
+                }
+            }
+
+            return Activator.CreateInstance(defaultType);
         }
     }
 }

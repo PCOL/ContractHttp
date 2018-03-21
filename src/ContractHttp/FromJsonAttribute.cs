@@ -18,23 +18,12 @@ namespace ContractHttp
         /// <summary>
         /// Converts a json string to an object.
         /// </summary>
-        /// <param name="httpContent">The response content.</param>
+        /// <param name="response">The response.</param>
         /// <param name="dataType">The object type.</param>
         /// <returns></returns>
-        public override object ToObject(HttpContent httpContent, Type dataType)
+        public override object ToObject(HttpResponseMessage response, Type dataType)
         {
-            var content = httpContent.ReadAsStringAsync().Result;
-            return this.ToObject(content, dataType);
-        }
-
-        /// <summary>
-        /// Converts a json string to an object.
-        /// </summary>
-        /// <param name="httpContent">The response content.</param>
-        /// <param name="dataType">The object type.</param>
-        /// <returns></returns>
-        public override object ToObject(string content, Type dataType)
-        {
+            var content = response.Content.ReadAsStringAsync().Result;
             if (content.IsNullOrEmpty() == false)
             {
                 var jobj = JObject.Parse(content);
