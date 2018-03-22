@@ -7,6 +7,9 @@ namespace ContractHttp
     using System.Threading;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// Implementation of the <see cref="IHttpRequestSender"/> interface.
+    /// </summary>
     internal class HttpRequestSender
         : IHttpRequestSender
     {

@@ -9,6 +9,7 @@ namespace ContractHttp
         : HttpResponseIntercepterAttribute
     {
         public FromJsonAttribute(string jsonPath)
+            : base ("application/json")
         {
             this.JsonPath = jsonPath;
         }
@@ -20,8 +21,12 @@ namespace ContractHttp
         /// </summary>
         /// <param name="response">The response.</param>
         /// <param name="dataType">The object type.</param>
-        /// <returns></returns>
-        public override object ToObject(HttpResponseMessage response, Type dataType)
+        /// <param name="serializer">The object serializer.</param>
+        /// <returns>The object instance.</returns>
+        public override object ToObject(
+            HttpResponseMessage response,
+            Type dataType,
+            IObjectSerializer serializer)
         {
             var content = response.Content.ReadAsStringAsync().Result;
             if (content.IsNullOrEmpty() == false)

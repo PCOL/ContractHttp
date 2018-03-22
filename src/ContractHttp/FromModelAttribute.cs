@@ -32,12 +32,12 @@ namespace ContractHttp
         /// </summary>
         public string PropertyName { get; }
 
-        public override object ToObject(HttpResponseMessage response, Type dataType)
+        public override object ToObject(HttpResponseMessage response, Type dataType, IObjectSerializer serializer)
         {
             var content = response.Content.ReadAsStringAsync().Result;
             if (content.IsNullOrEmpty() == false)
             {
-                object model = null; //serializer.DeserializeObject(content, this.ModelType);
+                object model = serializer.DeserializeObject(content, this.ModelType);
                 if (model != null)
                 {
                     var property = this.ModelType.GetProperty(this.PropertyName);

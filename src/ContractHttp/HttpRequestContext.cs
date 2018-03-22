@@ -180,7 +180,6 @@ namespace ContractHttp
                 returnType);
         }
 
-
         /// <summary>
         /// Checks the arguments for specific ones.
         /// </summary>
@@ -452,24 +451,23 @@ namespace ContractHttp
             Type returnType)
         {
             object result = null;
-            string content = response.Content.ReadAsStringAsync().Result;
-            if (content.IsNullOrEmpty() == false)
+            if (response.Content.Headers.ContentLength != 0)
             {
                 if (returnType != typeof(HttpResponseMessage) &&
                     returnType != typeof(void))
                 {
-                    result = this.DeserialiseObject(
+                    result = this.DeserialiseObjectAsync(
                         response,
                         returnType,
-                        this.MethodInfo.ReturnParameter);
+                        this.MethodInfo.ReturnParameter).Result;
                 }
 
                 if (this.dataArg != -1)
                 {
-                    this.Arguments[this.dataArg] = this.DeserialiseObject(
+                    this.Arguments[this.dataArg] = this.DeserialiseObjectAsync(
                         response,
                         this.dataArgType,
-                        this.MethodInfo.GetParameters()[this.dataArg]);
+                        this.MethodInfo.GetParameters()[this.dataArg]).Result;
                 }
             }
 
@@ -495,8 +493,7 @@ namespace ContractHttp
                 }
             }
 
-            if (this.fromModels != null &&
-                content.IsNullOrEmpty() == false)
+            if (this.fromModels != null)
             {
                 foreach (var item in this.fromModels)
                 {
@@ -532,41 +529,46 @@ namespace ContractHttp
         /// <param name="dataType">The return data type.</param>
         /// <param name="parameterInfo">The parameter that the content is to returned via.</param>
         /// <returns></returns>
-        private object DeserialiseObject(
+        private async Task<object> DeserialiseObjectAsync(
             HttpResponseMessage response,
             Type dataType,
             ParameterInfo parameterInfo)
         {
-            var contType = response.Content.Headers.ContentType.MediaType;
-
-            if (parameterInfo != null &&
-                contentType == "application/json")
+            if (response.Content.Headers.ContentLength == 0)
             {
-                var fromJsonAttr = parameterInfo.GetCustomAttribute<FromJsonAttribute>();
-                if (fromJsonAttr != null)
+                return null;
+            }
+
+            var responseContentType = response.Content.Headers.ContentType.MediaType;
+
+            var attr = parameterInfo.GetCustomAttributes<HttpResponseIntercepterAttribute>()?.FirstOrDefault();
+            if (attr != null)
+            {
+                if (attr.ContentType == null ||
+                    attr.ContentType == responseContentType)
                 {
-                    return fromJsonAttr.ToObject(response, dataType);
+                    var serializer = this.options.GetObjectSerializer(responseContentType);
+                    if (serializer == null)
+                    {
+                        throw new NotSupportedException($"Serializer for {responseContentType} not found");
+                    }
+
+                    return attr.ToObject(
+                        response,
+                        dataType,
+                        serializer);
                 }
             }
 
-            var serializer = this.options.GetObjectSerializer(contType);
-            if (serializer == null)
+            var responeSerializer = this.options.GetObjectSerializer(responseContentType);
+            if (responeSerializer == null)
             {
-                throw new NotSupportedException($"Serializer for {contType} not found");
+                throw new NotSupportedException($"Serializer for {responseContentType} not found");
             }
 
-            var content = response.Content.ReadAsStringAsync().Result;
-            if (parameterInfo != null)
-            {
-                var fromModelAttr = parameterInfo.GetCustomAttribute<FromModelAttribute>();
-                if (fromModelAttr != null)
-                {
-                    var model = serializer.DeserializeObject(content, fromModelAttr.ModelType);
-                    return this.GetModelProperty(model, fromModelAttr.ModelType, fromModelAttr.PropertyName);
-                }
-            }
+            var content = await response.Content.ReadAsStringAsync();
 
-            return serializer.DeserializeObject(content, dataType);
+            return responeSerializer.DeserializeObject(content, dataType);
         }
 
         /// <summary>
@@ -580,80 +582,6 @@ namespace ContractHttp
         {
             var property = modelType.GetProperty(propertyName);
             return property?.GetValue(model);
-        }
-
-        /// <summary>
-        /// Sends the request with retry if configured.
-        /// </summary>
-        /// <param name="httpClient">The http client to use.</param>
-        /// <param name="requestBuilder">The http request builder.</param>
-        /// <param name="completionOption">The completion option.</param>
-        /// <returns></returns>
-        internal async Task<HttpResponseMessage> SendAsync(
-            HttpRequestBuilder requestBuilder,
-            HttpCompletionOption completionOption)
-        {
-            var httpClient = this.options.GetHttpClient();
-
-            var retryAttribute = this.MethodInfo.GetCustomAttribute<RetryAttribute>() ??
-                this.MethodInfo.DeclaringType.GetCustomAttribute<RetryAttribute>();
-
-            if (retryAttribute != null)
-            {
-                RetryHandler retry = new RetryHandler()
-                    .RetryCount(retryAttribute.RetryCount)
-                    .WaitTime(TimeSpan.FromMilliseconds(retryAttribute.WaitTime))
-                    .MaxWaitTime(TimeSpan.FromMilliseconds(retryAttribute.MaxWaitTime))
-                    .DoubleWaitTimeOnRetry(retryAttribute.DoubleWaitTimeOnRetry);
-
-                return await retry.RetryAsync<HttpResponseMessage>(
-                    () =>
-                    {
-                        return this.SendAsync(
-                            httpClient,
-                            requestBuilder.Build(),
-                            completionOption);
-                    },
-                    (r) =>
-                    {
-                        if (retryAttribute.HttpStatusCodesToRetry != null)
-                        {
-                            return retryAttribute.HttpStatusCodesToRetry.Contains(r.StatusCode);
-                        }
-
-                        return false;
-                    });
-            }
-
-            return await this.SendAsync(
-                httpClient,
-                requestBuilder.Build(),
-                completionOption);
-        }
-
-        /// <summary>
-        /// Sends the request to the service calling pre and post actions if they are configured. 
-        /// </summary>
-        /// <param name="httpClient">The http client to use.</param>
-        /// <param name="request">The http request to send.</param>
-        /// <param name="completionOption">The completion option.</param>
-        /// <returns>A <see cref="HttpResponseMessage"/>.</returns>
-        private async Task<HttpResponseMessage> SendAsync(
-            HttpClient httpClient,
-            HttpRequestMessage request,
-            HttpCompletionOption completionOption)
-        {
-
-            this.InvokeRequestAction(request);
-
-            var response = await httpClient.SendAsync(
-                request,
-                completionOption,
-                this.GetCancellationToken());
-
-            this.InvokeResponseAction(response);
-
-            return response;
         }
 
         /// <summary>
