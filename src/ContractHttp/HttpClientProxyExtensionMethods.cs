@@ -135,7 +135,6 @@ namespace ContractHttp
             var httpMethodAttr = methodInfo.GetCustomAttribute<HttpMethodAttribute>(true);
             if (httpMethodAttr != null)
             {
-                Console.WriteLine("HttpMethodAttr: {0}", httpMethodAttr);
                 return httpMethodAttr.GetMethodAndTemplateFromAttribute(out httpMethod);
             }
 
@@ -143,7 +142,6 @@ namespace ContractHttp
             var methodAttr = methodInfo.GetCustomAttribute<MethodAttribute>(true);
             if (methodAttr != null)
             {
-                Console.WriteLine("MethodAttr: {0}", methodAttr);
                 return methodAttr.GetMethodAndTemplateFromAttribute(out httpMethod);
             }
 
