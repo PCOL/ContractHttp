@@ -88,8 +88,7 @@ namespace ContractHttp
                 }
             }
 
-            // Create a client.
-            return new HttpClient();
+            return HttpClientSingleton.Instance;
         }
 
         /// <summary>

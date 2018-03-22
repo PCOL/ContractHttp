@@ -132,21 +132,13 @@
                 }
             }
 
-            // Check for a http method attribute.
-            HttpMethodAttribute httpMethodAttr = method.GetCustomAttribute<HttpMethodAttribute>(false);
-            if (httpMethodAttr != null)
+            string route = method.GetHttpMethodAndTemplate(out HttpMethod httpAttrMethod);
+            if (route != null)
             {
-                string route = this.GetMethodAndTemplateFromAttribute(httpMethodAttr, ref httpMethod);
                 uri = this.CombineUri(localBaseUri, route);
             }
 
-            // Check for a method attribute.
-            MethodAttribute methodAttr = method.GetCustomAttribute<MethodAttribute>(false);
-            if (methodAttr != null)
-            {
-                string route = this.GetMethodAndTemplateFromAttribute(methodAttr, ref httpMethod);
-                uri = this.CombineUri(localBaseUri, route);
-            }
+            httpMethod = httpAttrMethod ?? httpMethod;
 
             try
             {

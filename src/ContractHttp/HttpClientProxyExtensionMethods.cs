@@ -2,6 +2,9 @@ namespace ContractHttp
 {
     using System;
     using System.Net.Http;
+    using System.Reflection;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
@@ -123,5 +126,101 @@ namespace ContractHttp
 
             return services;
         }
+
+        public static string GetHttpMethodAndTemplate(this MethodInfo methodInfo, out HttpMethod httpMethod)
+        {
+            httpMethod = null;
+
+            // Check for a http method attribute.
+            var httpMethodAttr = methodInfo.GetCustomAttribute<HttpMethodAttribute>(true);
+            if (httpMethodAttr != null)
+            {
+                Console.WriteLine("HttpMethodAttr: {0}", httpMethodAttr);
+                return httpMethodAttr.GetMethodAndTemplateFromAttribute(out httpMethod);
+            }
+
+            // Check for a method attribute.
+            var methodAttr = methodInfo.GetCustomAttribute<MethodAttribute>(true);
+            if (methodAttr != null)
+            {
+                Console.WriteLine("MethodAttr: {0}", methodAttr);
+                return methodAttr.GetMethodAndTemplateFromAttribute(out httpMethod);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the Http method and the template from a <see cref="HttpMethodAttribute"/>.
+        /// </summary>
+        /// <param name="attr">The <see cref="HttpMethodAttribute"/> instance.</param>
+        /// <param name="httpMethod">A variable to receive the <see cref="HttpMethod"/>.</param>
+        /// <returns>The attribute template.</returns>
+        private static string GetMethodAndTemplateFromAttribute(
+            this HttpMethodAttribute attr,
+            out HttpMethod httpMethod)
+        {
+            httpMethod = null;
+
+            if (attr is HttpGetAttribute)
+            {
+                httpMethod = HttpMethod.Get;
+            }
+            else if (attr is HttpPostAttribute)
+            {
+                httpMethod = HttpMethod.Post;
+            }
+            else if (attr is HttpPutAttribute)
+            {
+                httpMethod = HttpMethod.Put;
+            }
+            else if (attr is HttpPatchAttribute)
+            {
+                httpMethod = new HttpMethod("Patch");
+            }
+            else if (attr is HttpDeleteAttribute)
+            {
+                httpMethod = HttpMethod.Delete;
+            }
+
+            return ((HttpMethodAttribute)attr).Template;
+        }
+
+        /// <summary>
+        /// Gets the Http method and the template from a <see cref="MethodAttribute"/>.
+        /// </summary>
+        /// <param name="attr">The <see cref="MethodAttribute"/> instance.</param>
+        /// <param name="httpMethod">A variable to receive the <see cref="HttpMethod"/>.</param>
+        /// <returns>The attribute template.</returns>
+        private static string GetMethodAndTemplateFromAttribute(
+            this MethodAttribute attr,
+            out HttpMethod httpMethod)
+        {
+            httpMethod = null;
+
+            if (attr is GetAttribute)
+            {
+                httpMethod = HttpMethod.Get;
+            }
+            else if (attr is PostAttribute)
+            {
+                httpMethod = HttpMethod.Post;
+            }
+            else if (attr is PutAttribute)
+            {
+                httpMethod = HttpMethod.Put;
+            }
+            else if (attr is PatchAttribute)
+            {
+                httpMethod = new HttpMethod("Patch");
+            }
+            else if (attr is DeleteAttribute)
+            {
+                httpMethod = HttpMethod.Delete;
+            }
+
+            return ((MethodAttribute)attr).Template;
+        }
+
     }
 }
