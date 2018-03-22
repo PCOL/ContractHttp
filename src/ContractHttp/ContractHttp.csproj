@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <VersionPrefix>1.0.0</VersionPrefix>
-    <VersionSuffix>alpha9</VersionSuffix>
+    <VersionSuffix>alpha10</VersionSuffix>
     <PackageId>ContractHttp</PackageId>
     <Authors>pcol</Authors>
     <AssemblyTitle>ContractHttp</AssemblyTitle>
