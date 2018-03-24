@@ -19,3 +19,8 @@ TestResults
 [Dd]ebug/
 [Rr]elease/
 x64/
+
+coverage-html/
+coverage.json
+coverage.xml
+coverage-hits.txt
