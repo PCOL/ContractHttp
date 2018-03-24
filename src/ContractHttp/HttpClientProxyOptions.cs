@@ -81,7 +81,7 @@ namespace ContractHttp
             var httpClientFactory = this.Services?.GetService<IHttpClientFactory>();
             if (httpClientFactory != null)
             {
-                httpClient = httpClientFactory.CreateClient();
+                httpClient = httpClientFactory.GetClient();
                 if (httpClient != null)
                 {
                     return httpClient;

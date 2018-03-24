@@ -10,6 +10,7 @@ namespace ContractHttp
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
     /// Represents a request call context.
@@ -101,20 +102,6 @@ namespace ContractHttp
         /// </summary>
         public object[] Arguments { get; }
 
-
-        /// <summary>
-        /// Gets a value indicating whether or not content is expected.
-        /// </summary>
-        public bool IsContentExpected
-        {
-            get
-            {
-                return (this.MethodInfo.ReturnType != typeof(HttpResponseMessage) &&
-                    this.MethodInfo.ReturnType != typeof(void)) ||
-                    this.dataArg != -1;
-            }
-        }
-
         /// <summary>
         /// Builds a request, sends it, and proecesses the response.
         /// </summary>
@@ -158,9 +145,11 @@ namespace ContractHttp
                 this.SetTimeout(timeout.Value);
             }
 
-            var requestSender = new HttpRequestSender(
-                this.options.GetHttpClient(),
-                this);
+            var httpRequestSenderFactory = this.options.Services?.GetService<IHttpRequestSenderFactory>();
+
+            var httpClient = this.options.GetHttpClient();
+            var requestSender = httpRequestSenderFactory?.CreateRequestSender(httpClient, this) ??
+                new HttpRequestSender(httpClient,this);
 
             if (returnType.IsAsync(out Type taskType) == true &&
                 taskType != typeof(void))

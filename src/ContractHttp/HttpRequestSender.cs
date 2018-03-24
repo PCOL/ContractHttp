@@ -15,9 +15,9 @@ namespace ContractHttp
     {
         private readonly HttpClient httpClient;
 
-        private readonly HttpRequestContext requestContext;
+        private readonly IHttpRequestContext requestContext;
 
-        public HttpRequestSender(HttpClient httpClient, HttpRequestContext methodContext)
+        public HttpRequestSender(HttpClient httpClient, IHttpRequestContext methodContext)
         {
             this.httpClient = httpClient;
             this.requestContext = methodContext;

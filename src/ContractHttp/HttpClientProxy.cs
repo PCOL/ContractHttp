@@ -152,6 +152,10 @@
             }
             catch (AggregateException ex)
             {
+                foreach (var e in ex.InnerExceptions)
+                {
+                    Console.WriteLine(e.ToString());   
+                }
                 throw ex.Flatten().InnerException;
             }
         }

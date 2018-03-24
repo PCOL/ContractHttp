@@ -204,31 +204,34 @@ namespace ContractHttp
                 throw new ArgumentException("Argument is not of type", nameof(defaultType));
             }
 
-            var service = serviceProvider.GetService(serviceType);
-            if (service != null)
+            if (serviceProvider != null)
             {
-                return service;
-            }
-
-            service = serviceProvider.GetService(defaultType);
-            if (service != null)
-            {
-                return service;
-            }
-
-            var ctor = defaultType.GetConstructors().FirstOrDefault();
-            if (ctor != null)
-            {
-                var parms = ctor.GetParameters();
-                if (parms.Any() == true)
+                var service = serviceProvider.GetService(serviceType);
+                if (service != null)
                 {
-                    object[] args = new object[parms.Length];
-                    for (int i = 0; i < args.Length; i++)
-                    {
-                        args[i] = serviceProvider.GetRequiredService(parms[i].ParameterType);
-                    }
+                    return service;
+                }
 
-                    return ctor.Invoke(args);
+                service = serviceProvider.GetService(defaultType);
+                if (service != null)
+                {
+                    return service;
+                }
+
+                var ctor = defaultType.GetConstructors().FirstOrDefault();
+                if (ctor != null)
+                {
+                    var parms = ctor.GetParameters();
+                    if (parms.Any() == true)
+                    {
+                        object[] args = new object[parms.Length];
+                        for (int i = 0; i < args.Length; i++)
+                        {
+                            args[i] = serviceProvider.GetRequiredService(parms[i].ParameterType);
+                        }
+
+                        return ctor.Invoke(args);
+                    }
                 }
             }
 
