@@ -440,7 +440,7 @@ namespace ContractHttp
             Type returnType)
         {
             object result = null;
-            if (response.Content.Headers.ContentLength != 0)
+            if (response.Content?.Headers?.ContentLength != 0)
             {
                 if (returnType != typeof(HttpResponseMessage) &&
                     returnType != typeof(void))

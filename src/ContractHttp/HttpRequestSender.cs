@@ -10,7 +10,7 @@ namespace ContractHttp
     /// <summary>
     /// Implementation of the <see cref="IHttpRequestSender"/> interface.
     /// </summary>
-    internal class HttpRequestSender
+    public class HttpRequestSender
         : IHttpRequestSender
     {
         private readonly HttpClient httpClient;
