@@ -1,6 +1,7 @@
 namespace ContractHttp
 {
     using System;
+    using System.Net.Http;
     using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
@@ -28,5 +29,10 @@ namespace ContractHttp
         /// Gets the services instance.
         /// </summary>
         public IServiceProvider Services { get; }
+
+        /// <summary>
+        /// Gets or sets a response.
+        /// </summary>
+        public HttpResponseMessage Response { get; set; }
     }
 }
