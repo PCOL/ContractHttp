@@ -499,6 +499,31 @@ namespace ContractHttp
                 return response;
             }
 
+            if (result != null)
+            {
+                if (returnType.IsGenericType == true)
+                {
+                    if (typeof(IEnumerable<object>).IsAssignableFrom(returnType) == true)
+                    {
+                        var property = returnType.GetGenericArguments()[0]
+                            .GetProperties()
+                            .FirstOrDefault(p => p.PropertyType == typeof(HttpResponseMessage));
+
+                        if (property != null)
+                        {
+                            foreach (var item in (IEnumerable<object>)result)
+                            {
+                                property.SetValue(item, response);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    result.SetObjectProperty<HttpResponseMessage>(response);
+                }
+            }
+
             if (this.responseFuncArg != -1 &&
                 this.Arguments[this.responseFuncArg] != null)
             {

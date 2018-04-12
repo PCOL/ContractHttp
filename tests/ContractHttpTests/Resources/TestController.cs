@@ -13,7 +13,21 @@ namespace ContractHttpTests.Resources
         [HttpGet("")]
         public IActionResult Get()
         {
-            return this.StatusCode(StatusCodes.Status200OK);
+            return this.StatusCode(
+                StatusCodes.Status200OK,
+                new[]
+                {
+                    new TestData()
+                    {
+                        Name = "Name",
+                        Address = "Address"
+                    },
+                    new TestData()
+                    {
+                        Name = "Name",
+                        Address = "Address"
+                    }
+                });
         }
 
         [HttpGet("{name}")]
@@ -98,6 +112,18 @@ namespace ContractHttpTests.Resources
             }
 
             return this.StatusCode(StatusCodes.Status404NotFound);
+        }
+
+        [HttpGet("id/{id}")]
+        public IActionResult GetById(string id)
+        {
+            return this.StatusCode(
+                StatusCodes.Status200OK,
+                new TestData()
+                {
+                    Name = "Name",
+                    Address = "Address"
+                });
         }
     }
 }

@@ -3,6 +3,7 @@ namespace ContractHttp
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -176,6 +177,36 @@ namespace ContractHttp
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Sets the value of an objects property.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <param name="propertyName">The name of the property.</param>
+        /// <param name="value">The value to set.</param>
+        public static void SetObjectProperty<T>(this object obj, string propertyName, T value)
+        {
+            var property = obj?.GetType().GetProperty(propertyName, typeof(T));
+            if (property != null && property.SetMethod != null && property.SetMethod.IsPublic)
+            {
+                property.SetValue(obj, value);
+            }
+        }
+
+        /// <summary>
+        /// Set the value of an objects property by the type of property.
+        /// </summary>
+        /// <typeparam name="T">The property type.null</typeparam>
+        /// <param name="obj">The object.</param>
+        /// <param name="value">The value.</param>
+        public static void SetObjectProperty<T>(this object obj, T value)
+        {
+            var property = obj?.GetType().GetProperties(BindingFlags.Public | BindingFlags.SetProperty).FirstOrDefault();
+            if (property != null)
+            {
+                property.SetValue(obj, value);
+            }
         }
 
         /// <summary>

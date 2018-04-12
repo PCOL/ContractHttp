@@ -15,6 +15,9 @@ namespace ContractHttpTests.Resources
         [Get("{name}")]
         TestData Get(string name);
 
+        [Get("")]
+        IEnumerable<TestData> GetAll();
+
         [Post("")]
         HttpResponseMessage Create(CreateModel model);
 
@@ -32,5 +35,9 @@ namespace ContractHttpTests.Resources
 
         [Delete("")]
         HttpResponseMessage DeleteUsingQueryString([SendAsQuery("name")] string name);
+
+        [Get("id/{id}")]
+        [return: FromJson("", ReturnType = typeof(ServiceResult<TestData>))]
+        IServiceResult<TestData> GetById(string id);
     }
 }

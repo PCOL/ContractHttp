@@ -179,5 +179,31 @@ namespace ContractHttpTests
             Assert.IsNotNull(response);
             Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode);
         }
+
+        [TestMethod]
+        public void CallGetById_WithServiceResultReturnType()
+        {
+            var result = this.testService.GetById("id");
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Response);
+            Assert.AreEqual(HttpStatusCode.OK, result.Response.StatusCode);
+            Assert.IsNotNull(result.Result);
+            Assert.AreEqual("Name", result.Result.Name);
+            Assert.AreEqual("Address", result.Result.Address);
+        }
+
+        [TestMethod]
+        public void CallGetAll_WithResponseInReturnType()
+        {
+            var results = this.testService.GetAll();
+            Assert.IsNotNull(results);
+            foreach (var item in results)
+            {
+                Assert.AreEqual("Name", item.Name);
+                Assert.AreEqual("Address", item.Address);
+                Assert.IsNotNull(item.Response);
+                Assert.AreEqual(HttpStatusCode.OK, item.Response.StatusCode);
+            }
+        }
     }
 }

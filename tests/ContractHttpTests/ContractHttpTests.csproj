@@ -38,5 +38,7 @@
     <Content Include="Resources\TestRetryCounts.cs" />
     <Content Include="RetryHandlerUnitTests.cs" />
     <Content Include="RequestSenderUnitTests.cs" />
+    <Content Include="Resources\IServiceResult{T}.cs" />
+    <Content Include="Resources\ServiceResult{T}.cs" />
   </ItemGroup>
 </Project>
