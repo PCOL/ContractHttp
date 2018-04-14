@@ -105,29 +105,6 @@ namespace ContractHttp
         }
 
         /// <summary>
-        /// Sets the first property of a given type that is publicly setable.
-        /// </summary>
-        /// <param name="properties">A list of properties.</param>
-        /// <param name="obj">The object that the property belongs to.</param>
-        /// <param name="propertyType">The type of property to look for.</param>
-        /// <param name="func">A function to provide the property value.</param>
-        private void SetProperty(IEnumerable<PropertyInfo> properties, object obj, Type propertyType, Func<object> func)
-        {
-            if (obj != null)
-            {
-                var resultProperty = properties?.FirstOrDefault(
-                    p => p.PropertyType == propertyType &&
-                    p.SetMethod != null &&
-                    p.SetMethod.IsPublic == true);
-
-                if (resultProperty != null)
-                {
-                    resultProperty.SetValue(obj, func());
-                }
-            }
-        }
-
-        /// <summary>
         /// Gets an object from a <see cref="JObject"/> instance.
         /// </summary>
         /// <param name="obj">The <see cref="JObject"/> instance.</param>
