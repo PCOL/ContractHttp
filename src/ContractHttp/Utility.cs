@@ -202,10 +202,62 @@ namespace ContractHttp
         /// <param name="value">The value.</param>
         public static void SetObjectProperty<T>(this object obj, T value)
         {
-            var property = obj?.GetType().GetProperties(BindingFlags.Public | BindingFlags.SetProperty).FirstOrDefault();
+            obj.SetObjectProperty(() => value);
+        }
+
+        /// <summary>
+        /// Set the value of an objects property by the type of property.
+        /// </summary>
+        /// <typeparam name="T">The property type.null</typeparam>
+        /// <param name="obj">The object.</param>
+        /// <param name="valueFunction">The function that provides the value.</param>
+        public static void SetObjectProperty<T>(this object obj, Func<T> valueFunction)
+        {
+            obj?.GetType()
+                .GetProperties().SetProperty(obj, valueFunction());
+        }
+
+        /// <summary>
+        /// Set the value of a property by the type of property.
+        /// </summary>
+        /// <typeparam name="T">The property type.null</typeparam>
+        /// <param name="properties">A list of properties</param>
+        /// <param name="obj">The object.</param>
+        /// <param name="value">The value.</param>
+        public static void SetProperty<T>(this IEnumerable<PropertyInfo> properties, object obj, T value)
+        {
+            properties.SetProperty(obj, () => value);
+        }
+
+        /// <summary>
+        /// Set the value of a property by the type of property.
+        /// </summary>
+        /// <typeparam name="T">The property type.null</typeparam>
+        /// <param name="properties">A list of properties</param>
+        /// <param name="obj">The object.</param>
+        /// <param name="valueFunction">The function that provides the value.</param>
+        public static void SetProperty<T>(this IEnumerable<PropertyInfo> properties, object obj, Func<T> valueFunction)
+        {
+            var property = properties?.FirstOrDefault(p => p.PropertyType == typeof(T));
             if (property != null)
             {
-                property.SetValue(obj, value);
+                property.SetValue(obj, valueFunction());
+            }
+        }
+
+        /// <summary>
+        /// Set the value of a property by the type of property.
+        /// </summary>
+        /// <typeparam name="T">The property type.null</typeparam>
+        /// <param name="properties">A list of properties</param>
+        /// <param name="obj">The object.</param>
+        /// <param name="valueFunction">The function that provides the value.</param>
+        public static void SetProperty(this IEnumerable<PropertyInfo> properties, object obj, Type propertyType, Func<object> valueFunction)
+        {
+            var property = properties?.FirstOrDefault(p => p.PropertyType == propertyType);
+            if (property != null)
+            {
+                property.SetValue(obj, valueFunction());
             }
         }
 

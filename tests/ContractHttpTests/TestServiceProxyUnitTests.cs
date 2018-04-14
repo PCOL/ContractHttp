@@ -193,6 +193,24 @@ namespace ContractHttpTests
         }
 
         [TestMethod]
+        public void CallGetById_WithFromJsonAttribute()
+        {
+            var response = this.testService.GetById("id", out string name);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual("Name", name);
+        }
+
+        [TestMethod]
+        public void CallGetById_WithFromModelAttribute()
+        {
+            var response = this.testService.GetAddressById("id", out string address);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual("Address", address);
+        }
+
+        [TestMethod]
         public void CallGetAll_WithResponseInReturnType()
         {
             var results = this.testService.GetAll();

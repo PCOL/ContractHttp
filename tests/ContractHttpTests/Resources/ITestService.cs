@@ -39,5 +39,15 @@ namespace ContractHttpTests.Resources
         [Get("id/{id}")]
         [return: FromJson("", ReturnType = typeof(ServiceResult<TestData>))]
         IServiceResult<TestData> GetById(string id);
+
+        [Get("id/{id}")]
+        HttpResponseMessage GetById(
+            string id,
+            [FromJson("name")]out string name);
+
+        [Get("id/{id}")]
+        HttpResponseMessage GetAddressById(
+            string id,
+            [FromModel(typeof(TestData), "Address")]out string address);
     }
 }

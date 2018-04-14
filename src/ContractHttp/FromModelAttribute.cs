@@ -9,7 +9,7 @@ namespace ContractHttp
     /// </summary>
     [AttributeUsage(AttributeTargets.ReturnValue | AttributeTargets.Parameter)]
     public class FromModelAttribute
-        : HttpResponseIntercepterAttribute
+        : FromResponseAttribute
     {
         /// <summary>
         /// Initialises a new instance of the <see cref="FromModelAttribute"/> class.

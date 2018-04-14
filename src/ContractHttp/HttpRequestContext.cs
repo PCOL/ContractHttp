@@ -64,9 +64,9 @@ namespace ContractHttp
         private Dictionary<int, string> fromHeaders;
 
         /// <summary>
-        /// A dictionary of from model parameters.
+        /// A dictionary of from response parameters.
         /// </summary>
-        private Dictionary<int, Tuple<string, Type>> fromModels;
+        private Dictionary<int, Tuple<FromResponseAttribute, Type>> fromResponses;
 
         /// <summary>
         /// A cancellation token source.
@@ -215,11 +215,11 @@ namespace ContractHttp
                     }
                     else
                     {
-                        var fromModel = parms[i].GetCustomAttribute<FromModelAttribute>();
-                        if (fromModel != null)
+                        var fromResponse = parms[i].GetCustomAttribute<FromResponseAttribute>();
+                        if (fromResponse != null)
                         {
-                            this.fromModels = this.fromModels ?? new Dictionary<int, Tuple<string, Type>>();
-                            this.fromModels.Add(i, Tuple.Create(fromModel.PropertyName, fromModel.ModelType));
+                            this.fromResponses = this.fromResponses ?? new Dictionary<int, Tuple<FromResponseAttribute, Type>>();
+                            this.fromResponses.Add(i, Tuple.Create(fromResponse, parmType.GetElementType()));
                         }
                         else
                         {
@@ -482,15 +482,21 @@ namespace ContractHttp
                 }
             }
 
-            if (this.fromModels != null)
+            if (this.fromResponses != null)
             {
-                foreach (var item in this.fromModels)
+                string lastContentType = null;
+                IObjectSerializer serializer = null;
+
+                foreach (var fromResponse in this.fromResponses.OrderBy(a => a.Value.Item1.ContentType))
                 {
-                    if (result != null &&
-                        result.GetType() == item.Value.Item2)
+                    string responseContentType = fromResponse.Value.Item1.ContentType ?? this.contentType;
+                    if (responseContentType != lastContentType)
                     {
-                        this.Arguments[item.Key] = this.GetModelProperty(result, item.Value.Item2, item.Value.Item1);
+                        lastContentType = responseContentType;
+                        serializer = this.GetObjectSerializer(responseContentType);
                     }
+
+                    this.Arguments[fromResponse.Key] = fromResponse.Value.Item1.ToObject(response, fromResponse.Value.Item2, serializer);
                 }
             }
 
@@ -555,17 +561,13 @@ namespace ContractHttp
 
             var responseContentType = response.Content.Headers.ContentType.MediaType;
 
-            var attr = parameterInfo.GetCustomAttributes<HttpResponseIntercepterAttribute>()?.FirstOrDefault();
+            var attr = parameterInfo.GetCustomAttributes<FromResponseAttribute>()?.FirstOrDefault();
             if (attr != null)
             {
                 if (attr.ContentType == null ||
                     attr.ContentType == responseContentType)
                 {
-                    var serializer = this.options.GetObjectSerializer(responseContentType);
-                    if (serializer == null)
-                    {
-                        throw new NotSupportedException($"Serializer for {responseContentType} not found");
-                    }
+                    var serializer = this.GetObjectSerializer(responseContentType);
 
                     return attr.ToObject(
                         response,
@@ -574,15 +576,26 @@ namespace ContractHttp
                 }
             }
 
-            var responeSerializer = this.options.GetObjectSerializer(responseContentType);
-            if (responeSerializer == null)
-            {
-                throw new NotSupportedException($"Serializer for {responseContentType} not found");
-            }
-
+            var responseSerializer = this.GetObjectSerializer(responseContentType);
             var content = await response.Content.ReadAsStringAsync();
 
-            return responeSerializer.DeserializeObject(content, dataType);
+            return responseSerializer.DeserializeObject(content, dataType);
+        }
+
+        /// <summary>
+        /// Gets the object serializer for a given content type.
+        /// </summary>
+        /// <param name="contentType">The content type.</param>
+        /// <returns>An object serializer.</returns>
+        private IObjectSerializer GetObjectSerializer(string contentType)
+        {
+            var serializer = this.options.GetObjectSerializer(contentType);
+            if (serializer == null)
+            {
+                throw new NotSupportedException($"Serializer for {contentType} not found");
+            }
+
+            return serializer;
         }
 
         /// <summary>

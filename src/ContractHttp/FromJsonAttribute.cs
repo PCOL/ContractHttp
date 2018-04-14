@@ -7,14 +7,30 @@ namespace ContractHttp
     using System.Reflection;
     using Newtonsoft.Json.Linq;
 
+    /// <summary>
+    /// Allows an out parameter or return value to be set from a JSON value.
+    /// </summary>
     [AttributeUsage(AttributeTargets.ReturnValue | AttributeTargets.Parameter)]
     public class FromJsonAttribute
-        : HttpResponseIntercepterAttribute
+        : FromResponseAttribute
     {
+        /// <summary>
+        /// Initialises a new instance of the <see cref="FromJsonAttribute"/> class.
+        /// </summary>
+        /// <param name="jsonPath">The path to the json value.</param>
         public FromJsonAttribute(string jsonPath)
-            : base ("application/json")
         {
+            this.ContentType = "application/json";
             this.JsonPath = jsonPath;
+        }
+
+        /// <summary>
+        /// Gets or sets the contentType
+        /// </summary>
+        public new string ContentType
+        {
+            get => base.ContentType;
+            set {}
         }
 
         /// <summary>
@@ -75,19 +91,16 @@ namespace ContractHttp
                 var resultType = genArgs.First();
 
                 returnObj = Activator.CreateInstance(this.ReturnType);
-                this.SetProperty(
-                    properties,
+                properties.SetProperty(
                     returnObj,
                     resultType,
                     () => this.GetObject(jobj, resultType, this.JsonPath));
             }
 
-            this.SetProperty(
-                properties,
+            properties.SetProperty<HttpResponseMessage>(
                 returnObj,
-                typeof(HttpResponseMessage),
                 () => response);
-                
+
             return returnObj;
         }
 
