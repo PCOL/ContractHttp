@@ -12,7 +12,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="httpClient">The <see cref="HttpClient"/> to use.</param>
         /// <param name="httpRequestContext">The current http request context.</param>
-        /// <returns></returns>
+        /// <returns>A request sender.</returns>
         IHttpRequestSender CreateRequestSender(HttpClient httpClient, IHttpRequestContext httpRequestContext);
     }
 }

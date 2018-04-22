@@ -33,6 +33,13 @@ namespace ContractHttp
         public string PropertyName { get; }
 
         /// <summary>
+        /// Hides the return type property.
+        /// </summary>
+        [System.ComponentModel.Browsable(false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
+        public new Type ReturnType { get; set; }
+
+        /// <summary>
         /// Converts the <see cref="HttpResponseMessage"/> into the required data type.
         /// </summary>
         /// <param name="response">The <see cref="HttpResponseMessage"/>.</param>

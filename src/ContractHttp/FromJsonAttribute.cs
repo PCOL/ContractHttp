@@ -27,6 +27,8 @@ namespace ContractHttp
         /// <summary>
         /// Gets or sets the contentType
         /// </summary>
+        [System.ComponentModel.Browsable(false)]
+        [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
         public new string ContentType
         {
             get => base.ContentType;
@@ -37,11 +39,6 @@ namespace ContractHttp
         /// Gets the json path.
         /// </summary>
         public string JsonPath { get; }
-
-        /// <summary>
-        /// Gets or sets thge return type.
-        /// </summary>
-        public Type ReturnType { get; set; }
 
         /// <summary>
         /// Converts a json string to an object.

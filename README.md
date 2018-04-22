@@ -90,6 +90,14 @@ AddHeaderAttribute can be applied to a method or an interface to add a header va
 
 * AddAuthorizationHeaderAttribute can be applied to a method or an interface to add an authorization header to the request or all requests.
 
+One group of attributes can be used to alter how return values or out parameters use the Http responses content to obtain their values.
+
+* The **FromResponseAttribute** class can be used to indicate the return type. This is only required if the methods return type or out parameter is an interface type.
+
+* The **FromJsonAttribute** class can be used to indicate that the value is obtained from a JSON object. It can be used to specify a sub type within the JSON object via a path parameter. It is also possible to indicate a return type (as with FromResponseAttribute) if the methods return type is an interface.
+
+* The **FromModelAttribute** class can be used to indicate that the value is obtained from a property of a model, rather than the model itself.
+
 ### Example synchronous client
 
 Create an interface and decorate with attributes to define how the client should interact with the service:

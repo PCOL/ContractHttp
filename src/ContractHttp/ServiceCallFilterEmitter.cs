@@ -30,6 +30,11 @@ namespace ContractHttp
 
         private ILocal localServiceCallAttrs;
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="ServiceCallFilterEmitter"/> class.
+        /// </summary>
+        /// <param name="type">The type to be checked for <see cref="ServiceCallFilterAttributes"/> attributes..</param>
+        /// <param name="ilGen">The IL generator to use.</param>
         public ServiceCallFilterEmitter(Type type, IEmitter ilGen)
         {
             this.Type = type;
@@ -60,8 +65,14 @@ namespace ContractHttp
             }
         }
 
+        /// <summary>
+        /// Gets the type being checked for <see cref="ServiceCallFilterAttribute"/> attributes.
+        /// </summary>
         public Type Type { get; }
 
+        /// <summary>
+        /// A value indicating whether or not the type has any of the attributes.
+        /// </summary>
         public bool HasAttributes { get; }
 
         /// <summary>
