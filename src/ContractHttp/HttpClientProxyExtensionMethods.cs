@@ -237,6 +237,5 @@ namespace ContractHttp
 
             return ((MethodAttribute)attr).Template;
         }
-
     }
 }

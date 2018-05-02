@@ -12,26 +12,26 @@ namespace ContractHttp.Reflection.Emit
     /// <summary>
     /// Reflection emit extension methods
     /// </summary>
-    public static class ReflectionEmitExtensions
+    public static class ReflectionEmitExtensionMethods
     {
-        private static readonly MethodInfo getCustomAttributeTMethod =
+        private static readonly MethodInfo GetCustomAttributeTMethod =
             typeof(CustomAttributeExtensions)
                 .BuildMethodInfo("GetCustomAttribute")
                 .HasParameterTypes(typeof(MemberInfo), typeof(bool))
                 .FirstOrDefault();
 
-        private static readonly MethodInfo getCustomAttributesTMethod =
+        private static readonly MethodInfo GetCustomAttributesTMethod =
             typeof(CustomAttributeExtensions)
                 .BuildMethodInfo("GetCustomAttributes")
                 .IsGenericDefinition()
                 .HasParameterTypes(typeof(MemberInfo), typeof(bool))
                 .FirstOrDefault();
 
-        private static readonly MethodInfo getMethodByMetadataToken =
+        private static readonly MethodInfo GetMethodByMetadataToken =
             typeof(FluentIL.ReflectionExtensions)
                 .GetMethod("GetMethod", new[] { typeof(Type), typeof(int) });
 
-        private static readonly MethodInfo anyTMethod =
+        private static readonly MethodInfo AnyTMethod =
             typeof(Enumerable)
                 .BuildMethodInfo("Any")
                 .IsGenericDefinition()
@@ -150,41 +150,41 @@ namespace ContractHttp.Reflection.Emit
         {
             return emitter
                 .LdLoc(local)
-                .EmitIfNotNull(il =>
-                {
-                    var anyMethod = anyTMethod.MakeGenericMethod(local.LocalType.GetElementType());
-                    il
-                        .LdLoc(local)
-                        .Call(anyMethod)
-
-                        .DefineLabel(out ILabel endAny);
-
-                    if (emitElse != null)
+                .EmitIfNotNull(
+                    il =>
                     {
-                        il.DefineLabel(out ILabel some)
-                            .BrTrue(some)
-                            .Nop();
+                        var anyMethod = AnyTMethod.MakeGenericMethod(local.LocalType.GetElementType());
+                        il
+                            .LdLoc(local)
+                            .Call(anyMethod)
 
-                        emitElse(il);
+                            .DefineLabel(out ILabel endAny);
 
-                        il.Br(endAny)
-                            .MarkLabel(some);
+                        if (emitElse != null)
+                        {
+                            il.DefineLabel(out ILabel some)
+                                .BrTrue(some)
+                                .Nop();
 
-                        emitBody(il);
-                    }
-                    else
-                    {
-                        il.BrFalse(endAny)
-                            .Nop();
+                            emitElse(il);
 
-                        emitBody(il);
-                    }
+                            il.Br(endAny)
+                                .MarkLabel(some);
 
-                    il.MarkLabel(endAny);
-                },
-                emitElse);
+                            emitBody(il);
+                        }
+                        else
+                        {
+                            il.BrFalse(endAny)
+                                .Nop();
+
+                            emitBody(il);
+                        }
+
+                        il.MarkLabel(endAny);
+                    },
+                    emitElse);
         }
-
 
         /// <summary>
         /// Emits the IL to get a custom attribute from a <see cref="Type"/>
@@ -224,7 +224,7 @@ namespace ContractHttp.Reflection.Emit
             return ilGen
                 .EmitTypeOf(customType)
                 .Emit(OpCodes.Ldc_I4_1)
-                .Emit(OpCodes.Call, getCustomAttributeTMethod.MakeGenericMethod(attributeType));
+                .Emit(OpCodes.Call, GetCustomAttributeTMethod.MakeGenericMethod(attributeType));
         }
 
         /// <summary>
@@ -265,7 +265,7 @@ namespace ContractHttp.Reflection.Emit
             return ilGen
                 .EmitTypeOf(customType)
                 .Emit(OpCodes.Ldc_I4_1)
-                .Emit(OpCodes.Call, getCustomAttributesTMethod.MakeGenericMethod(attributeType));
+                .Emit(OpCodes.Call, GetCustomAttributesTMethod.MakeGenericMethod(attributeType));
         }
 
         /// <summary>
@@ -291,9 +291,9 @@ namespace ContractHttp.Reflection.Emit
             return ilGen
                 .EmitTypeOf(methodInfo.DeclaringType)
                 .Emit(OpCodes.Ldc_I4, methodInfo.MetadataToken)
-                .Emit(OpCodes.Call, getMethodByMetadataToken)
+                .Emit(OpCodes.Call, GetMethodByMetadataToken)
                 .Emit(OpCodes.Ldc_I4_1)
-                .Emit(OpCodes.Call, getCustomAttributeTMethod.MakeGenericMethod(attributeType));
+                .Emit(OpCodes.Call, GetCustomAttributeTMethod.MakeGenericMethod(attributeType));
         }
 
         /// <summary>
@@ -332,9 +332,9 @@ namespace ContractHttp.Reflection.Emit
             return ilGen
                 .EmitTypeOf(methodInfo.DeclaringType)
                 .Emit(OpCodes.Ldc_I4, methodInfo.MetadataToken)
-                .Emit(OpCodes.Call, getMethodByMetadataToken)
+                .Emit(OpCodes.Call, GetMethodByMetadataToken)
                 .Emit(OpCodes.Ldc_I4_1)
-                .Emit(OpCodes.Call, getCustomAttributesTMethod.MakeGenericMethod(attributeType));
+                .Emit(OpCodes.Call, GetCustomAttributesTMethod.MakeGenericMethod(attributeType));
         }
 
         /// <summary>

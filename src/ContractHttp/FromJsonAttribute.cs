@@ -32,7 +32,7 @@ namespace ContractHttp
         public new string ContentType
         {
             get => base.ContentType;
-            set {}
+            set { }
         }
 
         /// <summary>

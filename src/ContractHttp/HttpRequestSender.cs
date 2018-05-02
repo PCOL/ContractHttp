@@ -83,10 +83,9 @@ namespace ContractHttp
             HttpRequestMessage request,
             HttpCompletionOption completionOption)
         {
-
             this.requestContext.InvokeRequestAction(request);
 
-            var response = await httpClient.SendAsync(
+            var response = await this.httpClient.SendAsync(
                 request,
                 completionOption,
                 this.requestContext.GetCancellationToken());

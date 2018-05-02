@@ -43,8 +43,10 @@ namespace ContractHttp
                 controllerTypes.Add(controllerType);
             }
 
-            services.AddTransient(controllerType,
-                (sp) => {
+            services.AddTransient(
+                controllerType,
+                (sp) =>
+                {
                     TService service = sp.GetService<TService>();
                     var controller = factory.CreateController<TController>(service);
                     return controller;
@@ -72,8 +74,10 @@ namespace ContractHttp
                 controllerTypes.Add(controllerType);
             }
 
-            services.AddTransient(controllerType,
-                (sp) => {
+            services.AddTransient(
+                controllerType,
+                (sp) =>
+                {
                     TService service = sp.GetService<TService>();
                     var controller = factory.CreateController(controllerType, service);
                     return controller;
@@ -174,8 +178,10 @@ namespace ContractHttp
 
             services.AddSingleton(serviceType, serviceImpl);
 
-            services.AddTransient(controllerType,
-                (sp) => {
+            services.AddTransient(
+                controllerType,
+                (sp) =>
+                {
                     var service = sp.GetService(serviceType);
                     var controller = factory.CreateController(controllerType, service);
                     return controller;
@@ -335,8 +341,10 @@ namespace ContractHttp
 
             mvcBuilder.AddApplicationPart(controllerType.Assembly);
 
-            mvcBuilder.Services.AddTransient(controllerType,
-                (sp) => {
+            mvcBuilder.Services.AddTransient(
+                controllerType,
+                (sp) =>
+                {
                     var service = sp.GetService(serviceType);
                     var controller = factory.CreateController(controllerType, service);
                     return controller;

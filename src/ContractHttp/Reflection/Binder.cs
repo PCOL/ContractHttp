@@ -45,7 +45,7 @@ namespace ContractHttp.Reflection
 
             if (obj != null)
             {
-                object result = Activator.CreateInstance(typeResult); 
+                object result = Activator.CreateInstance(typeResult);
                 if (result != null)
                 {
                     Bind(obj, result);

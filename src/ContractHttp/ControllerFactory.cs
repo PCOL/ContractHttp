@@ -65,7 +65,6 @@
             return controllerTypeName;
         }
 
-
         /// <summary>
         /// Creates a controller type.
         /// </summary>
@@ -235,19 +234,6 @@
         {
             var propertyMethods = new Dictionary<string, IMethodBuilder>();
 
-            // Type[] implementedInterfaces = context.NewType.GetInterfaces();
-            // if (implementedInterfaces.IsNullOrEmpty() == false)
-            // {
-            //     foreach (Type iface in implementedInterfaces)
-            //     {
-            //         TypeFactoryContext ifaceContext = context.CreateTypeFactoryContext(iface);
-            //         this.ImplementInterface(ifaceContext);
-            //     }
-            // }
-
-            // Add the interface to the type.
-            //context.TypeBuilder.AddInterfaceImplementation(context.NewType);
-
             // Iterate through the interafces members.
             foreach (var memberInfo in context.NewType.GetMembers())
             {
@@ -318,17 +304,14 @@
                 }
             }
 
-            MethodAttributes attrs = methodInfo.Attributes & ~MethodAttributes.Abstract; // & ~MethodAttributes.Virtual;
+            MethodAttributes attrs = methodInfo.Attributes & ~MethodAttributes.Abstract;
 
-            //MethodAttributes attrs = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.Virtual;
             var methodBuilder = context
                 .TypeBuilder
                 .NewMethod(methodInfo.Name)
                 .MethodAttributes(attrs)
                 .CallingConvention(CallingConventions.HasThis)
                 .Returns<IActionResult>();
-
-                //methodParmTypes);
 
             var parms = methodInfo.GetParameters();
             if (methodParmAttrs.Any() == true)
@@ -360,9 +343,9 @@
 
             MethodInfo binderGetValueMethod = typeof(ContractHttp.Reflection.Binder).GetMethod("GetValue", new[] { typeof(object), typeof(string) });
             MethodInfo serviceMethod = context.BaseType.GetMethod(name, methodArgs);
-            //MethodInfo getServiceCallAttrMethod = typeof(CustomAttributeExtensions).GetMethod("GetCustomAttribute", new[] { typeof(MemberInfo), typeof(bool) }).MakeGenericMethod(typeof(ServiceCallFilterAttribute));
-            //MethodInfo getCurrentMethod = typeof(MethodBase).GetMethod("GetCurrentMethod", Type.EmptyTypes);
-            //MethodInfo getMethod = typeof(ReflectionExtensions).GetMethod("GetMethod", new[] { typeof(Type), typeof(int) });
+            ////MethodInfo getServiceCallAttrMethod = typeof(CustomAttributeExtensions).GetMethod("GetCustomAttribute", new[] { typeof(MemberInfo), typeof(bool) }).MakeGenericMethod(typeof(ServiceCallFilterAttribute));
+            ////MethodInfo getCurrentMethod = typeof(MethodBase).GetMethod("GetCurrentMethod", Type.EmptyTypes);
+            ////MethodInfo getMethod = typeof(ReflectionExtensions).GetMethod("GetMethod", new[] { typeof(Type), typeof(int) });
             PropertyInfo requestProp = typeof(ControllerBase).GetProperty("Request", typeof(HttpRequest));
             PropertyInfo headersProp = typeof(HttpRequest).GetProperty("Headers", typeof(IHeaderDictionary));
             PropertyInfo itemProp = typeof(IHeaderDictionary).GetProperty("Item", typeof(StringValues));
@@ -449,6 +432,7 @@
                             methodIL.EmitLoadArrayElement(proxyArguments, index);
                             this.EmitConverter(methodIL, methodParmTypes[index], parms[i].ParameterType);
                         }
+
                         continue;
                     }
 
@@ -570,7 +554,6 @@
                             var prop = typeof(FromHeaderAttribute).GetProperty("Name");
                             return new[] { new Tuple<PropertyInfo, object>(prop, methodParm.FromName) };
                         }));
-
                 }
                 else if (methodParm.From == ControllerMethodParameterFromOption.Query)
                 {
@@ -580,7 +563,6 @@
                             var prop = typeof(FromQueryAttribute).GetProperty("Name");
                             return new[] { new Tuple<PropertyInfo, object>(prop, methodParm.FromName) };
                         }));
-
                 }
                 else if (methodParm.From == ControllerMethodParameterFromOption.Route)
                 {
@@ -605,7 +587,7 @@
         {
             for (int i = 0; i < parmInfos.Length; i++)
             {
-                var parmBuilder = methodBuilder.Param(parmInfos[i].ParameterType, parmInfos[i].Name, parmInfos[i].Attributes); //  .DefineParameter(i + 1, parmInfos[i].Attributes, parmInfos[i].Name);
+                var parmBuilder = methodBuilder.Param(parmInfos[i].ParameterType, parmInfos[i].Name, parmInfos[i].Attributes);
                 var attrs = parmInfos[i].GetCustomAttributes();
                 if (attrs == null)
                 {
@@ -635,7 +617,6 @@
                             {
                                 return this.GetPropertiesAndValues(attr, "Name");
                             }));
-
                     }
                     else if (attr is FromRouteAttribute)
                     {
@@ -648,7 +629,7 @@
                     }
                     else if (attr is FromServicesAttribute)
                     {
-                        parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromServicesAttribute>());                                
+                        parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromServicesAttribute>());
                     }
                 }
             }
@@ -716,7 +697,7 @@
         private void EmitConverter(IEmitter methodIL, ILocal localFrom, Type toType)
         {
             methodIL.Emit(OpCodes.Ldloc_S, localFrom);
-            EmitConverter(methodIL, localFrom.LocalType, toType);
+            this.EmitConverter(methodIL, localFrom.LocalType, toType);
         }
 
         private void EmitConverter(IEmitter methodIL, Type fromType, Type toType)
@@ -804,7 +785,7 @@
         /// <param name="localTo">A local containing the type to bind to.</param>
         private void EmitModelBinder(IEmitter methodIL, ILocal localFrom, ILocal localTo)
         {
-            //MethodInfo bindMethod = typeof(Binder).GetMethod("bind", new[] { typeof(Type), typeof(object) });
+            ////MethodInfo bindMethod = typeof(Binder).GetMethod("bind", new[] { typeof(Type), typeof(object) });
             MethodInfo getObjectMethod = typeof(Reflection.Binder).GetMethod("GetObject", Type.EmptyTypes).MakeGenericMethod(localTo.LocalType);
             ConstructorInfo binderCtor = typeof(Reflection.Binder).GetConstructor(new[] { typeof(object) });
 
@@ -816,8 +797,8 @@
             methodIL.Emit(OpCodes.Stloc_S, localBinder);
 
             methodIL.Emit(OpCodes.Ldloc_S, localBinder);
-            //methodIL.EmitTypeOf(localTo.LocalType);
-            //methodIL.Emit(OpCodes.Callvirt, bindMethod);
+            ////methodIL.EmitTypeOf(localTo.LocalType);
+            ////methodIL.Emit(OpCodes.Callvirt, bindMethod);
             methodIL.Emit(OpCodes.Callvirt, getObjectMethod);
             methodIL.Emit(OpCodes.Stloc_S, localTo);
         }
@@ -830,7 +811,7 @@
         /// <param name="localResponse">A local to receive the <see cref="IActionResult"/>.</param>
         private IEmitter EmitStatusCodeCall(IEmitter emitter, int statusCode, ILocal localResponse)
         {
-            MethodInfo statusCodeMethod = typeof(ControllerBase).GetMethod("StatusCode", new Type[] { typeof(int)});
+            MethodInfo statusCodeMethod = typeof(ControllerBase).GetMethod("StatusCode", new Type[] { typeof(int) });
 
             emitter.Emit(OpCodes.Ldarg_0);
             emitter.Emit(OpCodes.Ldc_I4, statusCode);
@@ -849,7 +830,7 @@
         /// <param name="localResponse"></param>
         private void EmitStatusCodeCall(IEmitter emitter, int statusCode, ILocal local, ILocal localResponse)
         {
-            MethodInfo statusCodeWithResultMethod = typeof(ControllerBase).GetMethod("StatusCode", new Type[] { typeof(int), typeof(object)});
+            MethodInfo statusCodeWithResultMethod = typeof(ControllerBase).GetMethod("StatusCode", new Type[] { typeof(int), typeof(object) });
             emitter.Emit(OpCodes.Ldarg_0);
             emitter.Emit(OpCodes.Ldc_I4, statusCode);
             if (local != null)
@@ -864,7 +845,6 @@
             emitter.Emit(OpCodes.Callvirt, statusCodeWithResultMethod);
             emitter.Emit(OpCodes.Stloc_S, localResponse);
         }
-
 
         private void ProcessAttributes(ITypeBuilder typeBuilder, Type type)
         {
@@ -906,6 +886,7 @@
                             ((ProducesResponseTypeAttribute)attr).StatusCode,
                             () => AttributeUtility.GetAttributePropertyValues<ProducesResponseTypeAttribute>((ProducesResponseTypeAttribute)attr, new[] { "type" })));
                 }
+
 /*
                 else if (attr is SwaggerParameterAttribute)
                 {

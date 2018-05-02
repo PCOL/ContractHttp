@@ -149,7 +149,7 @@ namespace ContractHttp
 
             var httpClient = this.options.GetHttpClient();
             var requestSender = httpRequestSenderFactory?.CreateRequestSender(httpClient, this) ??
-                new HttpRequestSender(httpClient,this);
+                new HttpRequestSender(httpClient, this);
 
             if (returnType.IsAsync(out Type taskType) == true &&
                 taskType != typeof(void))
@@ -226,12 +226,12 @@ namespace ContractHttp
                             var elemParmType = parms[i].ParameterType.GetElementType();
                             if (elemParmType == typeof(HttpResponseMessage))
                             {
-                                responseArg = i;
+                                this.responseArg = i;
                             }
                             else
                             {
-                                dataArg = i;
-                                dataArgType = parmType;
+                                this.dataArg = i;
+                                this.dataArgType = parmType;
                             }
                         }
                     }
@@ -535,7 +535,7 @@ namespace ContractHttp
             {
                 var interceptorType = typeof(Func<,>).MakeGenericType(typeof(HttpResponseMessage), returnType);
                 var interceptorMethod = interceptorType.GetMethod("Invoke", new[] { typeof(HttpResponseMessage) });
-                result = interceptorMethod.Invoke(this.Arguments[this.responseFuncArg], new object[] {response });
+                result = interceptorMethod.Invoke(this.Arguments[this.responseFuncArg], new object[] { response });
             }
 
             return result;
@@ -637,8 +637,8 @@ namespace ContractHttp
         /// <param name="timeout">The timeout value.</param>
         private void SetTimeout(TimeSpan timeout)
         {
-            cancellationTokenSource = cancellationTokenSource ?? new CancellationTokenSource();
-            cancellationTokenSource.CancelAfter(timeout);
+            this.cancellationTokenSource = this.cancellationTokenSource ?? new CancellationTokenSource();
+            this.cancellationTokenSource.CancelAfter(timeout);
         }
 
         /// <summary>

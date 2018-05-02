@@ -20,6 +20,6 @@ namespace ContractHttp
         /// Gets or sets the paramter name.
         /// </summary>
         /// <returns></returns>
-        public string Name { get; set;}
+        public string Name { get; set; }
     }
 }

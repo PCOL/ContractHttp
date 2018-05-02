@@ -110,7 +110,7 @@ namespace ContractHttp
             Exception lastEx = null;
 
             int retry = 0;
-            TimeSpan wait = this.waitTime;;
+            TimeSpan wait = this.waitTime;
             while (retry < this.retryCount)
             {
                 try

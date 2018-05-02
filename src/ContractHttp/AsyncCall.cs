@@ -54,7 +54,7 @@ namespace ContractHttp
                 return (T)(object)result;
             }
 
-            return (T) this.httpContext.ProcessResult(response, typeof(T));
+            return (T)this.httpContext.ProcessResult(response, typeof(T));
         }
     }
 }

@@ -15,8 +15,10 @@
     <DebugType>portable</DebugType>
     <AssemblyName>ContractHttp</AssemblyName>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
+    <CodeAnalysisRuleSet>ca.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.1" />
@@ -77,7 +79,6 @@
     <Content Include="HttpClientProxyOptions.cs" />
     <Content Include="FromModelAttribute.cs" />
     <Content Include="PostAttribute.cs" />
-    <Content Include="MethodAtribute.cs" />
     <Content Include="GetAttribute.cs" />
     <Content Include="PutAttribute.cs" />
     <Content Include="PatchAttribute.cs" />
@@ -94,5 +95,6 @@
     <Content Include="FromResponseAttribute.cs" />
     <Content Include="HttpClientSingleton.cs" />
     <Content Include="RetryAttribute.cs" />
+    <Content Include="MethodAttribute.cs" />
   </ItemGroup>
 </Project>

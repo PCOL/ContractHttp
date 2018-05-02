@@ -16,26 +16,26 @@ namespace ContractHttp
     /// </summary>
     public class ServiceCallFilterEmitter
     {
-        private static readonly ConstructorInfo ctorExecuting = typeof(ServiceCallExecutingContext).GetConstructor(new[] { typeof(Controller), typeof(IServiceProvider) });
+        private static readonly ConstructorInfo CtorExecuting = typeof(ServiceCallExecutingContext).GetConstructor(new[] { typeof(Controller), typeof(IServiceProvider) });
 
-        private static readonly ConstructorInfo ctorExecuted = typeof(ServiceCallExecutingContext).GetConstructor(new[] { typeof(Controller), typeof(IServiceProvider) });
+        private static readonly ConstructorInfo CtorExecuted = typeof(ServiceCallExecutingContext).GetConstructor(new[] { typeof(Controller), typeof(IServiceProvider) });
 
-        private static readonly MethodInfo onExecutingMethod = typeof(ServiceCallFilterAttribute).GetMethod("OnExecuting", new[] { typeof(ServiceCallExecutingContext) });
+        private static readonly MethodInfo OnExecutingMethod = typeof(ServiceCallFilterAttribute).GetMethod("OnExecuting", new[] { typeof(ServiceCallExecutingContext) });
 
-        private static readonly MethodInfo onExecutedMethod = typeof(ServiceCallFilterAttribute).GetMethod("OnExecuted", new[] { typeof(ServiceCallExecutedContext) });
+        private static readonly MethodInfo OnExecutedMethod = typeof(ServiceCallFilterAttribute).GetMethod("OnExecuted", new[] { typeof(ServiceCallExecutedContext) });
 
-        private static readonly MethodInfo getServiceMethod = typeof(IServiceProvider).GetMethod("GetService", new[] { typeof(Type) });
+        private static readonly MethodInfo GetServiceMethod = typeof(IServiceProvider).GetMethod("GetService", new[] { typeof(Type) });
 
-        private static readonly MethodInfo delegateInvokeMethod = typeof(Delegate).GetMethod("DynamicInvoke", new[] { typeof(object[]) });
+        private static readonly MethodInfo DelegateInvokeMethod = typeof(Delegate).GetMethod("DynamicInvoke", new[] { typeof(object[]) });
 
-        private static readonly MethodInfo toArrayTMethod =
+        private static readonly MethodInfo ToArrayTMethod =
             typeof(Enumerable)
                 .BuildMethodInfo("ToArray")
                 .IsGenericDefinition()
                 .HasParameterTypes(typeof(IEnumerable<>))
                 .FirstOrDefault();
 
-        private IEmitter ilGen;
+        private IEmitter emitter;
 
         private ILocal localServiceCallAttrs;
 
@@ -43,11 +43,11 @@ namespace ContractHttp
         /// Initialises a new instance of the <see cref="ServiceCallFilterEmitter"/> class.
         /// </summary>
         /// <param name="type">The type to be checked for <see cref="ServiceCallFilterAttributes"/> attributes..</param>
-        /// <param name="ilGen">The IL generator to use.</param>
-        public ServiceCallFilterEmitter(Type type, IEmitter ilGen)
+        /// <param name="emitter">The IL generator to use.</param>
+        public ServiceCallFilterEmitter(Type type, IEmitter emitter)
         {
             this.Type = type;
-            this.ilGen = ilGen;
+            this.emitter = emitter;
             var attrs = this.Type.GetCustomAttributes<ServiceCallFilterAttribute>();
             if (attrs != null &&
                 attrs.Any() == true)
@@ -73,18 +73,18 @@ namespace ContractHttp
                 }
             }
 
-            this.ilGen
+            this.emitter
                 .DeclareLocal<ServiceCallFilterAttribute[]>(out this.localServiceCallAttrs);
 
             if (this.HasAttributes == true)
             {
-                this.ilGen
+                this.emitter
                     .DeclareLocal<IEnumerable<ServiceCallFilterAttribute>>(out ILocal localAttrs)
 
                     .EmitGetCustomAttributes<ServiceCallFilterAttribute>(this.Type, localAttrs)
 
                     .LdLoc(localAttrs)
-                    .Call(toArrayTMethod.MakeGenericMethod(typeof(ServiceCallFilterAttribute)))
+                    .Call(ToArrayTMethod.MakeGenericMethod(typeof(ServiceCallFilterAttribute)))
                     .StLoc(this.localServiceCallAttrs);
             }
         }
@@ -112,7 +112,7 @@ namespace ContractHttp
                 return;
             }
 
-            this.ilGen
+            this.emitter
                 .EmitIfNotNullOrEmpty(
                     this.localServiceCallAttrs,
                     (il) =>
@@ -147,7 +147,7 @@ namespace ContractHttp
                 return;
             }
 
-            this.ilGen.EmitIfNotNullOrEmpty(
+            this.emitter.EmitIfNotNullOrEmpty(
                 this.localServiceCallAttrs,
                 (il) =>
                 {
@@ -179,17 +179,17 @@ namespace ContractHttp
         private void EmitExecuting(ILocal localAttr, ILocal localController, ILocal localServices, ILocal localResponse)
         {
             // Create new instance of attribute and call on executing method.
-            this.ilGen
+            this.emitter
                 .DeclareLocal<ServiceCallExecutedContext>(out ILocal context)
 
                 .LdLoc(localController)
                 .LdLoc(localServices)
-                .Newobj(ctorExecuting)
+                .Newobj(CtorExecuting)
                 .StLocS(context)
 
                 .LdLoc(localAttr)
                 .LdLocS(context)
-                .CallVirt(onExecutingMethod)
+                .CallVirt(OnExecutingMethod)
                 .GetProperty("Response", context)
                 .StLocS(localResponse);
         }
@@ -205,63 +205,19 @@ namespace ContractHttp
         private void EmitExecuted(ILocal localAttr, ILocal localController, ILocal localServices, ILocal localResponse)
         {
             // Create new instance of attribute and call on executed method.
-            this.ilGen
+            this.emitter
                 .DeclareLocal<ServiceCallExecutedContext>(out ILocal context)
 
                 .LdLoc(localController)
                 .LdLoc(localServices)
-                .Newobj(ctorExecuted)
+                .Newobj(CtorExecuted)
                 .StLocS(context)
 
                 .LdLoc(localAttr)
                 .LdLocS(context)
-                .CallVirt(onExecutedMethod)
+                .CallVirt(OnExecutedMethod)
                 .GetProperty("Response", context)
                 .StLocS(localResponse);
-        }
-
-        /// <summary>
-        /// Emits IL to resolve <see cref="IServiceProvider"/> into a <see cref="IFrameworkServices"/> instance and
-        /// setup the attribute and arguments to construct an instance of the attribute class.
-        /// </summary>
-        /// <param name="localAttr">A <see cref="ILocal"/> containing a attribute instance.</param>
-        /// <param name="localController">A <see cref="ILocal"/> containing a controller instance.</param>
-        /// <param name="localServices">A <see cref="ILocal"/> containing a <see cref="IServiceProvider"/> instance.</param>
-        private void EmitPreamble(ILocal localAttr, ILocal localController, ILocal localServices)
-        {
-/*
-            var funcType = typeof(Func<IServiceProvider, IFrameworkServices>);
-            var func = this.ilGen.DeclareLocal(funcType);
-            var argsArray = this.ilGen.DeclareLocal(typeof(object[]));
-
-            // Build arguments array for delegate invoke.
-            this.ilGen.EmitArray(
-                typeof(object),
-                argsArray,
-                1,
-                (il, index) =>
-                {
-                    il.Emit(OpCodes.Ldloc_S, localServices);
-                });
-
-            // Get the function from the IServiceProvider.
-            this.ilGen.Emit(OpCodes.Ldloc_S, localServices);
-            this.ilGen.EmitTypeOf(funcType);
-            this.ilGen.Emit(OpCodes.Callvirt, getServiceMethod);
-            this.ilGen.Emit(OpCodes.Stloc_S, func);
-*/
-
-            // Load the attribute instance + arguments
-            this.ilGen
-                .LdLoc(localAttr)
-                .LdLoc(localController)
-                .LdLoc(localServices);
-/*
-            // Call factory method to convert IServiceProvider into IFrameworkServices
-            this.ilGen.Emit(OpCodes.Ldloc_S, func);
-            this.ilGen.Emit(OpCodes.Ldloc_S, argsArray);
-            this.ilGen.Emit(OpCodes.Callvirt, delegateInvokeMethod);
-*/
         }
     }
 }
