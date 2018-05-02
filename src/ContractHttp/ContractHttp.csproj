@@ -93,6 +93,5 @@
     <Content Include="MethodArgType.cs" />
     <Content Include="IHttpRequestSenderFactory.cs" />
     <Content Include="FromResponseAttribute.cs" />
-    <Content Include="Reflection\MethodInfoFinder.cs" />
   </ItemGroup>
 </Project>
