@@ -1,6 +1,7 @@
 namespace ContractHttp
 {
     using System;
+    using System.Net.Http;
     using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
@@ -13,7 +14,9 @@ namespace ContractHttp
         /// </summary>
         /// <param name="controller">The controller instance,</param>
         /// <param name="services">The services instance.</param>
-        public ServiceCallExecutingContext(Controller controller, IServiceProvider services)
+        public ServiceCallExecutingContext(
+            Controller controller,
+            IServiceProvider services)
         {
             this.Controller = controller;
             this.Services = services;
@@ -28,5 +31,10 @@ namespace ContractHttp
         /// Gets the services.`
         /// </summary>
         public IServiceProvider Services { get; }
+
+        /// <summary>
+        /// Gets or sets a http response.
+        /// </summary>
+        public IActionResult Response { get; set; }
     }
 }

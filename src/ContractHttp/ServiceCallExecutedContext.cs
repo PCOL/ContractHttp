@@ -33,6 +33,6 @@ namespace ContractHttp
         /// <summary>
         /// Gets or sets a response.
         /// </summary>
-        public HttpResponseMessage Response { get; set; }
+        public IActionResult Response { get; set; }
     }
 }

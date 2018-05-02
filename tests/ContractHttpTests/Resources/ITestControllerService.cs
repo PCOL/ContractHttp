@@ -14,5 +14,9 @@ namespace ContractHttpTests.Resources
 
         [HttpGet("{name}")]
         TestData GetByName(string name);
+
+        [HttpDelete("{name}")]
+        [ServiceCallFilterTest]
+        void Delete(string name);
     }
 }

@@ -6,6 +6,7 @@ namespace ContractHttp.Reflection.Emit
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
+    using ContractHttp.Reflection;
     using FluentIL;
 
     /// <summary>
@@ -13,14 +14,32 @@ namespace ContractHttp.Reflection.Emit
     /// </summary>
     public static class ReflectionEmitExtensions
     {
-        private static readonly MethodInfo getCustomAttributeTMethod = typeof(CustomAttributeExtensions).GetMethod("GetCustomAttribute", new[] { typeof(MemberInfo), typeof(bool) });
+        private static readonly MethodInfo getCustomAttributeTMethod =
+            typeof(CustomAttributeExtensions)
+                .BuildMethodInfo("GetCustomAttribute")
+                .HasParameterTypes(typeof(MemberInfo), typeof(bool))
+                .FirstOrDefault();
 
-        private static readonly MethodInfo getCustomAttributesTMethod = typeof(CustomAttributeExtensions).GetMethod("GetCustomAttributes", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(MemberInfo), typeof(bool) }, null);
+        private static readonly MethodInfo getCustomAttributesTMethod =
+            typeof(CustomAttributeExtensions)
+                .BuildMethodInfo("GetCustomAttributes")
+                .IsGenericDefinition()
+                .HasParameterTypes(typeof(MemberInfo), typeof(bool))
+                .FirstOrDefault();
 
-        private static readonly MethodInfo getMethodByMetadataToken = typeof(ReflectionExtensions).GetMethod("GetMethod", new[] { typeof(Type), typeof(int) });
+        private static readonly MethodInfo getMethodByMetadataToken =
+            typeof(FluentIL.ReflectionExtensions)
+                .GetMethod("GetMethod", new[] { typeof(Type), typeof(int) });
+
+        private static readonly MethodInfo anyTMethod =
+            typeof(Enumerable)
+                .BuildMethodInfo("Any")
+                .IsGenericDefinition()
+                .HasParameterTypes(typeof(IEnumerable<>))
+                .FirstOrDefault();
 
         /// <summary>
-        /// Emits IL to call writeline with the object of the top of the evaluation stack.
+        /// Emits IL to call the 'ToString' method on the object on the top of the evaluation stack.
         /// </summary>
         /// <param name="ilGen">THe <see cref="ILGenerator"/> to use.</param>
         public static IEmitter EmitToString(this IEmitter ilGen)
@@ -129,33 +148,35 @@ namespace ContractHttp.Reflection.Emit
         /// <param name="emitElse">A function to emit the IL to be executed if the object is null.</param>
         public static IEmitter EmitIfNotNullOrEmpty(this IEmitter emitter, ILocal local, Action<IEmitter> emitBody, Action<IEmitter> emitElse = null)
         {
-            var type = typeof(IEnumerable<>).MakeGenericType(local.LocalType.GetGenericArguments());
-            var anyMethod = typeof(Enumerable)
-                .GetMethod("Any", BindingFlags.Public | BindingFlags.Static, null, CallingConventions.HasThis, new[] { type }, null)
-                .MakeGenericMethod(local.LocalType.GetGenericArguments());
-
             return emitter
                 .LdLoc(local)
                 .EmitIfNotNull(il =>
                 {
-                    il.Emit(OpCodes.Ldloc, local);
-                    il.Emit(OpCodes.Call, anyMethod);
+                    var anyMethod = anyTMethod.MakeGenericMethod(local.LocalType.GetElementType());
+                    il
+                        .LdLoc(local)
+                        .Call(anyMethod)
 
-                    il.DefineLabel(out ILabel endAny);
+                        .DefineLabel(out ILabel endAny);
+
                     if (emitElse != null)
                     {
-                        il.DefineLabel(out ILabel some);
-                        il.Emit(OpCodes.Brtrue, some);
-                        il.Emit(OpCodes.Nop);
+                        il.DefineLabel(out ILabel some)
+                            .BrTrue(some)
+                            .Nop();
+
                         emitElse(il);
-                        il.Emit(OpCodes.Br, endAny);
-                        il.MarkLabel(some);
+
+                        il.Br(endAny)
+                            .MarkLabel(some);
+
                         emitBody(il);
                     }
                     else
                     {
-                        il.Emit(OpCodes.Brfalse, endAny);
-                        il.Emit(OpCodes.Nop);
+                        il.BrFalse(endAny)
+                            .Nop();
+
                         emitBody(il);
                     }
 

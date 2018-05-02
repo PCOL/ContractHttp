@@ -1,7 +1,9 @@
 namespace ContractHttpTests.Resources
 {
     using System.Collections.Generic;
+    using System.Net.Http;
     using ContractHttpTests.Resources.Models;
+    using Microsoft.AspNetCore.Mvc;
 
     public class TestControllerService
         : ITestControllerService
@@ -30,6 +32,10 @@ namespace ContractHttpTests.Resources
                 Name = name,
                 Address = "Somewhere"
             };
+        }
+
+        public void Delete(string name)
+        {
         }
     }
 }

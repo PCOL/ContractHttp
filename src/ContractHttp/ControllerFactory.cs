@@ -369,6 +369,8 @@
             PropertyInfo httpContextProp = typeof(HttpRequest).GetProperty("HttpContext", typeof(HttpContext));
             PropertyInfo requestServicesProp = typeof(HttpContext).GetProperty("RequestServices", typeof(IServiceProvider));
 
+            DebugOutput.Output = new ConsoleOutput();
+
             // Emit Method IL
             IEmitter methodIL = methodBuilder.Body();
             methodIL.DeclareLocal<IActionResult>(out ILocal localResponse);
@@ -400,7 +402,7 @@
 
             // Check for service calls.
             var serviceCallEmitter = new ServiceCallFilterEmitter(methodInfo.DeclaringType, methodIL);
-            serviceCallEmitter.EmitExecuting(localController, localServices);
+            serviceCallEmitter.EmitExecuting(localController, localServices, localResponse);
 
             ILocal proxyArguments = null;
             if (methodParmAttrs.Any() == true)
@@ -532,7 +534,7 @@
                 .Finally();
 
             // Emit Service Call Attribute Executed calls.
-            serviceCallEmitter.EmitExecuted(localController, localServices);
+            serviceCallEmitter.EmitExecuted(localController, localServices, localResponse);
 
             methodIL
                 .EndExceptionBlock()
