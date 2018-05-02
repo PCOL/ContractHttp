@@ -12,6 +12,12 @@ namespace ContractHttp
     /// </summary>
     public static class HttpClientProxyExtensionMethods
     {
+        /// <summary>
+        /// Adds a <see cref="HttpClient"/> singleton instance to dependency injection.
+        /// </summary>
+        /// <param name="services">A <see cref="IServiceCollection"/> instance.</param>
+        /// <param name="httpClient">A <see cref="HttpClient"/> instance.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
         public static IServiceCollection AddHttpClient(
             this IServiceCollection services,
             HttpClient httpClient)
@@ -20,6 +26,12 @@ namespace ContractHttp
             return services;
         }
 
+        /// <summary>
+        /// Adds a <see cref="HttpClient"/> factory to dependency injection.
+        /// </summary>
+        /// <param name="services">A <see cref="IServiceCollection"/> instance.</param>
+        /// <param name="httpClientFactory">A <see cref="HttpClient"/> factory.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
         public static IServiceCollection AddHttpClientFactory(
             this IServiceCollection services,
             IHttpClientFactory httpClientFactory)
@@ -127,6 +139,12 @@ namespace ContractHttp
             return services;
         }
 
+        /// <summary>
+        /// Gets a http method and path template from the <see cref="MethodInfo"/> instance.
+        /// </summary>
+        /// <param name="methodInfo">A <see cref="MethodInfo"/> instance.</param>
+        /// <param name="httpMethod">A variable to receive the http method.</param>
+        /// <returns>The path template; otherwise null.</returns>
         public static string GetHttpMethodAndTemplate(this MethodInfo methodInfo, out HttpMethod httpMethod)
         {
             httpMethod = null;

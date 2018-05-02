@@ -19,10 +19,22 @@ namespace ContractHttp
         /// </summary>
         object[] Arguments { get; }
 
+        /// <summary>
+        /// Invokes a request action.
+        /// </summary>
+        /// <param name="request">A http request.</param>
         void InvokeRequestAction(HttpRequestMessage request);
 
+        /// <summary>
+        /// Invokes a response action.
+        /// </summary>
+        /// <param name="responseMessage">A http response.</param>
         void InvokeResponseAction(HttpResponseMessage responseMessage);
 
+        /// <summary>
+        /// Gets a cancellation token.
+        /// </summary>
+        /// <returns>A cancellation token.</returns>
         CancellationToken GetCancellationToken();
     }
 }

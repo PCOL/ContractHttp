@@ -1,10 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-
 namespace ContractHttp
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+
+    /// <summary>
+    /// Http request builder extension methods.
+    /// </summary>
     internal static class HttpRequestBuilderExtensions
     {
         /// <summary>
@@ -38,6 +41,15 @@ namespace ContractHttp
             return requestBuilder;
         }
 
+        /// <summary>
+        /// Adds an authorization header.
+        /// </summary>
+        /// <param name="requestBuilder">A request builder.</param>
+        /// <param name="methodInfo">A method info.</param>
+        /// <param name="names">The methods parameter names.</param>
+        /// <param name="arguments">The methods arguments.</param>
+        /// <param name="serviceProvider">A <see cref="IServiceProvider"/> instance.</param>
+        /// <returns></returns>
         public static HttpRequestBuilder AddAuthorizationHeader(
             this HttpRequestBuilder requestBuilder,
             MethodInfo methodInfo,

@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <VersionPrefix>1.0.0</VersionPrefix>
-    <VersionSuffix>alpha12</VersionSuffix>
+    <VersionSuffix>alpha13</VersionSuffix>
     <PackageId>ContractHttp</PackageId>
     <Authors>pcol</Authors>
     <AssemblyTitle>ContractHttp</AssemblyTitle>
@@ -84,7 +84,6 @@
     <Content Include="DeleteAttribute.cs" />
     <Content Include="IHttpRequestModifier.cs" />
     <Content Include="RetryHandler.cs" />
-    <Content Include="IResponseIntercepter.cs" />
     <Content Include="IHttpRequestBuilder.cs" />
     <Content Include="HttpRequestBuilderExtensions.cs" />
     <Content Include="IHttpRequestSender.cs" />
@@ -93,5 +92,7 @@
     <Content Include="MethodArgType.cs" />
     <Content Include="IHttpRequestSenderFactory.cs" />
     <Content Include="FromResponseAttribute.cs" />
+    <Content Include="HttpClientSingleton.cs" />
+    <Content Include="RetryAttribute.cs" />
   </ItemGroup>
 </Project>

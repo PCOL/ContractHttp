@@ -1,21 +1,42 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
 namespace ContractHttp
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
+    /// <summary>
+    /// A simple retry handler.`
+    /// </summary>
     public class RetryHandler
     {
+        /// <summary>
+        /// The retry count.
+        /// </summary>
         private int retryCount;
 
+        /// <summary>
+        /// The wait time.
+        /// </summary>
         private TimeSpan waitTime;
 
+        /// <summary>
+        /// The maximum time to wait between retries.
+        /// </summary>
         private TimeSpan maxWaitTime = TimeSpan.MaxValue;
 
+        /// <summary>
+        /// A value indicating whetjer or not to double the wait time on each retry.
+        /// </summary>
         private bool doubleWaitTime;
 
+        /// <summary>
+        /// A list of exceptions that will trigger a retry.
+        /// </summary>
         private List<Type> exceptions;
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="RetryHandler"/> class.
+        /// </summary>
         public RetryHandler()
         {
         }
@@ -34,7 +55,7 @@ namespace ContractHttp
         }
 
         /// <summary>
-        /// Sets the number of retries`.
+        /// Sets the number of retries.
         /// </summary>
         /// <param name="count">The number of retries.`</param>
         /// <returns>The <see cref="RetryHandler"/> instance.</returns>
@@ -67,7 +88,7 @@ namespace ContractHttp
         }
 
         /// <summary>
-        /// Sets a vaule indicating whether or not to double the wait time after each retry.
+        /// Sets a value indicating whether or not to double the wait time after each retry.
         /// </summary>
         /// <param name="value">True to double the wait time; otherwise false.</param>
         /// <returns>The <see cref="RetryHandler"/> instance.</returns>
@@ -78,10 +99,10 @@ namespace ContractHttp
         }
 
         /// <summary>
-        /// 
+        /// Executes a function with retry.
         /// </summary>
-        /// <param name="function"></param>
-        /// <param name="responseHandler"></param>
+        /// <param name="function">The function to execute.</param>
+        /// <param name="responseHandler">A response handler.</param>
         /// <returns></returns>
         public async Task<T> RetryAsync<T>(Func<Task<T>> function, Func<T, bool> responseHandler)
         {

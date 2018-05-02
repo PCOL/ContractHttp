@@ -2,6 +2,9 @@ namespace ContractHttp
 {
     using System;
 
+    /// <summary>
+    /// A http response attribute.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public class HttpResponseAttribute
         : Attribute

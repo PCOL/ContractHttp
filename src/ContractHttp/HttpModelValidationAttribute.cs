@@ -3,7 +3,7 @@ namespace ContractHttp
     using System;
 
     /// <summary>
-    /// 
+    /// An attribute for http model validation.
     /// </summary>
     public class HttpModelValidationAttribute
     {

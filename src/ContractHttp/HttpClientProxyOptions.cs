@@ -4,6 +4,9 @@ namespace ContractHttp
     using System.Net.Http;
     using Microsoft.Extensions.DependencyInjection;
 
+    /// <summary>
+    /// Represents client proxy options
+    /// </summary>
     public class HttpClientProxyOptions
     {
         /// <summary>

@@ -17,12 +17,23 @@ namespace ContractHttp
 
         private readonly IHttpRequestContext requestContext;
 
+        /// <summary>
+        /// Initialises a new instance of the <see cref="HttpRequestSender"/> class.
+        /// </summary>
+        /// <param name="httpClient">A http client.</param>
+        /// <param name="methodContext">A http request context.</param>
         public HttpRequestSender(HttpClient httpClient, IHttpRequestContext methodContext)
         {
             this.httpClient = httpClient;
             this.requestContext = methodContext;
         }
 
+        /// <summary>
+        /// Sends a request.
+        /// </summary>
+        /// <param name="requestBuilder">A request builder.</param>
+        /// <param name="completionOption">A http completion option.</param>
+        /// <returns></returns>
         public async Task<HttpResponseMessage> SendAsync(
             IHttpRequestBuilder requestBuilder,
             HttpCompletionOption completionOption)

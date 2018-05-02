@@ -2,7 +2,7 @@ namespace ContractHttp
 {
     using System;
     using FluentIL;
-    
+
     /// <summary>
     /// Defines the controller factory context interface.
     /// </summary>
