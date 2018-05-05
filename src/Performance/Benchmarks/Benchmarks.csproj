@@ -12,6 +12,7 @@
     <PackageReference Include="Moq" Version="4.8.1" />
     <PackageReference Include="BenchmarkDotNet" Version="0.10.12" />
     <ProjectReference Include="..\..\ContractHttp\ContractHttp.csproj" />
+    <PackageReference Include="DynProxy" Version="1.0.0-alpha5" />
     <Content Include="Program.cs" />
     <Content Include="ClientBenchmarks.cs" />
     <Content Include="Controllers\BenchmarkController.cs" />
