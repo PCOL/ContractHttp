@@ -35,7 +35,7 @@ namespace ContractHttp
         private List<Type> exceptions;
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="RetryHandler"/> class.
+        /// Initializes a new instance of the <see cref="RetryHandler"/> class.
         /// </summary>
         public RetryHandler()
         {
@@ -101,9 +101,10 @@ namespace ContractHttp
         /// <summary>
         /// Executes a function with retry.
         /// </summary>
+        /// <typeparam name="T">The return type.</typeparam>
         /// <param name="function">The function to execute.</param>
         /// <param name="responseHandler">A response handler.</param>
-        /// <returns></returns>
+        /// <returns>The resultasync of the operation.</returns>
         public async Task<T> RetryAsync<T>(Func<Task<T>> function, Func<T, bool> responseHandler)
         {
             T lastResult = default(T);

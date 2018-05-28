@@ -11,7 +11,7 @@ namespace ContractHttp.Reflection
         private object obj;
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="Binder"/> class.
+        /// Initializes a new instance of the <see cref="Binder"/> class.
         /// </summary>
         /// <param name="obj">The object to bind from.</param>
         public Binder(object obj)
@@ -88,6 +88,8 @@ namespace ContractHttp.Reflection
         /// <summary>
         /// Copies the matching property values from one object to another.
         /// </summary>
+        /// <typeparam name="TSource">The source type.</typeparam>
+        /// <typeparam name="TDestination">The destination type.</typeparam>
         /// <param name="source">The object to copy values from.</param>
         /// <param name="destination">The object instance to copy the values to.</param>
         public static void Bind<TSource, TDestination>(TSource source, TDestination destination)

@@ -7,14 +7,14 @@ namespace ContractHttp
         : MethodAttribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="PatchAttribute"/> class.
+        /// Initializes a new instance of the <see cref="PatchAttribute"/> class.
         /// </summary>
         public PatchAttribute()
         {
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="PatchAttribute"/> class.
+        /// Initializes a new instance of the <see cref="PatchAttribute"/> class.
         /// </summary>
         /// <param name="template">A path template.</param>
         public PatchAttribute(string template)

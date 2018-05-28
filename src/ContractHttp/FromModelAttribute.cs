@@ -12,7 +12,7 @@ namespace ContractHttp
         : FromResponseAttribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="FromModelAttribute"/> class.
+        /// Initializes a new instance of the <see cref="FromModelAttribute"/> class.
         /// </summary>
         /// <param name="modelType">The model type.</param>
         /// <param name="propertyName">The property name.</param>
@@ -33,7 +33,7 @@ namespace ContractHttp
         public string PropertyName { get; }
 
         /// <summary>
-        /// Hides the return type property.
+        /// Gets or sets the return type property.
         /// </summary>
         [System.ComponentModel.Browsable(false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -45,7 +45,7 @@ namespace ContractHttp
         /// <param name="response">The <see cref="HttpResponseMessage"/>.</param>
         /// <param name="dataType">The type to convert to.</param>
         /// <param name="serializer">The <see cref="IObjectSerializer"/>.</param>
-        /// <returns></returns>
+        /// <returns>An object if found; otherwise null.</returns>
         public override object ToObject(HttpResponseMessage response, Type dataType, IObjectSerializer serializer)
         {
             var content = response.Content.ReadAsStringAsync().Result;

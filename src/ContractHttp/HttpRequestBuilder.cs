@@ -24,7 +24,7 @@ namespace ContractHttp
         private List<KeyValuePair<string, string>> formUrlProperties;
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="HttpRequestBuilder"/> class.
+        /// Initializes a new instance of the <see cref="HttpRequestBuilder"/> class.
         /// </summary>
         public HttpRequestBuilder()
         {
@@ -33,7 +33,6 @@ namespace ContractHttp
         /// <summary>
         /// Gets a value indicating whether or not the content has been set.
         /// </summary>
-        /// <returns></returns>
         public bool IsContentSet
         {
             get

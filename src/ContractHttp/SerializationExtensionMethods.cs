@@ -26,6 +26,7 @@ namespace ContractHttp
         /// <summary>
         /// Adds an object serialiser to dependency injection.
         /// </summary>
+        /// <typeparam name="T">The serializers type.</typeparam>
         /// <param name="services">A <see cref="IServiceCollection"/> instance.</param>
         /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
         public static IServiceCollection AddObjectSerializer<T>(

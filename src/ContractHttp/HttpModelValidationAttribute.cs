@@ -22,7 +22,6 @@ namespace ContractHttp
         /// <summary>
         /// Gets or sets the model to return if the validation fails.
         /// </summary>
-        /// <returns></returns>
         public Type ModelType { get; set; }
     }
 }

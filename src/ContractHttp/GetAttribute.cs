@@ -7,14 +7,14 @@ namespace ContractHttp
         : MethodAttribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="GetAttribute"/> class.
+        /// Initializes a new instance of the <see cref="GetAttribute"/> class.
         /// </summary>
         public GetAttribute()
         {
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="GetAttribute"/> class.
+        /// Initializes a new instance of the <see cref="GetAttribute"/> class.
         /// </summary>
         /// <param name="template">The path template.</param>
         public GetAttribute(string template)

@@ -71,6 +71,7 @@ namespace ContractHttp
         /// <summary>
         /// Checks if a list is null or empty.
         /// </summary>
+        /// <typeparam name="T">The list type.</typeparam>
         /// <param name="list">The list to check.</param>
         /// <returns>True if null or empty; otherwise false.</returns>
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> list)
@@ -183,6 +184,7 @@ namespace ContractHttp
         /// <summary>
         /// Sets the value of an objects property.
         /// </summary>
+        /// <typeparam name="T">The property type.</typeparam>
         /// <param name="obj">The object.</param>
         /// <param name="propertyName">The name of the property.</param>
         /// <param name="value">The value to set.</param>
@@ -265,6 +267,8 @@ namespace ContractHttp
         /// <summary>
         /// Gets a service implemtation or default.
         /// </summary>
+        /// <typeparam name="T">The return type.</typeparam>
+        /// <typeparam name="TDefault">The default type.</typeparam>
         /// <param name="serviceProvider">The service provider.</param>
         /// <returns>A service implementation or default</returns>
         public static T GetServiceOrDefault<T, TDefault>(this IServiceProvider serviceProvider)

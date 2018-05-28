@@ -10,12 +10,12 @@
         : Attribute
     {
         /// <summary>
-        /// Gets the Uri to send the request to.
+        /// Gets or sets the Uri to send the request to.
         /// </summary>
         public string Route { get; set; }
 
         /// <summary>
-        /// Gets the content type.
+        /// Gets or sets the content type.
         /// </summary>
         public string ContentType { get; set; }
 

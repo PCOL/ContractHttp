@@ -31,12 +31,12 @@ namespace ContractHttp
         public Type ParameterType { get; }
 
         /// <summary>
-        /// Gets the from option.
+        /// Gets or sets the from option.
         /// </summary>
         public ControllerMethodParameterFromOption From { get; set; }
 
         /// <summary>
-        /// Gets the from name.
+        /// Gets or sets the from name.
         /// </summary>
         public string FromName { get; set; }
     }

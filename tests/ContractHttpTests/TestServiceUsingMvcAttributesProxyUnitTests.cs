@@ -46,7 +46,6 @@ namespace ContractHttpTests
                     HttpClient = httpClient
                 });
 
-
             this.testService = testServiceUsingMvcProxy.GetProxyObject();
         }
 

@@ -12,7 +12,7 @@ namespace ContractHttpTests
     public class RetryHandlerUnitTests
     {
         /// <summary>
-        /// Creates a <see cref="RetryHandler"/> and checks that it retries to correct number 
+        /// Creates a <see cref="RetryHandler"/> and checks that it retries to correct number
         /// of times.
         /// </summary>
         [TestMethod]

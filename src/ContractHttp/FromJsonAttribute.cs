@@ -15,7 +15,7 @@ namespace ContractHttp
         : FromResponseAttribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="FromJsonAttribute"/> class.
+        /// Initializes a new instance of the <see cref="FromJsonAttribute"/> class.
         /// </summary>
         /// <param name="jsonPath">The path to the json value.</param>
         public FromJsonAttribute(string jsonPath)
@@ -107,7 +107,7 @@ namespace ContractHttp
         /// <param name="obj">The <see cref="JObject"/> instance.</param>
         /// <param name="objectType">The type of object to get.</param>
         /// <param name="jsonPath">The path to the json object.true</param>
-        /// <returns></returns>
+        /// <returns>An object if found; otherwise null.</returns>
         private object GetObject(JObject obj, Type objectType, string jsonPath)
         {
             if (jsonPath.IsNullOrEmpty() == false)

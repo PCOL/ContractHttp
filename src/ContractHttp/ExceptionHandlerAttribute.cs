@@ -38,7 +38,6 @@ namespace ContractHttp
         /// <summary>
         /// Gets or sets the header to return the error message in.
         /// </summary>
-        /// <returns></returns>
         public string ResponseHeader { get; set; }
     }
 }

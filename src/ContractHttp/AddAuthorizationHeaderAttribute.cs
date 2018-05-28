@@ -10,14 +10,14 @@ namespace ContractHttp
         : Attribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="AddAuthorizationHeaderAttribute"/> class.
+        /// Initializes a new instance of the <see cref="AddAuthorizationHeaderAttribute"/> class.
         /// </summary>
         public AddAuthorizationHeaderAttribute()
         {
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="AddAuthorizationHeaderAttribute"/> class.
+        /// Initializes a new instance of the <see cref="AddAuthorizationHeaderAttribute"/> class.
         /// </summary>
         /// <param name="authorizationFactoryType">The authorization header factory type.</param>
         public AddAuthorizationHeaderAttribute(Type authorizationFactoryType)
@@ -26,7 +26,7 @@ namespace ContractHttp
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="AddAuthorizationHeaderAttribute"/> class.
+        /// Initializes a new instance of the <see cref="AddAuthorizationHeaderAttribute"/> class.
         /// </summary>
         /// <param name="headerValue">The header value.</param>
         public AddAuthorizationHeaderAttribute(string headerValue)

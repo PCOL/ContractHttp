@@ -10,7 +10,7 @@ namespace ContractHttp
     public class HttpClientProxyOptions
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="HttpClientProxyOptions"/> class.
+        /// Initializes a new instance of the <see cref="HttpClientProxyOptions"/> class.
         /// </summary>
         public HttpClientProxyOptions()
         {

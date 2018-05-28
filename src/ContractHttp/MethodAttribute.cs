@@ -10,14 +10,14 @@ namespace ContractHttp
         : Attribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="MethodAttribute"/> class.
+        /// Initializes a new instance of the <see cref="MethodAttribute"/> class.
         /// </summary>
         protected MethodAttribute()
         {
         }
 
         /// <summary>
-        /// Gets the path template.
+        /// Gets or sets the path template.
         /// </summary>
         public string Template { get; protected set; }
 

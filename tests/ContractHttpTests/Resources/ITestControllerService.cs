@@ -3,8 +3,8 @@ namespace ContractHttpTests.Resources
     using System.Collections.Generic;
     using ContractHttp;
     using ContractHttpTests.Resources.Models;
-    using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
     /// Defines a test controller.

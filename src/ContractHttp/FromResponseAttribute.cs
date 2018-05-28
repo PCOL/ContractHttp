@@ -11,7 +11,7 @@ namespace ContractHttp
         : Attribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="FromResponseAttribute"/> class.
+        /// Initializes a new instance of the <see cref="FromResponseAttribute"/> class.
         /// </summary>
         protected FromResponseAttribute()
         {

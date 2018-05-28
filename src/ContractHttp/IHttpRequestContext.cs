@@ -15,7 +15,7 @@ namespace ContractHttp
         MethodInfo MethodInfo { get; }
 
         /// <summary>
-        /// The requests arguments.
+        /// Gets the requests arguments.
         /// </summary>
         object[] Arguments { get; }
 

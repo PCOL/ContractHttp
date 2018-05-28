@@ -11,7 +11,6 @@
         /// <summary>
         /// Gets or sets the name of the controller.
         /// </summary>
-        /// <returns></returns>
         public string ControllerTypeName { get; set; }
 
         /// <summary>

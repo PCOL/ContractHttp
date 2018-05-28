@@ -26,7 +26,7 @@ namespace ContractHttpTests
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="responseAction">An action to execute prior to returning the repsonse.</param>
-        /// <returns></returns>
+        /// <returns>A result.</returns>
         [Get("{name}")]
         Task<TestData> GetAsync(string name, Action<HttpResponseMessage> responseAction);
 
@@ -35,7 +35,7 @@ namespace ContractHttpTests
         /// </summary>
         /// <param name="name">The name.</param>
         /// <param name="responseFunc">A function to execute to build the return type from the response.</param>
-        /// <returns></returns>
+        /// <returns>A result.</returns>
         [Get("{name}")]
         Task<TestData> GetAsync(string name, Func<HttpResponseMessage, TestData> responseFunc);
     }

@@ -11,7 +11,7 @@ namespace ContractHttp
         : Attribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="SendAsQueryAttribute"/> class.
+        /// Initializes a new instance of the <see cref="SendAsQueryAttribute"/> class.
         /// </summary>
         /// <param name="name">The query parameters name.</param>
         public SendAsQueryAttribute(string name)

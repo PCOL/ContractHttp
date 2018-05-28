@@ -815,10 +815,10 @@
         /// <summary>
         /// Emits a call to the return a status code and result as an <see cref="IActionResult"/>
         /// </summary>
-        /// <param name="emitter"></param>
-        /// <param name="statusCode"></param>
-        /// <param name="local"></param>
-        /// <param name="localResponse"></param>
+        /// <param name="emitter">A IL emitter.</param>
+        /// <param name="statusCode">The status code.</param>
+        /// <param name="local">A local containg the result.</param>
+        /// <param name="localResponse">A local to store the response in.</param>
         private void EmitStatusCodeCall(IEmitter emitter, int statusCode, ILocal local, ILocal localResponse)
         {
             MethodInfo statusCodeWithResultMethod = typeof(ControllerBase).GetMethod("StatusCode", new Type[] { typeof(int), typeof(object) });

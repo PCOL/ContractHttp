@@ -20,6 +20,6 @@ namespace ContractHttpTests.Resources.Models
         /// <summary>
         /// Gets or sets the Http response.
         /// </summary>
-        public HttpResponseMessage Response { get; set;}
+        public HttpResponseMessage Response { get; set; }
     }
 }

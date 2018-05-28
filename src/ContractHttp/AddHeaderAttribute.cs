@@ -10,7 +10,7 @@ namespace ContractHttp
         : Attribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="AddHeaderAttribute"/> class.
+        /// Initializes a new instance of the <see cref="AddHeaderAttribute"/> class.
         /// </summary>
         /// <param name="header">The header name.</param>
         /// <param name="value">The header value.</param>

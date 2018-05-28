@@ -74,7 +74,7 @@ namespace ContractHttp
         private CancellationTokenSource cancellationTokenSource;
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="HttpRequestContext"/> class.
+        /// Initializes a new instance of the <see cref="HttpRequestContext"/> class.
         /// </summary>
         /// <param name="methodInfo">The methods <see cref="MethodInfo"/>.</param>
         /// <param name="arguments">The methods arguments.</param>
@@ -93,12 +93,12 @@ namespace ContractHttp
         }
 
         /// <summary>
-        /// A reference to the method.
+        /// Gets the methods info.
         /// </summary>
         public MethodInfo MethodInfo { get; }
 
         /// <summary>
-        /// A reference to the methods arguments.
+        /// Gets the methods arguments.
         /// </summary>
         public object[] Arguments { get; }
 
@@ -547,7 +547,7 @@ namespace ContractHttp
         /// <param name="response">The Http response.</param>
         /// <param name="dataType">The return data type.</param>
         /// <param name="parameterInfo">The parameter that the content is to returned via.</param>
-        /// <returns></returns>
+        /// <returns>The deserialised object.</returns>
         private async Task<object> DeserialiseObjectAsync(
             HttpResponseMessage response,
             Type dataType,
@@ -603,7 +603,7 @@ namespace ContractHttp
         /// <param name="model">The model.</param>
         /// <param name="modelType">The model type.</param>
         /// <param name="propertyName">The property name.</param>
-        /// <returns></returns>
+        /// <returns>The model property value.</returns>
         private object GetModelProperty(object model, Type modelType, string propertyName)
         {
             var property = modelType.GetProperty(propertyName);

@@ -189,7 +189,7 @@
         /// <summary>
         /// Gets the base uri.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The base uri.</returns>
         private string GetBaseUri()
         {
             if (this.baseUri != null)

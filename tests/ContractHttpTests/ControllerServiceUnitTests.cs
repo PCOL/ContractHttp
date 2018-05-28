@@ -27,7 +27,7 @@ namespace ContractHttpTests
         private HttpClient testClient;
 
         /// <summary>
-        /// Initialises the test.
+        /// Initializes the test.
         /// </summary>
         [TestInitialize]
         public void TestInitialize()

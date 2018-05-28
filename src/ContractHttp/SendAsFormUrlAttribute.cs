@@ -10,7 +10,7 @@ namespace ContractHttp
         : Attribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="SendAsFormUrlAttribute"/> class.
+        /// Initializes a new instance of the <see cref="SendAsFormUrlAttribute"/> class.
         /// </summary>
         public SendAsFormUrlAttribute()
         {
@@ -19,7 +19,6 @@ namespace ContractHttp
         /// <summary>
         /// Gets or sets the paramter name.
         /// </summary>
-        /// <returns></returns>
         public string Name { get; set; }
     }
 }

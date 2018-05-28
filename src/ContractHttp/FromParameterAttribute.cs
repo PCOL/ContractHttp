@@ -13,8 +13,8 @@ namespace Microsoft.AspNetCore.Http
         /// <summary>
         /// Initializes a new instance of the <see cref="FromParameterAttribute"/> class.
         /// </summary>
-        /// <param name="parameterName"></param>
-        /// <param name="parameterType"></param>
+        /// <param name="parameterName">The paremeters name.</param>
+        /// <param name="parameterType">The perameters type.</param>
         public FromParameterAttribute(string parameterName, Type parameterType)
         {
             this.ParameterName = parameterName;
@@ -37,14 +37,13 @@ namespace Microsoft.AspNetCore.Http
         public string PropertyName { get; set; }
 
         /// <summary>
-        /// Get the binding source.
+        /// Gets the binding source.
         /// </summary>
         public BindingSource BindingSource { get; } = BindingSource.Custom;
 
         /// <summary>
         /// Gets or sets the converter.
         /// </summary>
-        /// <returns></returns>
         public Type ConverterType { get; set; }
     }
 }

@@ -7,14 +7,14 @@ namespace ContractHttp
         : MethodAttribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="PostAttribute"/> class.
+        /// Initializes a new instance of the <see cref="PostAttribute"/> class.
         /// </summary>
         public PostAttribute()
         {
         }
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="PostAttribute"/> class.
+        /// Initializes a new instance of the <see cref="PostAttribute"/> class.
         /// </summary>
         /// <param name="template">A path template.</param>
         public PostAttribute(string template)

@@ -12,7 +12,7 @@ namespace ContractHttp
         /// <summary>
         /// Initializes a new instance of the <see cref="SendAsHeaderAttribute"/> class.
         /// </summary>
-        /// <param name="headerName"></param>
+        /// <param name="headerName">The header name.</param>
         public SendAsHeaderAttribute(string headerName)
         {
             this.Name = headerName;
@@ -24,7 +24,7 @@ namespace ContractHttp
         public string Name { get; }
 
         /// <summary>
-        /// Gets the header format.
+        /// Gets or sets the header format.
         /// </summary>
         public string Format { get; set; }
     }

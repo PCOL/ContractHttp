@@ -194,7 +194,7 @@ namespace ContractHttp
         /// Adds a list of assembly parts to a <see cref="IMvcBuilder"/>.
         /// </summary>
         /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance</param>
-        /// <param name="assemblyParts"></param>
+        /// <param name="assemblyParts">A list of assemblies.</param>
         /// <returns>The <see cref="IMvcBuilder"/> instance.</returns>
         public static IMvcBuilder AddAssemblyParts(
             this IMvcBuilder mvcBuilder,

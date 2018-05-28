@@ -16,7 +16,7 @@
     <AssemblyName>ContractHttp</AssemblyName>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <CodeAnalysisRuleSet>ca.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>../../ca.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />

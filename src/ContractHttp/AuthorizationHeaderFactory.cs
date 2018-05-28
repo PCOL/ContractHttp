@@ -13,7 +13,7 @@ namespace ContractHttp
         private Func<string> getAuthHeaderValue;
 
         /// <summary>
-        /// Initialises a new instance of the <see cref="AuthorizationHeaderFactory"/> class.
+        /// Initializes a new instance of the <see cref="AuthorizationHeaderFactory"/> class.
         /// </summary>
         /// <param name="scheme">The authorization scheme.</param>
         /// <param name="getAuthHeaderValue">A function to get the authorization header value.</param>

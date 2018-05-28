@@ -16,7 +16,7 @@ namespace ContractHttpTests
     /// Tests a service with headers.
     /// </summary>
     [TestClass]
-    public class TestServiceWithHeadersProxyUnitTests
+    public class TestServiceWithHeaderProxyUnitTests
     {
         private TestServer testServer;
 

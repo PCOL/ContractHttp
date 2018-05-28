@@ -50,7 +50,7 @@ namespace ContractHttp
         /// <param name="names">The methods parameter names.</param>
         /// <param name="arguments">The methods arguments.</param>
         /// <param name="serviceProvider">A <see cref="IServiceProvider"/> instance.</param>
-        /// <returns></returns>
+        /// <returns>The request builder.</returns>
         public static HttpRequestBuilder AddAuthorizationHeader(
             this HttpRequestBuilder requestBuilder,
             MethodInfo methodInfo,

@@ -103,6 +103,7 @@ namespace ContractHttp
         /// <summary>
         /// Transfers attributes from a defined method to a new one.
         /// </summary>
+        /// <typeparam name="T">The attribute type.</typeparam>
         /// <param name="methodInfo">The defined method.</param>
         /// <param name="methodBuilder">The new method builder.</param>
         /// <param name="attrs">A list of attributes.</param>
@@ -161,8 +162,8 @@ namespace ContractHttp
         /// Gets an array for attribute property values.
         /// </summary>
         /// <typeparam name="TAttr">The attribute type.</typeparam>
-        /// <param name="attr"></param>
-        /// <param name="ignoreProperties"></param>
+        /// <param name="attr">The attribute.</param>
+        /// <param name="ignoreProperties">A list od properties to ignore.</param>
         /// <returns>An array of properties and values.</returns>
         internal static Tuple<PropertyInfo, object>[] GetAttributePropertyValues<TAttr>(
             TAttr attr,
@@ -203,6 +204,7 @@ namespace ContractHttp
         /// <summary>
         /// Builds an attribute with no constructor arguments.
         /// </summary>
+        /// <typeparam name="TResult">The result type.</typeparam>
         /// <param name="func">A function to return properties and values.</param>
         /// <returns>A <see cref="CustomAttributeBuilder"/> instance.</returns>
         public static CustomAttributeBuilder BuildAttribute<TResult>(
@@ -216,6 +218,8 @@ namespace ContractHttp
         /// <summary>
         /// Builds an attribute with one constructor argument.
         /// </summary>
+        /// <typeparam name="T">The constructor argument type.</typeparam>
+        /// <typeparam name="TResult">The result type.</typeparam>
         /// <param name="constructorArg">The constructor argument value.</param>
         /// <param name="func">A function to return properties and values.</param>
         /// <returns>A <see cref="CustomAttributeBuilder"/> instance.</returns>
@@ -231,6 +235,9 @@ namespace ContractHttp
         /// <summary>
         /// Builds an attribute with two constructor arguments.
         /// </summary>
+        /// <typeparam name="T1">The first constructor argument type.</typeparam>
+        /// <typeparam name="T2">The second constructor argument type.</typeparam>
+        /// <typeparam name="TResult">The result type.</typeparam>
         /// <param name="constructorArg1">The first constructor argument value.</param>
         /// <param name="constructorArg2">The second constructor argument value.</param>
         /// <param name="func">A function to return properties and values.</param>

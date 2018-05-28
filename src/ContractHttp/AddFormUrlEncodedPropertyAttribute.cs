@@ -11,7 +11,7 @@ namespace ContractHttp
         : Attribute
     {
         /// <summary>
-        /// Initialises a new instance of the <see cref="AddFormUrlEncodedPropertyAttribute"/> class.
+        /// Initializes a new instance of the <see cref="AddFormUrlEncodedPropertyAttribute"/> class.
         /// </summary>
         /// <param name="key">The property key.</param>
         /// <param name="value">The property value.</param>
