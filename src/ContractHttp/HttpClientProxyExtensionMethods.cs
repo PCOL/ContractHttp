@@ -89,7 +89,7 @@ namespace ContractHttp
         /// Adds a <see cref="HttpClientProxy{T}"/> instance to a <see cref="IServiceCollection"/>.
         /// </summary>
         /// <param name="services">A <see cref="IServiceCollection"/> instance.</param>
-        /// <param name="baseUriFunc">A function to return the base uri.</param>
+        /// <param name="baseUrlFunc">A function to return the base url.</param>
         /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
         public static IServiceCollection AddHttpClientProxy<T>(
             this IServiceCollection services,

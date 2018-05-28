@@ -1,17 +1,20 @@
-using System;
-using System.Net;
-using System.Net.Http;
-using ContractHttp;
-using ContractHttpTests.Resources;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 namespace ContractHttpTests
 {
+    using System;
+    using System.Net;
+    using System.Net.Http;
+    using ContractHttp;
+    using ContractHttpTests.Resources;
+    using Microsoft.AspNetCore.Builder;
+    using Microsoft.AspNetCore.Hosting;
+    using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.TestHost;
+    using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+    /// <summary>
+    /// Tests a service with headers.
+    /// </summary>
     [TestClass]
     public class TestServiceWithHeadersProxyUnitTests
     {
@@ -21,6 +24,9 @@ namespace ContractHttpTests
 
         private ITestServiceWithHeaders testService;
 
+        /// <summary>
+        /// Test initialisation.
+        /// </summary>
         [TestInitialize]
         public void TestInitialize()
         {
@@ -41,6 +47,9 @@ namespace ContractHttpTests
             this.testService = clientProxy.GetProxyObject();
         }
 
+        /// <summary>
+        /// Test cleanup.
+        /// </summary>
         [TestCleanup]
         public void TestCleanup()
         {
@@ -50,6 +59,9 @@ namespace ContractHttpTests
             }
         }
 
+        /// <summary>
+        /// Sends a header.
+        /// </summary>
         [TestMethod]
         public void GetWithHeader_SendsHeader_ReceivesHeaderValue()
         {
@@ -60,6 +72,9 @@ namespace ContractHttpTests
             Assert.AreEqual(HeaderValue, response.Content.ReadAsStringAsync().Result.Trim('\"'));
         }
 
+        /// <summary>
+        /// Tests if a header is returned.
+        /// </summary>
         [TestMethod]
         public void GetByName_ReturnsHeader()
         {

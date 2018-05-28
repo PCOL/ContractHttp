@@ -15,6 +15,7 @@
     <DebugType>portable</DebugType>
     <AssemblyName>ContractHttp</AssemblyName>
     <NetStandardImplicitPackageVersion>2.0.0</NetStandardImplicitPackageVersion>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <CodeAnalysisRuleSet>ca.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>

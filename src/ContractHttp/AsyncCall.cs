@@ -11,7 +11,7 @@ namespace ContractHttp
     /// <summary>
     /// Represents a typed asynchronous call.
     /// </summary>
-    /// <typeparam name="U">The calls data type.</typeparam>
+    /// <typeparam name="T">The calls return type.</typeparam>
     internal class AsyncCall<T>
     {
         /// <summary>
@@ -25,6 +25,7 @@ namespace ContractHttp
         /// Initializes a new instance of the <see cref="AsyncCall{T}"/> class.
         /// </summary>
         /// <param name="requestSender">A <see cref="IHttpRequestSender"/></param>
+        /// <param name="httpContext">A <see cref="HttpRequestContext"/></param>
         public AsyncCall(
             IHttpRequestSender requestSender,
             HttpRequestContext httpContext)

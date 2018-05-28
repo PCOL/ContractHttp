@@ -5,9 +5,16 @@ namespace ContractHttpTests
     using ContractHttp;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+    /// <summary>
+    /// Tests a <see cref="RetryHandler"/>.
+    /// </summary>
     [TestClass]
     public class RetryHandlerUnitTests
     {
+        /// <summary>
+        /// Creates a <see cref="RetryHandler"/> and checks that it retries to correct number 
+        /// of times.
+        /// </summary>
         [TestMethod]
         public void RetryHandler_ResponseHandelerReturnsFalse_RetriesThreeTimes()
         {
@@ -28,6 +35,10 @@ namespace ContractHttpTests
             Assert.AreEqual(3, count);
         }
 
+        /// <summary>
+        /// Creates a <see cref="RetryHandler"/> and checks that it retries on exception, then
+        /// throws the exception on failure after the correct number of retries.
+        /// </summary>
         [TestMethod]
         public void RetryHandler_RetryOnException_ThenThrowException()
         {
@@ -59,6 +70,10 @@ namespace ContractHttpTests
             Assert.AreEqual(typeof(InvalidOperationException), thrownEx.GetType());
         }
 
+        /// <summary>
+        /// Creates a <see cref="RetryHandler"/> and checks that it retries on exception, then
+        /// returns correctly upon success.
+        /// </summary>
         [TestMethod]
         public void RetryHandler_RetryOnException_ThenReturnSuccess()
         {

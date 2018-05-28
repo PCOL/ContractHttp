@@ -42,7 +42,7 @@ namespace ContractHttp
         /// <summary>
         /// Initialises a new instance of the <see cref="ServiceCallFilterEmitter"/> class.
         /// </summary>
-        /// <param name="type">The type to be checked for <see cref="ServiceCallFilterAttributes"/> attributes..</param>
+        /// <param name="type">The type to be checked for <see cref="ServiceCallFilterAttribute"/> attributes..</param>
         /// <param name="emitter">The IL generator to use.</param>
         public ServiceCallFilterEmitter(Type type, IEmitter emitter)
         {

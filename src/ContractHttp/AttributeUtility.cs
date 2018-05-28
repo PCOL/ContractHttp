@@ -216,7 +216,7 @@ namespace ContractHttp
         /// <summary>
         /// Builds an attribute with one constructor argument.
         /// </summary>
-        /// <param name="constructorArg1">The constructor argument value.</param>
+        /// <param name="constructorArg">The constructor argument value.</param>
         /// <param name="func">A function to return properties and values.</param>
         /// <returns>A <see cref="CustomAttributeBuilder"/> instance.</returns>
         public static CustomAttributeBuilder BuildAttribute<T, TResult>(

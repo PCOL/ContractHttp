@@ -106,6 +106,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="obj">The <see cref="JObject"/> instance.</param>
         /// <param name="objectType">The type of object to get.</param>
+        /// <param name="jsonPath">The path to the json object.true</param>
         /// <returns></returns>
         private object GetObject(JObject obj, Type objectType, string jsonPath)
         {

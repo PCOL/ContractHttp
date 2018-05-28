@@ -3,10 +3,17 @@ namespace ContractHttp
     using System;
     using System.Text;
 
+    /// <summary>
+    /// An attribute used to state that a parameter should be sent as a query parameter in the request.
+    /// </summary>
     [AttributeUsage(AttributeTargets.Parameter)]
     public class SendAsQueryAttribute
         : Attribute
     {
+        /// <summary>
+        /// Initialises a new instance of the <see cref="SendAsQueryAttribute"/> class.
+        /// </summary>
+        /// <param name="name">The query parameters name.</param>
         public SendAsQueryAttribute(string name)
         {
             this.Name = name;

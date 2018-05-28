@@ -6,10 +6,17 @@ namespace ContractHttpTests.Resources
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Http;
 
+    /// <summary>
+    /// A test controller.
+    /// </summary>
     [Route("api/test")]
     public class TestController
         : Controller
     {
+        /// <summary>
+        /// Get.
+        /// </summary>
+        /// <returns>An <see cref="IActionResult"/>.</returns>
         [HttpGet("")]
         public IActionResult Get()
         {
@@ -30,6 +37,11 @@ namespace ContractHttpTests.Resources
                 });
         }
 
+        /// <summary>
+        /// Gets the address by name.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns>An <see cref="IActionResult"/>.</returns>
         [HttpGet("{name}")]
         public IActionResult GetAddress(string name)
         {
@@ -41,6 +53,11 @@ namespace ContractHttpTests.Resources
                 });
         }
 
+        /// <summary>
+        /// Deletes by name.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns>An <see cref="IActionResult"/>.</returns>
         [HttpDelete("{name}")]
         public IActionResult DeleteAddress(string name)
         {
@@ -52,6 +69,11 @@ namespace ContractHttpTests.Resources
             return this.StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Delete address by name.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns>An <see cref="IActionResult"/>.</returns>
         [HttpDelete("")]
         public IActionResult DeleteAddressFromQuery([FromQuery]string name)
         {
@@ -63,6 +85,11 @@ namespace ContractHttpTests.Resources
             return this.StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Create.
+        /// </summary>
+        /// <param name="model">The create model.</param>
+        /// <returns>An <see cref="IActionResult"/>.</returns>
         [HttpPost]
         public IActionResult Create([FromBody]CreateModel model)
         {
@@ -83,6 +110,11 @@ namespace ContractHttpTests.Resources
             return this.StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Create.
+        /// </summary>
+        /// <param name="model">The create model.</param>
+        /// <returns>An <see cref="IActionResult"/>.</returns>
         [HttpPost("form")]
         public IActionResult CreateFromForm([FromForm]CreateModel model)
         {
@@ -103,6 +135,12 @@ namespace ContractHttpTests.Resources
             return this.StatusCode(StatusCodes.Status500InternalServerError);
         }
 
+        /// <summary>
+        /// Update by name.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>An <see cref="IActionResult"/>.</returns>
         [HttpPut("{name}")]
         public IActionResult Update(string name, [FromBody]TestData value)
         {
@@ -114,6 +152,11 @@ namespace ContractHttpTests.Resources
             return this.StatusCode(StatusCodes.Status404NotFound);
         }
 
+        /// <summary>
+        /// Get by id.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <returns>An <see cref="IActionResult"/>.</returns>
         [HttpGet("id/{id}")]
         public IActionResult GetById(string id)
         {

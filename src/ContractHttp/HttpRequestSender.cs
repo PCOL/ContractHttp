@@ -75,7 +75,6 @@ namespace ContractHttp
         /// <summary>
         /// Sends the request to the service calling pre and post actions if they are configured.
         /// </summary>
-        /// <param name="httpClient">The http client to use.</param>
         /// <param name="request">The http request to send.</param>
         /// <param name="completionOption">The completion option.</param>
         /// <returns>A <see cref="HttpResponseMessage"/>.</returns>

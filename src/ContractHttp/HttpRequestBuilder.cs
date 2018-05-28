@@ -57,7 +57,7 @@ namespace ContractHttp
         /// Sets the requests Uri.
         /// </summary>
         /// <param name="uri">The Uri.</param>
-        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
+        /// <returns>The <see cref="HttpRequestBuilder"/> instance.</returns>
         public HttpRequestBuilder SetUri(string uri)
         {
             this.uri = uri;
@@ -68,7 +68,7 @@ namespace ContractHttp
         /// Sets the requests content.
         /// </summary>
         /// <param name="content">The content.</param>
-        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
+        /// <returns>The <see cref="HttpRequestBuilder"/> instance.</returns>
         public HttpRequestBuilder SetContent(HttpContent content)
         {
             this.content = content;
@@ -80,7 +80,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="scheme">The authorization scheme.</param>
         /// <param name="value">The authorization value.</param>
-        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
+        /// <returns>The <see cref="HttpRequestBuilder"/> instance.</returns>
         public HttpRequestBuilder AddAuthorizationHeader(string scheme, string value)
         {
             return this.AddHeader("Authorization", $"{scheme} {value}");
@@ -91,7 +91,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="key">The header key.</param>
         /// <param name="value">The header value.</param>
-        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
+        /// <returns>The <see cref="HttpRequestBuilder"/> instance.</returns>
         public HttpRequestBuilder AddHeader(string key, string value)
         {
             this.headers = this.headers ?? new Dictionary<string, string>();
@@ -104,7 +104,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="key">The query key.</param>
         /// <param name="value">The query value.</param>
-        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
+        /// <returns>The <see cref="HttpRequestBuilder"/> instance.</returns>
         public HttpRequestBuilder AddQueryString(string key, string value)
         {
             this.queryStrings = this.queryStrings ?? new Dictionary<string, string>();
@@ -117,7 +117,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="key">The property key.</param>
         /// <param name="value">The property value.</param>
-        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
+        /// <returns>The <see cref="HttpRequestBuilder"/> instance.</returns>
         public HttpRequestBuilder AddFormUrlProperty(string key, string value)
         {
             this.formUrlProperties = this.formUrlProperties ?? new List<KeyValuePair<string, string>>();
@@ -129,7 +129,7 @@ namespace ContractHttp
         /// Adds a list of form url properties.
         /// </summary>
         /// <param name="properties">The properties.</param>
-        /// <returns>The <see cref="HttpRequestBuild"/> instance.</returns>
+        /// <returns>The <see cref="HttpRequestBuilder"/> instance.</returns>
         public HttpRequestBuilder AddFormUrlProperties(IEnumerable<KeyValuePair<string, string>> properties)
         {
             if (properties != null)

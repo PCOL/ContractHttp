@@ -198,15 +198,6 @@
             Type controllerServiceType,
             IFieldBuilder controllerServiceTypeField)
         {
-/*
-            ConstructorBuilder defaultConstructorBuilder = typeBuilder.DefineConstructor(
-                MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName,
-                CallingConventions.HasThis,
-                null);
-
-            ILGenerator defaultIL = defaultConstructorBuilder.GetILGenerator();
-            defaultIL.Emit(OpCodes.Ret);
-*/
             var constructorBuilder = typeBuilder
                 .NewConstructor()
                 .Public()
@@ -533,7 +524,7 @@
         /// Build parameters.
         /// </summary>
         /// <param name="methodBuilder">The method builder.</param>
-        /// <param name="parmInfos">An array of <see cref="Tuple{string, ParameterAttributes}"/> objects.</param>
+        /// <param name="methodParms">An array of <see cref="ControllerMethodParameterAttribute"/> objects.</param>
         private void BuildParameters(
             IMethodBuilder methodBuilder,
             IEnumerable<ControllerMethodParameterAttribute> methodParms)

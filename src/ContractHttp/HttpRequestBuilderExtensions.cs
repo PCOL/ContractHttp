@@ -11,12 +11,13 @@ namespace ContractHttp
     internal static class HttpRequestBuilderExtensions
     {
         /// <summary>
-        /// Adds the method headers to a <see cref="RequestBuilder"/>.
+        /// Adds the method headers to a <see cref="HttpRequestBuilder"/>.
         /// </summary>
-        /// <param name="requestBuilder">THe <see cref=""/>RequestBuilder.</param>
+        /// <param name="requestBuilder">A <see cref="HttpRequestBuilder"/> instance.</param>
         /// <param name="method">The <see cref="MethodInfo"/>.</param>
         /// <param name="names">A list of keys.</param>
         /// <param name="values">A list of values.</param>
+        /// <returns>The <see cref="HttpRequestBuilder"/> instance.</returns>
         public static HttpRequestBuilder AddMethodHeaders(
             this HttpRequestBuilder requestBuilder,
             MethodInfo method,

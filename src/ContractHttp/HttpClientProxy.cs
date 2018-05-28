@@ -214,6 +214,7 @@
         /// <param name="uri">The request Uri.</param>
         /// <param name="inArgs">The method calls arguments.</param>
         /// <param name="contentType">The content type.</param>
+        /// <param name="timeout">The request timeout value.</param>
         /// <returns>The result of the request.</returns>
         private Task<object> BuildAndSendRequestAsync(
             MethodInfo method,

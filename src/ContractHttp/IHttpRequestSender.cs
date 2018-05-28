@@ -14,7 +14,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="requestBuilder">A request builder.</param>
         /// <param name="completionOption">A completion option.</param>
-        /// <returns>A <see cref="httpResonseMessage"/> instance.</returns>
+        /// <returns>A <see cref="HttpResponseMessage"/> instance.</returns>
         Task<HttpResponseMessage> SendAsync(
             IHttpRequestBuilder requestBuilder,
             HttpCompletionOption completionOption);

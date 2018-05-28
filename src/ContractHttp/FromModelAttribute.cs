@@ -44,7 +44,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="response">The <see cref="HttpResponseMessage"/>.</param>
         /// <param name="dataType">The type to convert to.</param>
-        /// <param name="serializer">The <see cref="IObjectSerialize"/>.</param>
+        /// <param name="serializer">The <see cref="IObjectSerializer"/>.</param>
         /// <returns></returns>
         public override object ToObject(HttpResponseMessage response, Type dataType, IObjectSerializer serializer)
         {

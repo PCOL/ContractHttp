@@ -16,6 +16,9 @@ namespace ContractHttpTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Newtonsoft.Json;
 
+    /// <summary>
+    /// Controller service tests.
+    /// </summary>
     [TestClass]
     public class ControllerServiceUnitTests
     {
@@ -23,6 +26,9 @@ namespace ContractHttpTests
 
         private HttpClient testClient;
 
+        /// <summary>
+        /// Initialises the test.
+        /// </summary>
         [TestInitialize]
         public void TestInitialize()
         {
@@ -46,6 +52,9 @@ namespace ContractHttpTests
             this.testClient = this.testServer.CreateClient();
         }
 
+        /// <summary>
+        /// Cleans up after test.
+        /// </summary>
         [TestCleanup]
         public void TestCleanup()
         {
@@ -55,6 +64,10 @@ namespace ContractHttpTests
             }
         }
 
+        /// <summary>
+        /// Creates a get all request and sends it to the controller.
+        /// </summary>
+        /// <returns>A task.</returns>
         [TestMethod]
         public async Task CreateController_GetAll()
         {
@@ -75,6 +88,10 @@ namespace ContractHttpTests
             }
         }
 
+        /// <summary>
+        /// Creates a get by name request and send it to the controller.
+        /// </summary>
+        /// <returns>A task.</returns>
         [TestMethod]
         public async Task CreateController_GetByName()
         {

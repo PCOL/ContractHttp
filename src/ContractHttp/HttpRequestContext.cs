@@ -108,6 +108,7 @@ namespace ContractHttp
         /// <param name="httpMethod">The http method.</param>
         /// <param name="uri">The request Uri.</param>
         /// <param name="contentType">The content type.</param>
+        /// <param name="timeout">A value representing the request timeout.</param>
         /// <returns>The result of the request.</returns>
         public async Task<object> BuildAndSendRequestAsync(
             HttpMethod httpMethod,
@@ -432,7 +433,6 @@ namespace ContractHttp
         /// Processes the result.
         /// </summary>
         /// <param name="response">A <see cref="HttpResponseMessage"/>.</param>
-        /// <param name="content">The response content.</param>
         /// <param name="returnType">The return type.</param>
         /// <returns>The result.</returns>
         internal object ProcessResult(
@@ -544,8 +544,7 @@ namespace ContractHttp
         /// <summary>
         /// Deserializes an object.
         /// </summary>
-        /// <param name="content">The request content.</param>
-        /// <param name="contType">The content Type.</param>
+        /// <param name="response">The Http response.</param>
         /// <param name="dataType">The return data type.</param>
         /// <param name="parameterInfo">The parameter that the content is to returned via.</param>
         /// <returns></returns>

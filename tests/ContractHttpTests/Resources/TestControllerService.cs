@@ -5,9 +5,16 @@ namespace ContractHttpTests.Resources
     using ContractHttpTests.Resources.Models;
     using Microsoft.AspNetCore.Mvc;
 
+    /// <summary>
+    /// An implemtation of the <see cref="ITestControllerService"/> interface.
+    /// </summary>
     public class TestControllerService
         : ITestControllerService
     {
+        /// <summary>
+        /// Get all.
+        /// </summary>
+        /// <returns>A list of <see cref="TestData"/> instances.</returns>
         public IEnumerable<TestData> GetAll()
         {
             return new[]
@@ -25,6 +32,11 @@ namespace ContractHttpTests.Resources
             };
         }
 
+        /// <summary>
+        /// Get by name.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns>A <see cref="TestData"/> instance.</returns>
         public TestData GetByName(string name)
         {
             return new TestData()
@@ -34,6 +46,10 @@ namespace ContractHttpTests.Resources
             };
         }
 
+        /// <summary>
+        /// Deletes by name.
+        /// </summary>
+        /// <param name="name">The name.</param>
         public void Delete(string name)
         {
         }

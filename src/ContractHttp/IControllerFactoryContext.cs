@@ -24,7 +24,7 @@ namespace ContractHttp
         Type[] BaseTypes { get; }
 
         /// <summary>
-        /// Gets the <see cref="FieldBuilder"/> which will contain the base object instance.
+        /// Gets the <see cref="IFieldBuilder"/> which will contain the base object instance.
         /// </summary>
         IFieldBuilder BaseObjectField { get; }
     }

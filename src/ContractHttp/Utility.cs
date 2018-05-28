@@ -97,7 +97,7 @@ namespace ContractHttp
         /// Expands a string from a key/value list.
         /// </summary>
         /// <param name="str">The str to expand.</param>
-        /// <param name="KeyValuePairs">A list of key/value pairs.</param>
+        /// <param name="keyValuePairs">A list of key/value pairs.</param>
         /// <returns>The expanded <see cref="string"/>.</returns>
         public static string ExpandString(this string str, IEnumerable<KeyValuePair<string, object>> keyValuePairs)
         {
@@ -166,6 +166,7 @@ namespace ContractHttp
         /// Checks if the return type is a task.
         /// </summary>
         /// <param name="returnType">The return type.</param>
+        /// <param name="taskType">A variable to receive the task type.</param>
         /// <returns>True if the return type is a <see cref="Task"/> and therefore asynchronous; otherwise false.</returns>
         public static bool IsAsync(this Type returnType, out Type taskType)
         {
@@ -248,9 +249,9 @@ namespace ContractHttp
         /// <summary>
         /// Set the value of a property by the type of property.
         /// </summary>
-        /// <typeparam name="T">The property type.null</typeparam>
         /// <param name="properties">A list of properties</param>
         /// <param name="obj">The object.</param>
+        /// <param name="propertyType">The properties type.</param>
         /// <param name="valueFunction">The function that provides the value.</param>
         public static void SetProperty(this IEnumerable<PropertyInfo> properties, object obj, Type propertyType, Func<object> valueFunction)
         {

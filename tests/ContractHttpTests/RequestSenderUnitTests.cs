@@ -10,9 +10,15 @@ namespace ContractHttpTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
 
+    /// <summary>
+    /// Tests a request sender.
+    /// </summary>
     [TestClass]
     public class RequestSenderUnitTests
     {
+        /// <summary>
+        /// Call a get method without retry.
+        /// </summary>
         [TestMethod]
         public void CreateClient_CallGetWithoutRetry_SendsRequestOnlyOnce()
         {
