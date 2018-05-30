@@ -41,10 +41,10 @@ namespace ContractHttpTests
                 "http://localhost",
                 new HttpClientProxyOptions()
                 {
-                    HttpClient = testServer.CreateClient()
+                    HttpClient = this.testServer.CreateClient()
                 });
 
-            this.testService = clientProxy.GetProxyObject();
+            this.testService = this.clientProxy.GetProxyObject();
         }
 
         /// <summary>

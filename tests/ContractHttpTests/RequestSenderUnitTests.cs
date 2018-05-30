@@ -58,7 +58,6 @@ namespace ContractHttpTests
 
         private IServiceProvider BuildServices(IHttpRequestSender requestSender)
         {
-
             var services = new ServiceCollection();
 
             return services

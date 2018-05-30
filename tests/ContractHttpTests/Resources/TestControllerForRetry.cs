@@ -13,7 +13,7 @@ namespace ContractHttpTests
         private TestRetryCounts retryCounts;
 
         /// <summary>
-        /// Initialise a new instance of the <see cref="TestControllerForRetry"/> class.
+        /// Initializes a new instance of the <see cref="TestControllerForRetry"/> class.
         /// </summary>
         /// <param name="retryCounts">A type for collecting retry counts.</param>
         public TestControllerForRetry(TestRetryCounts retryCounts)

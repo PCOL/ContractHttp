@@ -33,7 +33,7 @@ namespace ContractHttpTests
                     services.AddMvc();
                 });
 
-            var httpClient = testServer.CreateClient();
+            var httpClient = this.testServer.CreateClient();
             var testServiceProxy = new HttpClientProxy<ITestServiceWithRetry>(
                 "http://localhost",
                 new HttpClientProxyOptions()
@@ -59,7 +59,7 @@ namespace ContractHttpTests
         /// <summary>
         /// Tests that a method with retry retries the correct number of times.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A task.</returns>
         [TestMethod]
         public async Task CallMethod_WithRetry_RetriesThreeTimes()
         {
@@ -71,7 +71,7 @@ namespace ContractHttpTests
         /// Tests that a method with retry and a response function retries the correct
         /// number of times.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A task.</returns>
         [TestMethod]
         public async Task CallMethod_WithResponseFunctionAndRetry_RetriesThreeTimes()
         {
@@ -84,8 +84,8 @@ namespace ContractHttpTests
                     return r.IsSuccessStatusCode;
                 });
 
-            Assert.IsTrue(called)
-;            Assert.AreEqual(2, this.retryCounts.GetCount);
+            Assert.IsTrue(called);
+            Assert.AreEqual(2, this.retryCounts.GetCount);
         }
     }
 }

@@ -18,7 +18,7 @@ namespace ContractHttpTests
         [TestMethod]
         public void RetryHandler_ResponseHandelerReturnsFalse_RetriesThreeTimes()
         {
-            int count =0;
+            int count = 0;
             var result = new RetryHandler()
                 .RetryCount(3)
                 .RetryAsync<bool>(

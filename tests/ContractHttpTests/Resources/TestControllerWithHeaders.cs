@@ -36,7 +36,6 @@ namespace ContractHttpTests.Resources
         [HttpGet("{name}")]
         public IActionResult Get(string name)
         {
-
             this.Response.Headers.Add("x-test-header", "header value");
 
             return this.StatusCode(

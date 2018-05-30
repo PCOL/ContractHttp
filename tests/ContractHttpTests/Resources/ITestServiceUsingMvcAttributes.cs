@@ -55,7 +55,7 @@ namespace ContractHttpTests.Resources
         /// </summary>
         /// <param name="model">The data model.</param>
         /// <returns>A response model.</returns>
-        [HttpPost()]
+        [HttpPost]
         CreateResponseModel Create([SendAsContent]CreateModel model);
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace ContractHttpTests.Resources
         /// </summary>
         /// <param name="model">The data model.</param>
         /// <returns>A response model.</returns>
-        [HttpPost()]
+        [HttpPost]
         Task<CreateResponseModel> CreateAsync([SendAsContent]CreateModel model);
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace ContractHttpTests.Resources
         /// <param name="model">The data model.</param>
         /// <param name="response">A variable to receive the <see cref="HttpResponseMessage"/>.</param>
         /// <returns>A response model.</returns>
-        [HttpPost()]
+        [HttpPost]
         CreateResponseModel CreateWithHttpResponse([SendAsContent]CreateModel model, out HttpResponseMessage response);
 
         /// <summary>

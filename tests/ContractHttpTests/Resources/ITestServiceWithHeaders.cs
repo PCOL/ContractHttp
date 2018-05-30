@@ -13,8 +13,9 @@ namespace ContractHttpTests.Resources
         /// <summary>
         /// Get.
         /// </summary>
+        /// <param name="header">A header value.</param>
         /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
-        [Get()]
+        [Get]
         HttpResponseMessage Get([SendAsHeader("x-test-header")]string header);
 
         /// <summary>

@@ -65,7 +65,7 @@ namespace ContractHttpTests.Resources
         /// <summary>
         /// Delete by name.
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">The name.</param>
         /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
         [Delete("{name}")]
         HttpResponseMessage Delete(string name);
@@ -73,6 +73,7 @@ namespace ContractHttpTests.Resources
         /// <summary>
         /// Delete using query string.
         /// </summary>
+        /// <param name="name">The name.</param>
         /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
         [Delete("")]
         HttpResponseMessage DeleteUsingQueryString([SendAsQuery("name")] string name);
@@ -80,8 +81,8 @@ namespace ContractHttpTests.Resources
         /// <summary>
         /// Get by id.
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
+        /// <param name="id">The id.</param>
+        /// <returns>Test data.</returns>
         [Get("id/{id}")]
         [return: FromJson("", ReturnType = typeof(ServiceResult<TestData>))]
         IServiceResult<TestData> GetById(string id);
@@ -89,8 +90,8 @@ namespace ContractHttpTests.Resources
         /// <summary>
         /// Get by id.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="name"></param>
+        /// <param name="id">The id.</param>
+        /// <param name="name">The name.</param>
         /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
         [Get("id/{id}")]
         HttpResponseMessage GetById(
@@ -100,8 +101,8 @@ namespace ContractHttpTests.Resources
         /// <summary>
         /// Get address by id.
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="address"></param>
+        /// <param name="id">The id.</param>
+        /// <param name="address">The address.</param>
         /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
         [Get("id/{id}")]
         HttpResponseMessage GetAddressById(
