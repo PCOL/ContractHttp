@@ -117,7 +117,7 @@ public interface ICustomerClient
 }
 ```
 
-Once the interface is defined a proxy can be generated and the used to call the service:
+Once the interface is defined a proxy can be generated and then used to call the service:
 
 ```cs
 var httpClient = new HttpClient();
