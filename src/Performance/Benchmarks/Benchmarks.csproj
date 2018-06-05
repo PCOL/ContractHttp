@@ -20,5 +20,6 @@
     <Content Include="Contracts\IClientBenchmarks.cs" />
     <Content Include="Contracts\Models\SimpleModel.cs" />
     <Content Include="AllowNonOptimised.cs" />
+    <Content Include="BenchmarkDotNet.Artifacts\ClientBenchmarks.log" />
   </ItemGroup>
 </Project>
