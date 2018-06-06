@@ -7,6 +7,7 @@ namespace ContractHttp
     /// An attribute used to indicate that a method or all methods on an interface should
     /// attempt to retry upon failure.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Method)]
     public class RetryAttribute
         : Attribute

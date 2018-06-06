@@ -5,6 +5,7 @@ namespace ContractHttp
     /// <summary>
     /// An attribute used to send a parameter as a request header.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Parameter)]
     public class SendAsHeaderAttribute
         : Attribute

@@ -6,6 +6,7 @@ namespace ContractHttp
     /// <summary>
     /// An attribute used to state that a parameter should be sent as a query parameter in the request.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Parameter)]
     public class SendAsQueryAttribute
         : Attribute

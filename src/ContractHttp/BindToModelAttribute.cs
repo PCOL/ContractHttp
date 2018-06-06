@@ -7,6 +7,7 @@ namespace ContractHttp
     /// An attribute used to specifiy that an out parameter should use a <see cref="Binder"/> to
     /// return a specific type.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
     public class BindToModelAttribute
         : Attribute

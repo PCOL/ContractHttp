@@ -5,6 +5,7 @@ namespace ContractHttp
     /// <summary>
     /// A base attribute class use to define a method attributes.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class MethodAttribute
         : Attribute

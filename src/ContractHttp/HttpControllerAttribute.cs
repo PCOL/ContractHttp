@@ -5,6 +5,8 @@
     /// <summary>
     /// Defines a generated http controller.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
     public class HttpControllerAttribute
         : Attribute
     {

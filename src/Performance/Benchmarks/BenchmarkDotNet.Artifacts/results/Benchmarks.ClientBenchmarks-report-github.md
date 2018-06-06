@@ -8,9 +8,9 @@ Intel Celeron CPU N2840 2.16GHz, 1 CPU, 2 logical cores and 2 physical cores
 
 
 ```
-|               Method |       Mean |    Error |    StdDev |     Median |
-|--------------------- |-----------:|---------:|----------:|-----------:|
-|            SimpleGet |   892.7 us | 57.79 us | 163.00 us |   814.2 us |
-|       SimpleGetAsync |   913.2 us | 17.72 us |  17.41 us |   911.7 us |
-|      SimpleGetByName |   882.0 us | 17.39 us |  24.38 us |   874.0 us |
-| SimpleGetByNameAsync | 1,057.5 us | 20.93 us |  39.31 us | 1,074.2 us |
+|               Method |     Mean |     Error |    StdDev |   Median |
+|--------------------- |---------:|----------:|----------:|---------:|
+|            SimpleGet | 1.160 ms | 0.1264 ms | 0.3706 ms | 1.004 ms |
+|       SimpleGetAsync | 1.575 ms | 0.1584 ms | 0.4645 ms | 1.439 ms |
+|      SimpleGetByName | 1.047 ms | 0.0624 ms | 0.1739 ms | 1.013 ms |
+| SimpleGetByNameAsync | 1.351 ms | 0.1020 ms | 0.2894 ms | 1.255 ms |

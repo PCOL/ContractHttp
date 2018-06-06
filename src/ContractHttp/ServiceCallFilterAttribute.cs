@@ -5,6 +5,7 @@ namespace ContractHttp
     /// <summary>
     /// An attribute thata represents a service call filter.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public abstract class ServiceCallFilterAttribute
         : Attribute

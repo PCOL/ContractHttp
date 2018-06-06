@@ -5,6 +5,7 @@ namespace ContractHttp
     /// <summary>
     /// A http response attribute.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
     public class HttpResponseAttribute
         : Attribute

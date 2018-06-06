@@ -5,6 +5,7 @@ namespace ContractHttp
     /// <summary>
     /// Represents a controller method parameter.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public class ControllerMethodParameterAttribute
         : Attribute

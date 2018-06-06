@@ -5,6 +5,7 @@
     /// <summary>
     /// An attribute used to define an Http call contract.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Method)]
     public class HttpCallContractAttribute
         : Attribute

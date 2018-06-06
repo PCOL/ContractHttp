@@ -5,6 +5,7 @@ namespace ContractHttp
     /// <summary>
     /// Specifies an exception handler.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
     public class ExceptionHandlerAttribute
         : Attribute

@@ -9,6 +9,7 @@
     /// <summary>
     /// Defines the atrributes of a http controller end point.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Method)]
     public class HttpControllerEndPointAttribute
         : Attribute

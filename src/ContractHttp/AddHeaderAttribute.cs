@@ -5,6 +5,7 @@ namespace ContractHttp
     /// <summary>
     /// An attribute used to specify that a header should be added to the request.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverage]
     [AttributeUsage(AttributeTargets.Interface | AttributeTargets.Method, AllowMultiple = true)]
     public class AddHeaderAttribute
         : Attribute
