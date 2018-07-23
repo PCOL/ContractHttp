@@ -290,5 +290,15 @@ namespace ContractHttpTests
                 Assert.AreEqual(HttpStatusCode.OK, item.Response.StatusCode);
             }
         }
+
+        /// <summary>
+        /// Calls a none existent uri.
+        /// </summary>
+        [TestMethod]
+        [ExpectedException(typeof(HttpRequestException))]
+        public void CallGetNotExists()
+        {
+            var result = this.testService.GetNotExists();
+        }
     }
 }

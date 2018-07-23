@@ -108,5 +108,12 @@ namespace ContractHttpTests.Resources
         HttpResponseMessage GetAddressById(
             string id,
             [FromModel(typeof(TestData), "Address")]out string address);
+
+        /// <summary>
+        /// Get from a none existent uri.
+        /// </summary>
+        /// <returns>A <see cref="TestData" /> instance.</returns>
+        [Get("does/not/exist")]
+        TestData GetNotExists();
     }
 }

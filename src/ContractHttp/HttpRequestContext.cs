@@ -439,6 +439,12 @@ namespace ContractHttp
             HttpResponseMessage response,
             Type returnType)
         {
+            if (this.responseArg == -1 &&
+                returnType != typeof(HttpResponseMessage))
+            {
+                response.EnsureSuccessStatusCode();
+            }
+
             object result = null;
             if (response.Content?.Headers?.ContentLength != 0)
             {
@@ -458,12 +464,6 @@ namespace ContractHttp
                         this.dataArgType,
                         this.MethodInfo.GetParameters()[this.dataArg]).Result;
                 }
-            }
-
-            if (this.responseArg == -1 &&
-                returnType != typeof(HttpResponseMessage))
-            {
-                response.EnsureSuccessStatusCode();
             }
 
             if (this.responseArg != -1)
