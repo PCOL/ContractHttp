@@ -274,6 +274,31 @@ namespace ContractHttpTests
         }
 
         /// <summary>
+        /// Call <see cref="ITestService.GetByIdUsingResponseProcessor(string)"/> with response processor
+        /// </summary>
+        [TestMethod]
+        public void CallGetById_WithResponseProcessor()
+        {
+            var result = this.testService.GetByIdUsingResponseProcessor("id");
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Result);
+            Assert.AreEqual("Address", result.Result.Address);
+        }
+
+        /// <summary>
+        /// Call <see cref="ITestService.GetByIdUsingResponseProcessorAsync(string)"/> with response processor async.
+        /// </summary>
+        /// <returns>A task.</returns>
+        [TestMethod]
+        public async Task CallGetById_WithResponseProcessorAsync()
+        {
+            var result = await this.testService.GetByIdUsingResponseProcessorAsync("id");
+            Assert.IsNotNull(result);
+            Assert.IsNotNull(result.Result);
+            Assert.AreEqual("Address", result.Result.Address);
+        }
+
+        /// <summary>
         /// Creates a proxy and calls a get all method that returns a <see cref="HttpResponseMessage"/>
         /// in the return type.
         /// </summary>

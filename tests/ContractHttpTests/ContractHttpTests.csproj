@@ -43,5 +43,6 @@
     <Content Include="Resources\IServiceResult{T}.cs" />
     <Content Include="Resources\ServiceResult{T}.cs" />
     <Content Include="ServiceCallFilterTestAttribute.cs" />
+    <Content Include="ServiceResponseProcessor{T}.cs" />
   </ItemGroup>
 </Project>

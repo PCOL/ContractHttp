@@ -11,6 +11,24 @@ namespace ContractHttp.Reflection.Emit
     public static class ReflectionExtensionMethods
     {
         /// <summary>
+        /// Gets an attribute from the method or its declaring type.
+        /// </summary>
+        /// <param name="methodInfo">The method.</param>
+        /// <typeparam name="T">The attribute type.</typeparam>
+        /// <returns>The attribute if found; otherwise null.</returns>
+        public static T GetMethodOrTypeAttribute<T>(this MethodInfo methodInfo)
+            where T : Attribute
+        {
+            var attr = methodInfo.GetCustomAttribute<T>();
+            if (attr != null)
+            {
+                return attr;
+            }
+
+            return methodInfo.DeclaringType.GetCustomAttribute<T>();
+        }
+
+        /// <summary>
         /// Processes type builder attributes.
         /// </summary>
         /// <param name="typeBuilder">A type builder.</param>

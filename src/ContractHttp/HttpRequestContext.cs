@@ -9,6 +9,7 @@ namespace ContractHttp
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
+    using ContractHttp.Reflection.Emit;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.DependencyInjection;
 
@@ -42,6 +43,11 @@ namespace ContractHttp
         /// The data argument type.
         /// </summary>
         private Type dataArgType;
+
+        /// <summary>
+        /// The response processor type.
+        /// </summary>
+        private Type responseProcessorType;
 
         /// <summary>
         /// The request action.
@@ -178,6 +184,12 @@ namespace ContractHttp
         private string[] CheckArgsAndBuildRequest(
             HttpRequestBuilder requestBuilder)
         {
+            var responseAttr = this.MethodInfo.GetMethodOrTypeAttribute<HttpResponseProcessorAttribute>();
+            if (responseAttr != null)
+            {
+                this.responseProcessorType = responseAttr.ResponseProcesorType;
+            }
+
             var formUrlAttrs = this.MethodInfo.GetCustomAttributes<AddFormUrlEncodedPropertyAttribute>();
             if (formUrlAttrs.Any() == true)
             {
@@ -439,13 +451,21 @@ namespace ContractHttp
             HttpResponseMessage response,
             Type returnType)
         {
+            object result = null;
+            if (this.responseProcessorType != null)
+            {
+                return this.ExecuteResponseProcessor(
+                    this.responseProcessorType,
+                    returnType,
+                    response);
+            }
+
             if (this.responseArg == -1 &&
                 returnType != typeof(HttpResponseMessage))
             {
                 response.EnsureSuccessStatusCode();
             }
 
-            object result = null;
             if (response.Content?.Headers?.ContentLength != 0)
             {
                 if (returnType != typeof(HttpResponseMessage) &&
@@ -539,6 +559,36 @@ namespace ContractHttp
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Executes a response processor.
+        /// </summary>
+        /// <param name="responseProcessorType">The response processor type.</param>
+        /// <param name="returnType">The return type.</param>
+        /// <param name="response">The http response.</param>
+        /// <returns>The response processors result.</returns>
+        private object ExecuteResponseProcessor(
+            Type responseProcessorType,
+            Type returnType,
+            HttpResponseMessage response)
+        {
+            var responseProcessor = this.options.Services?.GetService(responseProcessorType);
+            if (responseProcessor == null)
+            {
+                responseProcessor = this.options.Services.CreateInstance(this.responseProcessorType);
+            }
+
+            if (responseProcessor != null)
+            {
+                var taskType = typeof(Task<>).MakeGenericType(returnType);
+                var resultProperty = taskType.GetProperty("Result");
+                var processMethod = this.responseProcessorType.GetMethod("ProcessResponseAsync", new[] { typeof(HttpResponseMessage) });
+                var task = processMethod.Invoke(responseProcessor, new object[] { response });
+                return resultProperty.GetValue(task);
+            }
+
+            return null;
         }
 
         /// <summary>

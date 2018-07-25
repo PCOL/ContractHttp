@@ -306,24 +306,70 @@ namespace ContractHttp
                     return service;
                 }
 
-                var ctor = defaultType.GetConstructors().FirstOrDefault();
-                if (ctor != null)
-                {
-                    var parms = ctor.GetParameters();
-                    if (parms.Any() == true)
-                    {
-                        object[] args = new object[parms.Length];
-                        for (int i = 0; i < args.Length; i++)
-                        {
-                            args[i] = serviceProvider.GetRequiredService(parms[i].ParameterType);
-                        }
-
-                        return ctor.Invoke(args);
-                    }
-                }
+                return serviceProvider.CreateInstance(defaultType);
             }
 
             return Activator.CreateInstance(defaultType);
+        }
+
+        /// <summary>
+        /// Creates an instance of a type resolving any arguments using dependency injection.
+        /// </summary>
+        /// <typeparam name="T">The type to create.</typeparam>
+        /// <param name="serviceProvider">A service provider.</param>
+        /// <returns>An instance of the type.</returns>
+        internal static T CreateInstance<T>(this IServiceProvider serviceProvider)
+        {
+            return (T)serviceProvider.CreateInstance(typeof(T));
+        }
+
+        /// <summary>
+        /// Creates an instance of a type resolving any arguments using dependency injection.
+        /// </summary>
+        /// <param name="serviceProvider">A service provider.</param>
+        /// <param name="instanceType">The type to create.</param>
+        /// <returns>An instance of the type.</returns>
+        internal static object CreateInstance(this IServiceProvider serviceProvider, Type instanceType)
+        {
+            var ctor = instanceType.GetConstructors().FirstOrDefault();
+            if (ctor != null)
+            {
+                var parms = ctor.GetParameters();
+                if (parms.Any() == true)
+                {
+                    object[] args = new object[parms.Length];
+                    for (int i = 0; i < args.Length; i++)
+                    {
+                        args[i] = serviceProvider?.GetRequiredService(parms[i].ParameterType);
+                    }
+
+                    return ctor.Invoke(args);
+                }
+            }
+
+            return Activator.CreateInstance(instanceType);
+        }
+
+        /// <summary>
+        /// Checks if a type a subclass of a generic type.
+        /// </summary>
+        /// <param name="type">The generic type.</param>
+        /// <param name="check">The type to check.</param>
+        /// <returns>True if it is a subclass; otherwise false.</returns>
+        public static bool IsSubclassOfGeneric(this Type type, Type check)
+        {
+            while (type != null && type != typeof(object))
+            {
+                var genType = type.IsGenericType ? type.GetGenericTypeDefinition() : type;
+                if (check == genType)
+                {
+                    return true;
+                }
+
+                type = type.BaseType;
+            }
+
+            return false;
         }
     }
 }

@@ -115,5 +115,23 @@ namespace ContractHttpTests.Resources
         /// <returns>A <see cref="TestData" /> instance.</returns>
         [Get("does/not/exist")]
         TestData GetNotExists();
+
+        /// <summary>
+        /// Get address by id.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <returns>Test data.</returns>
+        [Get("id/{id}")]
+        [HttpResponseProcessor(typeof(ServiceResponseProcessor<TestData>))]
+        IServiceResult<TestData> GetByIdUsingResponseProcessor(string id);
+
+        /// <summary>
+        /// Get address by id.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <returns>Test data.</returns>
+        [Get("id/{id}")]
+        [HttpResponseProcessor(typeof(ServiceResponseProcessor<TestData>))]
+        Task<IServiceResult<TestData>> GetByIdUsingResponseProcessorAsync(string id);
     }
 }

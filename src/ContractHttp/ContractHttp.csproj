@@ -97,5 +97,8 @@
     <Content Include="HttpClientSingleton.cs" />
     <Content Include="RetryAttribute.cs" />
     <Content Include="MethodAttribute.cs" />
+    <Content Include="HttpResponseProcessorAttribute.cs" />
+    <Content Include="HttpResponseProcessor{T}.cs" />
+    <Content Include="Reflection\Emit\ReflectionExtensionMethods.cs" />
   </ItemGroup>
 </Project>
