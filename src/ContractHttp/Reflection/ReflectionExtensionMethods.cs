@@ -112,5 +112,17 @@ namespace ContractHttp.Reflection.Emit
 
             return methodBuilder;
         }
+
+        /// <summary>
+        /// Checks if the type is a model object.
+        /// </summary>
+        /// <param name="type">The type</param>
+        /// <returns>True if the type is a model object; otherwise false.</returns>
+        internal static bool IsModelObject(this Type type)
+        {
+            return type.IsPrimitive == false &&
+                type.IsClass == true &&
+                type != typeof(string);
+        }
     }
 }

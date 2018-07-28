@@ -99,6 +99,6 @@
     <Content Include="MethodAttribute.cs" />
     <Content Include="HttpResponseProcessorAttribute.cs" />
     <Content Include="HttpResponseProcessor{T}.cs" />
-    <Content Include="Reflection\Emit\ReflectionExtensionMethods.cs" />
+    <Content Include="Reflection\ReflectionExtensionMethods.cs" />
   </ItemGroup>
 </Project>

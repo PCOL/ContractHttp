@@ -4,6 +4,7 @@ namespace ContractHttp
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Net;
     using System.Net.Http;
     using System.Reflection;
     using System.Text;
@@ -278,7 +279,7 @@ namespace ContractHttp
 
                     if (formUrlContent == false &&
                         requestBuilder.IsContentSet == false &&
-                        this.IsModelObject(parms[i].ParameterType) == true)
+                        parms[i].ParameterType.IsModelObject() == true)
                     {
                         var serializer = this.options.GetObjectSerializer(this.contentType);
                         if (serializer == null)
@@ -358,7 +359,7 @@ namespace ContractHttp
                                                         kvp.Value?.ToString());
                                                 })));
                             }
-                            else if (this.IsModelObject(parm.ParameterType) == true)
+                            else if (parm.ParameterType.IsModelObject() == true)
                             {
                                 var list = new Dictionary<string, string>();
                                 var properties = argument.GetType().GetProperties();
@@ -427,18 +428,6 @@ namespace ContractHttp
             }
 
             return formUrlContent;
-        }
-
-        /// <summary>
-        /// Checks if the type is a model object.
-        /// </summary>
-        /// <param name="type">The type</param>
-        /// <returns>True if the type is a model object; otherwise false.</returns>
-        internal bool IsModelObject(Type type)
-        {
-            return type.IsPrimitive == false &&
-                type.IsClass == true &&
-                type != typeof(string);
         }
 
         /// <summary>
@@ -529,24 +518,23 @@ namespace ContractHttp
             {
                 if (returnType.IsGenericType == true)
                 {
-                    if (typeof(IEnumerable<object>).IsAssignableFrom(returnType) == true)
+                    if (returnType.IsSubclassOfGeneric(typeof(IEnumerable<>)) == true &&
+                        typeof(IEnumerable<object>).IsAssignableFrom(returnType) == true)
                     {
-                        var property = returnType.GetGenericArguments()[0]
-                            .GetProperties()
-                            .FirstOrDefault(p => p.PropertyType == typeof(HttpResponseMessage));
-
-                        if (property != null)
+                        var properties = returnType.GetGenericArguments()[0].GetProperties();
+                        var responseProperty = properties?.FirstOrDefault(p => p.PropertyType == typeof(HttpResponseMessage));
+                        var statusCodeProperty = properties?.FirstOrDefault(p => p.PropertyType == typeof(HttpStatusCode));
+                        foreach (var item in (IEnumerable<object>)result)
                         {
-                            foreach (var item in (IEnumerable<object>)result)
-                            {
-                                property.SetValue(item, response);
-                            }
+                            responseProperty?.SetValue(item, response);
+                            statusCodeProperty?.SetValue(item, response.StatusCode);
                         }
                     }
                 }
                 else
                 {
                     result.SetObjectProperty<HttpResponseMessage>(response);
+                    result.SetObjectProperty<HttpStatusCode>(response.StatusCode);
                 }
             }
 
