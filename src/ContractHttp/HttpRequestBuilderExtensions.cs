@@ -84,5 +84,82 @@ namespace ContractHttp
 
             return requestBuilder;
         }
+
+        /// <summary>
+        /// Checks a parameter for any <see cref="SendAsQueryAttribute"/> attributes.
+        /// </summary>
+        /// <param name="requestBuilder">A request builder instance.</param>
+        /// <param name="attrs">The parameters attributes.</param>
+        /// <param name="parm">The parameter.</param>
+        /// <param name="argument">The parameters actual value.</param>
+        /// <returns>The request builder instance.</returns>
+        internal static HttpRequestBuilder CheckParameterForSendAsQuery(
+            this HttpRequestBuilder requestBuilder,
+            IEnumerable<Attribute> attrs,
+            ParameterInfo parm,
+            object argument)
+        {
+            foreach (var query in attrs.OfType<SendAsQueryAttribute>())
+            {
+                var name = query.Name.IsNullOrEmpty() == false ? query.Name : parm.Name;
+                var value = argument.ToString();
+                if (query.Format.IsNullOrEmpty() == false)
+                {
+                    if (parm.ParameterType == typeof(short))
+                    {
+                        value = ((short)argument).ToString(query.Format);
+                    }
+                    else if (parm.ParameterType == typeof(int))
+                    {
+                        value = ((int)argument).ToString(query.Format);
+                    }
+                    else if (parm.ParameterType == typeof(long))
+                    {
+                        value = ((long)argument).ToString(query.Format);
+                    }
+                }
+
+                if (query.Base64 == true)
+                {
+                    value = Convert.ToBase64String(query.Encoding.GetBytes(value));
+                }
+
+                requestBuilder.AddQueryString(name, value);
+            }
+
+            return requestBuilder;
+        }
+
+        /// <summary>
+        /// Checks a parameter for any <see cref="SendAsHeaderAttribute"/> attributes.
+        /// </summary>
+        /// <param name="requestBuilder">A request builder instance.</param>
+        /// <param name="attrs">The parameters attributes.</param>
+        /// <param name="argument">The parameters actual value.</param>
+        /// <returns>The request builder instance.</returns>
+        internal static HttpRequestBuilder CheckParameterForSendAsHeader(
+            this HttpRequestBuilder requestBuilder,
+            IEnumerable<Attribute> attrs,
+            object argument
+        )
+        {
+            foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
+            {
+                if (string.IsNullOrEmpty(attr.Format) == false)
+                {
+                    requestBuilder.AddHeader(
+                        attr.Name,
+                        string.Format(attr.Format, argument.ToString()));
+                }
+                else
+                {
+                    requestBuilder.AddHeader(
+                        attr.Name,
+                        argument.ToString());
+                }
+            }
+
+            return requestBuilder;
+        }
     }
 }
