@@ -98,6 +98,14 @@ One group of attributes can be used to alter how return values or out parameters
 
 * The **FromModelAttribute** class can be used to indicate that the value is obtained from a property of a model, rather than the model itself.
 
+### Special Properties
+
+When defining the return type it is possible to use 'special properties' to obtain extra information from the response. If the return type contains one of the special properties, then
+the corresponding response values are put into those properties when the call returns.
+
+* Any property of type **HttpResponseMessage** will return the http response.
+
+* Any property of type **HttpStatusCode** will return the 
 ### Example synchronous client
 
 Create an interface and decorate with attributes to define how the client should interact with the service:

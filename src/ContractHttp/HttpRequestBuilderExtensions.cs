@@ -140,8 +140,7 @@ namespace ContractHttp
         internal static HttpRequestBuilder CheckParameterForSendAsHeader(
             this HttpRequestBuilder requestBuilder,
             IEnumerable<Attribute> attrs,
-            object argument
-        )
+            object argument)
         {
             foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
             {

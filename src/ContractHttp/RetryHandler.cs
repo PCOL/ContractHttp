@@ -116,7 +116,7 @@ namespace ContractHttp
             {
                 try
                 {
-                    lastResult = await function();
+                    lastResult = await function().ConfigureAwait(false);
                     if (responseHandler(lastResult) == true)
                     {
                         return lastResult;
@@ -136,7 +136,7 @@ namespace ContractHttp
                 retry++;
                 if (retry < this.retryCount)
                 {
-                    await Task.Delay(wait);
+                    await Task.Delay(wait).ConfigureAwait(false);
 
                     if (this.doubleWaitTime == true)
                     {

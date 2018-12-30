@@ -15,10 +15,13 @@ namespace ContractHttp
     internal class AsyncCall<T>
     {
         /// <summary>
-        /// A reterence to the <see cref="IHttpRequestSender"/>
+        /// A reference to the <see cref="IHttpRequestSender"/>
         /// </summary>
         private readonly IHttpRequestSender requestSender;
 
+        /// <summary>
+        /// A reference to the request context.
+        /// </summary>
         private readonly HttpRequestContext httpContext;
 
         /// <summary>
@@ -43,15 +46,20 @@ namespace ContractHttp
         public async Task<T> SendAsync(HttpRequestBuilder requestBuilder, HttpCompletionOption completionOption)
         {
             var dataType = typeof(T);
-            var response = await this.requestSender.SendAsync(
-                requestBuilder,
-                completionOption);
+            var response = await this.requestSender
+                .SendAsync(
+                    requestBuilder,
+                    completionOption)
+                .ConfigureAwait(false);
 
             if (dataType == typeof(Stream))
             {
                 response.EnsureSuccessStatusCode();
 
-                var result = await response.Content.ReadAsStreamAsync();
+                var result = await response.Content
+                    .ReadAsStreamAsync()
+                    .ConfigureAwait(false);
+
                 return (T)(object)result;
             }
 

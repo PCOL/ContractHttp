@@ -48,12 +48,12 @@ namespace ContractHttp
         public string AuthorzationScheme { get; set; }
 
         /// <summary>
-        /// Gets or sets the authorization value.
+        /// Gets or sets the function used to obtain an authorization value.
         /// </summary>
         public Func<IServiceProvider, string> GetAuthorzationValue { get; set; }
 
         /// <summary>
-        /// Gets or sets the function to get a correlation id.
+        /// Gets or sets the function to obtain a correlation id.
         /// </summary>
         public Func<IServiceProvider, string> GetCorrelationId { get; set; }
 

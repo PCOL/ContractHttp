@@ -64,12 +64,15 @@ namespace ContractHttp
                         }
 
                         return false;
-                    });
+                    })
+                    .ConfigureAwait(false);
             }
 
-            return await this.SendAsync(
-                requestBuilder.Build(),
-                completionOption);
+            return await this
+                .SendAsync(
+                    requestBuilder.Build(),
+                    completionOption)
+                .ConfigureAwait(false);
         }
 
         /// <summary>
@@ -84,10 +87,12 @@ namespace ContractHttp
         {
             this.requestContext.InvokeRequestAction(request);
 
-            var response = await this.httpClient.SendAsync(
-                request,
-                completionOption,
-                this.requestContext.GetCancellationToken());
+            var response = await this.httpClient
+                .SendAsync(
+                    request,
+                    completionOption,
+                    this.requestContext.GetCancellationToken())
+                .ConfigureAwait(false);
 
             this.requestContext.InvokeResponseAction(response);
 

@@ -168,9 +168,11 @@ namespace ContractHttp
                 return mi.Invoke(obj, new object[] { requestBuilder, completionOption });
             }
 
-            var response = await requestSender.SendAsync(
-                requestBuilder,
-                completionOption);
+            var response = await requestSender
+                .SendAsync(
+                    requestBuilder,
+                    completionOption)
+                .ConfigureAwait(false);
 
             return this.ProcessResult(
                 response,
@@ -574,7 +576,9 @@ namespace ContractHttp
             }
 
             var responseSerializer = this.GetObjectSerializer(responseContentType);
-            var content = await response.Content.ReadAsStringAsync();
+            var content = await response.Content
+                .ReadAsStringAsync()
+                .ConfigureAwait(false);
 
             return responseSerializer.DeserializeObject(content, dataType);
         }

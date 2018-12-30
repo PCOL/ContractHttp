@@ -93,22 +93,33 @@ namespace ContractHttp
         /// <typeparam name="T">The proxy type.</typeparam>
         /// <param name="services">A <see cref="IServiceCollection"/> instance.</param>
         /// <param name="baseUrlFunc">A function to return the base url.</param>
+        /// <param name="optionAction">A function to configure the proxy options.</param>
         /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
         public static IServiceCollection AddHttpClientProxy<T>(
             this IServiceCollection services,
-            Func<IServiceProvider, string> baseUrlFunc)
+            Func<IServiceProvider, string> baseUrlFunc,
+            Action<HttpClientProxyOptions> optionAction = null)
             where T : class
         {
+            if (baseUrlFunc == null)
+            {
+                throw new ArgumentNullException(nameof(baseUrlFunc));
+            }
+
             services.AddSingleton<T>(
                 sp =>
                 {
+                    var options = new HttpClientProxyOptions()
+                    {
+                        Services = sp
+                    };
+
+                    optionAction?.Invoke(options);
+
                     var baseUri = baseUrlFunc(sp);
                     var proxy = new HttpClientProxy<T>(
                         baseUri,
-                        new HttpClientProxyOptions()
-                        {
-                            Services = sp
-                        });
+                        options);
 
                     return proxy.GetProxyObject();
                 });
