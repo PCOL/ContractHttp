@@ -20,5 +20,10 @@
         /// Gets or sets the encoding.
         /// </summary>
         public Encoding Encoding { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether or not to send as multipart.
+        /// </summary>
+        public bool Multipart { get; set; }
     }
 }

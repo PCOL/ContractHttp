@@ -109,12 +109,12 @@ namespace ContractHttp.Reflection.Emit
         /// <param name="emitElse">A function to emit the IL to be executed if the object is null.</param>
         public static IEmitter EmitIfNotNull(this IEmitter emitter, Action<IEmitter> emitBody, Action<IEmitter> emitElse = null)
         {
-            emitter.DefineLabel(out ILabel endIf);
+            emitter.DefineLabel("endIf", out ILabel endIf);
 
             if (emitElse != null)
             {
                 emitter
-                    .DefineLabel(out ILabel notNull)
+                    .DefineLabel("notNull", out ILabel notNull)
                     .Emit(OpCodes.Brtrue, notNull)
                     .Emit(OpCodes.Nop);
 
@@ -143,7 +143,7 @@ namespace ContractHttp.Reflection.Emit
         /// Emits IL to check if the passed in local variable is not null or empty, executing the emitted body if not.
         /// </summary>
         /// <param name="emitter">The <see cref="ILGenerator"/> to use.</param>
-        /// <param name="local">The locval variable to check.</param>
+        /// <param name="local">The local variable to check.</param>
         /// <param name="emitBody">A function to emit the IL to be executed if the object is not null.</param>
         /// <param name="emitElse">A function to emit the IL to be executed if the object is null.</param>
         public static IEmitter EmitIfNotNullOrEmpty(this IEmitter emitter, ILocal local, Action<IEmitter> emitBody, Action<IEmitter> emitElse = null)
@@ -158,11 +158,11 @@ namespace ContractHttp.Reflection.Emit
                             .LdLoc(local)
                             .Call(anyMethod)
 
-                            .DefineLabel(out ILabel endAny);
+                            .DefineLabel("endAny", out ILabel endAny);
 
                         if (emitElse != null)
                         {
-                            il.DefineLabel(out ILabel some)
+                            il.DefineLabel("some", out ILabel some)
                                 .BrTrue(some)
                                 .Nop();
 

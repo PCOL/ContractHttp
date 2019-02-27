@@ -6,6 +6,7 @@ namespace ContractHttp
     using System.Linq;
     using System.Net;
     using System.Net.Http;
+    using System.Net.Http.Headers;
     using System.Reflection;
     using System.Text;
     using System.Threading;
@@ -209,6 +210,7 @@ namespace ContractHttp
             }
 
             bool formUrlContent = false;
+            bool contentDisposition = false;
             ParameterInfo[] parms = this.MethodInfo.GetParameters();
             if (parms == null)
             {
@@ -274,10 +276,12 @@ namespace ContractHttp
                 }
                 else
                 {
-                    formUrlContent = this.CheckParameterAttributes(
+                    this.CheckParameterAttributes(
                         requestBuilder,
                         parms[i],
-                        this.Arguments[i]);
+                        this.Arguments[i],
+                        out formUrlContent,
+                        out contentDisposition);
 
                     if (formUrlContent == false &&
                         requestBuilder.IsContentSet == false &&
@@ -306,90 +310,133 @@ namespace ContractHttp
         /// <param name="requestBuilder">The request builder.</param>
         /// <param name="parm">The parameter.</param>
         /// <param name="argument">The parameters value.</param>
-        /// <returns>A value indicating whether or not there is form url content.</returns>
-        internal bool CheckParameterAttributes(
+        /// <param name="formUrlContent">A variable to receive the a value indicating whether or not there is form url content.</param>
+        /// <param name="contentDisposition">A variable to receive the a value indicating whether or not there is content disposition.</param>
+        internal void CheckParameterAttributes(
             HttpRequestBuilder requestBuilder,
             ParameterInfo parm,
-            object argument)
+            object argument,
+            out bool formUrlContent,
+            out bool contentDisposition)
         {
-            bool formUrlContent = false;
+            formUrlContent = false;
+            contentDisposition = false;
             var attrs = parm.GetCustomAttributes();
-            if (attrs != null &&
-                attrs.Any() == true &&
-                argument != null)
+            if (attrs == null ||
+                attrs.Any() == false ||
+                argument == null)
             {
-                if (requestBuilder.IsContentSet == false)
-                {
-                    var sendAsAttr = attrs.OfType<SendAsContentAttribute>().FirstOrDefault();
-                    if (sendAsAttr != null)
-                    {
-                        string contType = sendAsAttr.ContentType ?? this.contentType;
-                        var serializer = this.options.GetObjectSerializer(contType);
-                        if (serializer == null)
-                        {
-                            throw new NotSupportedException($"Serializer for {contType} not found");
-                        }
-
-                        requestBuilder.SetContent(new StringContent(
-                            serializer.SerializeObject(argument),
-                            sendAsAttr.Encoding ?? Encoding.UTF8,
-                            serializer.ContentType));
-                    }
-                    else
-                    {
-                        var formUrlAttr = attrs.OfType<SendAsFormUrlAttribute>().FirstOrDefault();
-                        if (formUrlAttr != null)
-                        {
-                            formUrlContent = true;
-                            var argType = argument.GetType();
-                            if (typeof(Dictionary<string, string>).IsAssignableFrom(argType) == true)
-                            {
-                                requestBuilder.SetContent(
-                                    new FormUrlEncodedContent(
-                                        (Dictionary<string, string>)argument));
-                            }
-                            else if (typeof(Dictionary<string, object>).IsAssignableFrom(argType) == true)
-                            {
-                                requestBuilder.SetContent(
-                                    new FormUrlEncodedContent(
-                                        ((Dictionary<string, object>)argument)
-                                            .Select(
-                                                kvp =>
-                                                {
-                                                    return new KeyValuePair<string, string>(
-                                                        kvp.Key,
-                                                        kvp.Value?.ToString());
-                                                })));
-                            }
-                            else if (parm.ParameterType.IsModelObject() == true)
-                            {
-                                var list = new Dictionary<string, string>();
-                                var properties = argument.GetType().GetProperties();
-                                foreach (var property in properties)
-                                {
-                                    list.Add(
-                                        property.Name,
-                                        property.GetValue(argument)?.ToString());
-                                }
-
-                                requestBuilder.SetContent(new FormUrlEncodedContent(list));
-                            }
-                            else
-                            {
-                                requestBuilder.AddFormUrlProperty(
-                                    formUrlAttr.Name ?? parm.Name,
-                                    argument.ToString());
-                            }
-                        }
-                    }
-                }
-
-                requestBuilder
-                    .CheckParameterForSendAsQuery(attrs, parm, argument)
-                    .CheckParameterForSendAsHeader(attrs, argument);
+                return;
             }
 
-            return formUrlContent;
+/*
+            if (requestBuilder.IsContentSet == true)
+            {
+                return;
+            }
+*/
+
+            var sendAsAttr = attrs.OfType<SendAsContentAttribute>().FirstOrDefault();
+            if (sendAsAttr != null)
+            {
+                if (typeof(HttpContent).IsAssignableFrom(parm.ParameterType) == true)
+                {
+                    requestBuilder.SetContent((HttpContent)argument);
+                }
+                else if (typeof(Stream).IsAssignableFrom(parm.ParameterType) == true)
+                {
+                    requestBuilder.SetContent(new StreamContent((Stream)argument));
+                }
+                else
+                {
+                    string contType = sendAsAttr.ContentType ?? this.contentType;
+                    var serializer = this.options.GetObjectSerializer(contType);
+                    if (serializer == null)
+                    {
+                        throw new NotSupportedException($"Serializer for {contType} not found");
+                    }
+
+                    requestBuilder.SetContent(new StringContent(
+                        serializer.SerializeObject(argument),
+                        sendAsAttr.Encoding ?? Encoding.UTF8,
+                        serializer.ContentType));
+                }
+
+                return;
+            }
+
+            var formUrlAttr = attrs.OfType<SendAsFormUrlAttribute>().FirstOrDefault();
+            if (formUrlAttr != null)
+            {
+                formUrlContent = true;
+                var argType = argument.GetType();
+                if (argument is Dictionary<string, string> strStrDictionayArgument)
+                {
+                    requestBuilder.SetContent(
+                        new FormUrlEncodedContent(
+                            (Dictionary<string, string>)argument));
+                }
+                else if (argument is Dictionary<string, object> strObjDictionaryArgument)
+                {
+                    requestBuilder.SetContent(
+                        new FormUrlEncodedContent(
+                            ((Dictionary<string, object>)argument)
+                                .Select(
+                                    kvp =>
+                                    {
+                                        return new KeyValuePair<string, string>(
+                                            kvp.Key,
+                                            kvp.Value?.ToString());
+                                    })));
+                }
+                else if (parm.ParameterType.IsModelObject() == true)
+                {
+                    var list = new Dictionary<string, string>();
+                    var properties = argument.GetType().GetProperties();
+                    foreach (var property in properties)
+                    {
+                        list.Add(
+                            property.Name,
+                            property.GetValue(argument)?.ToString());
+                    }
+
+                    requestBuilder.SetContent(new FormUrlEncodedContent(list));
+                }
+                else
+                {
+                    requestBuilder.AddFormUrlProperty(
+                        formUrlAttr.Name ?? parm.Name,
+                        argument.ToString());
+                }
+
+                return;
+            }
+
+            var contentDispAttr = attrs.OfType<SendAsContentDispositionAttribute>().FirstOrDefault();
+            if (contentDispAttr != null)
+            {
+                contentDisposition = true;
+                requestBuilder.SetMultipartContent(true);
+
+                if (contentDispAttr.IsName == true)
+                {
+                    requestBuilder.SetContentDispositionHeader(c => c.Name = (string)argument);
+                }
+                else if (contentDispAttr.IsFileName == true)
+                {
+                    requestBuilder.SetContentDispositionHeader(c => c.FileName = (string)argument);
+                }
+                else if (contentDispAttr.IsFileNameStar)
+                {
+                    requestBuilder.SetContentDispositionHeader(c => c.FileNameStar = (string)argument);
+                }
+
+                return;
+            }
+
+            requestBuilder
+                .CheckParameterForSendAsQuery(attrs, parm, argument)
+                .CheckParameterForSendAsHeader(attrs, argument);
         }
 
         /// <summary>
@@ -409,6 +456,14 @@ namespace ContractHttp
                     this.responseProcessorType,
                     returnType,
                     response);
+            }
+
+            if (this.responseFuncArg != -1 &&
+                this.Arguments[this.responseFuncArg] != null)
+            {
+                var interceptorType = typeof(Func<,>).MakeGenericType(typeof(HttpResponseMessage), returnType);
+                var interceptorMethod = interceptorType.GetMethod("Invoke", new[] { typeof(HttpResponseMessage) });
+                return interceptorMethod.Invoke(this.Arguments[this.responseFuncArg], new object[] { response });
             }
 
             if (this.responseArg == -1 &&
@@ -498,14 +553,6 @@ namespace ContractHttp
                     result.SetObjectProperty<HttpResponseMessage>(response);
                     result.SetObjectProperty<HttpStatusCode>(response.StatusCode);
                 }
-            }
-
-            if (this.responseFuncArg != -1 &&
-                this.Arguments[this.responseFuncArg] != null)
-            {
-                var interceptorType = typeof(Func<,>).MakeGenericType(typeof(HttpResponseMessage), returnType);
-                var interceptorMethod = interceptorType.GetMethod("Invoke", new[] { typeof(HttpResponseMessage) });
-                result = interceptorMethod.Invoke(this.Arguments[this.responseFuncArg], new object[] { response });
             }
 
             return result;

@@ -232,7 +232,7 @@ namespace ContractHttp
             {
                 httpMethod = HttpMethod.Get;
             }
-            else if (attr is PostAttribute)
+            else if (attr is PostAttribute || attr is UploadAttribute)
             {
                 httpMethod = HttpMethod.Post;
             }

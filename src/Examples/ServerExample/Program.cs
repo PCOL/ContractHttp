@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Text;
+using FluentIL;
 using Microsoft.AspNetCore.Hosting;
 using Newtonsoft.Json;
 using ServerExample.Models;
@@ -11,13 +13,41 @@ namespace ServerExample
     {
         static void Main(string[] args)
         {
+            DebugOutput.Output = new ConsoleOutput();
+
             string url = "http://localhost:6000";
 
             using (var webHost = StartServer(url))
             {
                 var httpClient = new HttpClient();
-                GetCustomers(httpClient, url);
-                GetCustomer(httpClient, url, "test");
+                CreateCustomer(httpClient, url, new CustomerModel() { Id = Guid.NewGuid().ToString(), Name = "Test" });
+                // GetCustomers(httpClient, url);
+                // GetCustomer(httpClient, url, "test");
+            }
+        }
+
+        private static CustomerModel CreateCustomer(HttpClient httpClient, string url, CustomerModel model)
+        {
+            using (var request = new HttpRequestMessage(HttpMethod.Post, $"{url}/api/customers"))
+            {
+                request.Content = new StringContent(
+                    JsonConvert.SerializeObject(model),
+                    Encoding.UTF8,
+                    "application/json");
+
+                var response = httpClient.SendAsync(request).Result;
+                Console.WriteLine("StatusCode: {0}", response.StatusCode);
+                if (response.IsSuccessStatusCode == true)
+                {
+                    var content = response.Content.ReadAsStringAsync().Result;
+                    if (string.IsNullOrEmpty(content) == false)
+                    {
+                        var customer = JsonConvert.DeserializeObject<CustomerModel>(content);
+                        return customer;
+                    }
+                }
+
+                return null;
             }
         }
 

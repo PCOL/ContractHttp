@@ -32,5 +32,14 @@ namespace ServerExample.Services
                 Name = name
             };
         }
+
+        public CustomerModel CreateCustomer(CustomerModel customer)
+        {
+            Console.WriteLine("-------------------------------------");
+            Console.WriteLine("Id: {0}", customer.Id);
+            Console.WriteLine("Name: {0}", customer.Name);
+            Console.WriteLine("-------------------------------------");
+            return customer;
+        }
     }
 }

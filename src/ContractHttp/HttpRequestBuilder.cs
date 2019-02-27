@@ -4,6 +4,7 @@ namespace ContractHttp
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
+    using System.Net.Http.Headers;
 
     /// <summary>
     /// Builds a <see cref="HttpRequestMessage"/>.
@@ -11,17 +12,45 @@ namespace ContractHttp
     internal class HttpRequestBuilder
         : IHttpRequestBuilder
     {
+        /// <summary>
+        /// The http method.
+        /// </summary>
         private HttpMethod httpMethod = HttpMethod.Get;
 
+        /// <summary>
+        /// The url.
+        /// </summary>
         private string uri;
 
+        /// <summary>
+        /// The http content.
+        /// </summary>
         private HttpContent content;
 
+        /// <summary>
+        /// A dictionary of query strings.
+        /// </summary>
         private Dictionary<string, string> queryStrings;
 
+        /// <summary>
+        /// A dictionary of request headers.
+        /// </summary>
         private Dictionary<string, string> headers;
 
+        /// <summary>
+        /// The content disposition header value.
+        /// </summary>
+        private ContentDispositionHeaderValue contentDispositionHeader;
+
+        /// <summary>
+        /// A list of form Url properties.
+        /// </summary>
         private List<KeyValuePair<string, string>> formUrlProperties;
+
+        /// <summary>
+        /// A value indicating whether or not the request is a mulitpart content request.
+        /// </summary>
+        private bool isMultipartContent;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestBuilder"/> class.
@@ -39,6 +68,27 @@ namespace ContractHttp
             {
                 return this.content != null;
             }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether or not the content is a specific type.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <returns>A value indicating whether or not the content is of the given type.</returns>
+        public bool IsContent<T>()
+        {
+            return this.content is T;
+        }
+
+        /// <summary>
+        /// Sets a value indicating whether or not this is a multipart content request.
+        /// </summary>
+        /// <param name="value">A value indicating whether or not this is a multipart content request.</param>
+        /// <returns>This instance of the <see cref="HttpRequestBuilder"/> class.</returns>
+        public HttpRequestBuilder SetMultipartContent(bool value)
+        {
+            this.isMultipartContent = value;
+            return this;
         }
 
         /// <summary>
@@ -95,6 +145,18 @@ namespace ContractHttp
         {
             this.headers = this.headers ?? new Dictionary<string, string>();
             this.headers.Add(key, value);
+            return this;
+        }
+
+        /// <summary>
+        /// Sets a <see cref="ContentDispositionHeaderValue"/> header value.
+        /// </summary>
+        /// <param name="action">An action to set the content disposition header.</param>
+        /// <returns>The <see cref="HttpRequestBuilder"/> instance.</returns>
+        public HttpRequestBuilder SetContentDispositionHeader(Action<ContentDispositionHeaderValue> action)
+        {
+            this.contentDispositionHeader = this.contentDispositionHeader ?? new ContentDispositionHeaderValue("form-data");
+            action(this.contentDispositionHeader);
             return this;
         }
 
@@ -167,6 +229,23 @@ namespace ContractHttp
                 this.formUrlProperties != null)
             {
                 this.content = new FormUrlEncodedContent(this.formUrlProperties);
+            }
+
+            Console.WriteLine("Mulipart {0}, Disposition: {1}", this.isMultipartContent, this.contentDispositionHeader);
+            if (this.isMultipartContent == true &&
+                this.contentDispositionHeader != null)
+            {
+                Console.WriteLine("Building Mulipart");
+                if (this.content is StreamContent streamContent)
+                {
+                    streamContent.Headers.ContentDisposition = this.contentDispositionHeader;
+                    streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+
+                    var multipartContent = new MultipartFormDataContent();
+                    multipartContent.Add(streamContent);
+
+                    this.content = multipartContent;
+                }
             }
 
             if (this.content != null)

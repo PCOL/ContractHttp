@@ -8,11 +8,14 @@ namespace ServerExample.Services
     [HttpController(RoutePrefix = "api/customers")]
     public interface ICustomerService
     {
-        [HttpGet("")]
-        IEnumerable<CustomerModel> GetAll();
+        // [HttpGet("")]
+        // IEnumerable<CustomerModel> GetAll();
 
 
-        [HttpGet("{name}")]
-        CustomerModel GetByName(string name);
+        // [HttpGet("{name}")]
+        // CustomerModel GetByName(string name);
+
+        [HttpPost("")]
+        CustomerModel CreateCustomer([FromBody]CustomerModel customer);
     }
 }

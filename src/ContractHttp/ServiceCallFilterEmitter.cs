@@ -18,7 +18,7 @@ namespace ContractHttp
     {
         private static readonly ConstructorInfo CtorExecuting = typeof(ServiceCallExecutingContext).GetConstructor(new[] { typeof(Controller), typeof(IServiceProvider) });
 
-        private static readonly ConstructorInfo CtorExecuted = typeof(ServiceCallExecutingContext).GetConstructor(new[] { typeof(Controller), typeof(IServiceProvider) });
+        private static readonly ConstructorInfo CtorExecuted = typeof(ServiceCallExecutedContext).GetConstructor(new[] { typeof(Controller), typeof(IServiceProvider) });
 
         private static readonly MethodInfo OnExecutingMethod = typeof(ServiceCallFilterAttribute).GetMethod("OnExecuting", new[] { typeof(ServiceCallExecutingContext) });
 
@@ -118,7 +118,7 @@ namespace ContractHttp
                     (il) =>
                     {
                     il
-                        .DefineLabel(out ILabel afterLoop)
+                        .DefineLabel("executingAfterLoop", out ILabel afterLoop)
 
                         .For(
                             this.localServiceCallAttrs,
@@ -152,7 +152,7 @@ namespace ContractHttp
                 (il) =>
                 {
                     il
-                        .DefineLabel(out ILabel afterLoop)
+                        .DefineLabel("executeAfterLoop", out ILabel afterLoop)
 
                         .For(
                             this.localServiceCallAttrs,
@@ -180,7 +180,7 @@ namespace ContractHttp
         {
             // Create new instance of attribute and call on executing method.
             this.emitter
-                .DeclareLocal<ServiceCallExecutedContext>(out ILocal context)
+                .DeclareLocal<ServiceCallExecutingContext>("excutingContext", out ILocal context)
 
                 .LdLoc(localController)
                 .LdLoc(localServices)
@@ -206,7 +206,7 @@ namespace ContractHttp
         {
             // Create new instance of attribute and call on executed method.
             this.emitter
-                .DeclareLocal<ServiceCallExecutedContext>(out ILocal context)
+                .DeclareLocal<ServiceCallExecutedContext>("executedContext", out ILocal context)
 
                 .LdLoc(localController)
                 .LdLoc(localServices)

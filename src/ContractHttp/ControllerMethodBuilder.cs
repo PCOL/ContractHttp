@@ -61,12 +61,24 @@ namespace ContractHttp
         /// </summary>
         private readonly Type[] methodArgs;
 
+        /// <summary>
+        /// The method parameters.
+        /// </summary>
         private readonly ParameterInfo[] methodParms;
 
+        /// <summary>
+        /// Method parameters attributes.
+        /// </summary>
         private IEnumerable<ControllerMethodParameterAttribute> methodParmAttrs;
 
+        /// <summary>
+        /// Method parameter types.
+        /// </summary>
         private Type[] methodParmTypes;
 
+        /// <summary>
+        /// Method parameter index.
+        /// </summary>
         private Dictionary<string, int> methodParmIndex;
 
         /// <summary>
@@ -156,29 +168,27 @@ namespace ContractHttp
 
             MethodInfo serviceMethod = this.context.BaseType.GetMethod(name, this.methodArgs);
 
-            DebugOutput.Output = new ConsoleOutput();
-
             // Emit Method IL
             IEmitter methodIL = methodBuilder.Body();
-            methodIL.DeclareLocal<IActionResult>(out ILocal localResponse);
+            methodIL.DeclareLocal<IActionResult>("actionResponse", out ILocal localResponse);
             ILocal localReturnValue = null;
 
             // Does the method return any data?
             if (this.methodInfo.ReturnType != typeof(void))
             {
-                methodIL.DeclareLocal(serviceMethod.ReturnType, out localReturnValue);
+                methodIL.DeclareLocal(serviceMethod.ReturnType, "returnValue", out localReturnValue);
             }
 
             methodIL
-                .DeclareLocal<Exception>(out ILocal localEx)
+                .DeclareLocal<Exception>("exception", out ILocal localEx)
 
                 // Store Controller reference
-                .DeclareLocal<Controller>(out ILocal localController)
+                .DeclareLocal<Controller>("controller", out ILocal localController)
                 .LdArg0()
                 .StLoc(localController)
 
                 // Get Services
-                .DeclareLocal<IServiceProvider>(out ILocal localServices)
+                .DeclareLocal<IServiceProvider>("services", out ILocal localServices)
                 .LdArg0()
                 .CallVirt(RequestPropertyInfo.GetGetMethod())
                 .CallVirt(HttpContextPropertyInfo.GetGetMethod())
@@ -255,39 +265,59 @@ namespace ContractHttp
         {
             foreach (var methodParm in methodParms)
             {
-                var parmBuilder = methodBuilder.Param(methodParm.ParameterType, methodParm.ParameterName);
+                methodBuilder.Param(
+                    parmBuilder =>
+                    {
+                        parmBuilder
+                            .Name(methodParm.ParameterName)
+                            .Type(methodParm.ParameterType);
 
-                if (methodParm.From == ControllerMethodParameterFromOption.Body)
-                {
-                    parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromBodyAttribute>());
-                }
-                else if (methodParm.From == ControllerMethodParameterFromOption.Header)
-                {
-                    parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromHeaderAttribute>(
-                        () =>
-                        {
-                            var prop = typeof(FromHeaderAttribute).GetProperty("Name");
-                            return new[] { new Tuple<PropertyInfo, object>(prop, methodParm.FromName) };
-                        }));
-                }
-                else if (methodParm.From == ControllerMethodParameterFromOption.Query)
-                {
-                    parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromQueryAttribute>(
-                        () =>
-                        {
-                            var prop = typeof(FromQueryAttribute).GetProperty("Name");
-                            return new[] { new Tuple<PropertyInfo, object>(prop, methodParm.FromName) };
-                        }));
-                }
-                else if (methodParm.From == ControllerMethodParameterFromOption.Route)
-                {
-                    parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromRouteAttribute>(
-                        () =>
-                        {
-                            var prop = typeof(FromQueryAttribute).GetProperty("Name");
-                            return new[] { new Tuple<PropertyInfo, object>(prop, methodParm.FromName) };
-                        }));
-                }
+                        this.ApplyParameterAttributes(
+                            parmBuilder,
+                            methodParm);
+                    });
+            }
+        }
+
+        /// <summary>
+        /// Applies method parameter attributes to a parameter builder. 
+        /// </summary>
+        /// <param name="parmBuilder">A parameter builder.</param>
+        /// <param name="methodParm">A method parameter attribute.</param>
+        private void ApplyParameterAttributes(
+            IParameterBuilder parmBuilder,
+            ControllerMethodParameterAttribute methodParm)
+        {
+            if (methodParm.From == ControllerMethodParameterFromOption.Body)
+            {
+                parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromBodyAttribute>());
+            }
+            else if (methodParm.From == ControllerMethodParameterFromOption.Header)
+            {
+                parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromHeaderAttribute>(
+                    () =>
+                    {
+                        var prop = typeof(FromHeaderAttribute).GetProperty("Name");
+                        return new[] { new Tuple<PropertyInfo, object>(prop, methodParm.FromName) };
+                    }));
+            }
+            else if (methodParm.From == ControllerMethodParameterFromOption.Query)
+            {
+                parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromQueryAttribute>(
+                    () =>
+                    {
+                        var prop = typeof(FromQueryAttribute).GetProperty("Name");
+                        return new[] { new Tuple<PropertyInfo, object>(prop, methodParm.FromName) };
+                    }));
+            }
+            else if (methodParm.From == ControllerMethodParameterFromOption.Route)
+            {
+                parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromRouteAttribute>(
+                    () =>
+                    {
+                        var prop = typeof(FromQueryAttribute).GetProperty("Name");
+                        return new[] { new Tuple<PropertyInfo, object>(prop, methodParm.FromName) };
+                    }));
             }
         }
 
@@ -302,50 +332,72 @@ namespace ContractHttp
         {
             for (int i = 0; i < parmInfos.Length; i++)
             {
-                var parmBuilder = methodBuilder.Param(parmInfos[i].ParameterType, parmInfos[i].Name, parmInfos[i].Attributes);
-                var attrs = parmInfos[i].GetCustomAttributes();
-                if (attrs == null)
-                {
-                    continue;
-                }
+                methodBuilder.Param(
+                    (parmBuilder) => 
+                    {
+                        parmBuilder
+                            .Type(parmInfos[i].ParameterType)
+                            .Name(parmInfos[i].Name);
+                            
+                        this.ApplyParameterAttributes(
+                            parmInfos[i],
+                            parmBuilder);
+                             //parmInfos[i].Attributes);
+                    });
+            }
+        }
 
-                foreach (var attr in attrs)
+        /// <summary>
+        /// Applies 'From...' attributes from a source parameter to a parameter builder.
+        /// </summary>
+        /// <param name="parameterInfo">A parameter info.</param>
+        /// <param name="parameterBuilder">A parameter builder.</param>
+        private void ApplyParameterAttributes(
+            ParameterInfo parameterInfo,
+            IParameterBuilder parameterBuilder)
+        {             
+            var attrs = parameterInfo.GetCustomAttributes();
+            if (attrs == null)
+            {
+                return;
+            }
+
+            foreach (var attr in attrs)
+            {
+                if (attr is FromBodyAttribute)
                 {
-                    if (attr is FromBodyAttribute)
-                    {
-                        parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromBodyAttribute>());
-                    }
-                    else if (attr is FromHeaderAttribute)
-                    {
-                        parmBuilder.SetCustomAttribute(
-                            AttributeUtility.BuildAttribute<FromHeaderAttribute>(
-                            () =>
-                            {
-                                return this.GetPropertiesAndValues(attr, "Name");
-                            }));
-                    }
-                    else if (attr is FromQueryAttribute)
-                    {
-                        parmBuilder.SetCustomAttribute(
-                            AttributeUtility.BuildAttribute<FromQueryAttribute>(
-                            () =>
-                            {
-                                return this.GetPropertiesAndValues(attr, "Name");
-                            }));
-                    }
-                    else if (attr is FromRouteAttribute)
-                    {
-                        parmBuilder.SetCustomAttribute(
-                            AttributeUtility.BuildAttribute<FromRouteAttribute>(
-                            () =>
-                            {
-                                return this.GetPropertiesAndValues(attr, "Name");
-                            }));
-                    }
-                    else if (attr is FromServicesAttribute)
-                    {
-                        parmBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromServicesAttribute>());
-                    }
+                    parameterBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromBodyAttribute>());
+                }
+                else if (attr is FromHeaderAttribute)
+                {
+                    parameterBuilder.SetCustomAttribute(
+                        AttributeUtility.BuildAttribute<FromHeaderAttribute>(
+                        () =>
+                        {
+                            return this.GetPropertiesAndValues(attr, "Name");
+                        }));
+                }
+                else if (attr is FromQueryAttribute)
+                {
+                    parameterBuilder.SetCustomAttribute(
+                        AttributeUtility.BuildAttribute<FromQueryAttribute>(
+                        () =>
+                        {
+                            return this.GetPropertiesAndValues(attr, "Name");
+                        }));
+                }
+                else if (attr is FromRouteAttribute)
+                {
+                    parameterBuilder.SetCustomAttribute(
+                        AttributeUtility.BuildAttribute<FromRouteAttribute>(
+                        () =>
+                        {
+                            return this.GetPropertiesAndValues(attr, "Name");
+                        }));
+                }
+                else if (attr is FromServicesAttribute)
+                {
+                    parameterBuilder.SetCustomAttribute(AttributeUtility.BuildAttribute<FromServicesAttribute>());
                 }
             }
         }
@@ -394,7 +446,7 @@ namespace ContractHttp
             {
                 // Load the proxy method arguments into an array.
                 methodIL
-                    .DeclareLocal<object[]>(out proxyArguments)
+                    .DeclareLocal<object[]>("proxyArguments", out proxyArguments)
 
                     .Array(
                         typeof(object),

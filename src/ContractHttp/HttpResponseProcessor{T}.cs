@@ -15,5 +15,15 @@ namespace ContractHttp
         /// <param name="response">A <see cref="HttpResponseMessage"/>.</param>
         /// <returns>A result.</returns>
         public abstract Task<T> ProcessResponseAsync(HttpResponseMessage response);
+
+        /// <summary>
+        /// Checks if the request should be retried.
+        /// </summary>
+        /// <param name="response">A <see cref="HttpResponseMessage"/>.</param>
+        /// <returns>True is the request should retry; otherwise false.</returns>
+        public virtual Task<bool> ShoudRetryAsync(HttpResponseMessage response)
+        {
+            return Task.FromResult(false);
+        }
     }
 }
