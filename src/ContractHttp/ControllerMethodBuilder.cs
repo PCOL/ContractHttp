@@ -280,7 +280,7 @@ namespace ContractHttp
         }
 
         /// <summary>
-        /// Applies method parameter attributes to a parameter builder. 
+        /// Applies method parameter attributes to a parameter builder.
         /// </summary>
         /// <param name="parmBuilder">A parameter builder.</param>
         /// <param name="methodParm">A method parameter attribute.</param>
@@ -333,16 +333,16 @@ namespace ContractHttp
             for (int i = 0; i < parmInfos.Length; i++)
             {
                 methodBuilder.Param(
-                    (parmBuilder) => 
+                    (parmBuilder) =>
                     {
                         parmBuilder
                             .Type(parmInfos[i].ParameterType)
                             .Name(parmInfos[i].Name);
-                            
+                            ////parmInfos[i].Attributes);
+
                         this.ApplyParameterAttributes(
                             parmInfos[i],
                             parmBuilder);
-                             //parmInfos[i].Attributes);
                     });
             }
         }
@@ -355,7 +355,7 @@ namespace ContractHttp
         private void ApplyParameterAttributes(
             ParameterInfo parameterInfo,
             IParameterBuilder parameterBuilder)
-        {             
+        {
             var attrs = parameterInfo.GetCustomAttributes();
             if (attrs == null)
             {
