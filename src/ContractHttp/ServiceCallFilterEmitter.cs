@@ -207,6 +207,8 @@ namespace ContractHttp
             // Create new instance of attribute and call on executed method.
             this.emitter
                 .DeclareLocal<ServiceCallExecutedContext>("executedContext", out ILocal context)
+                .DeclareLocal<IActionResult>("contextResponse", out ILocal contextResponse)
+                .DefineLabel("executedEnd", out ILabel end)
 
                 .LdLoc(localController)
                 .LdLoc(localServices)
@@ -216,8 +218,18 @@ namespace ContractHttp
                 .LdLoc(localAttr)
                 .LdLocS(context)
                 .CallVirt(OnExecutedMethod)
+
                 .GetProperty("Response", context)
-                .StLocS(localResponse);
+                .StLocS(contextResponse)
+
+                .LdLocS(contextResponse)
+                .BrFalseS(end)
+                .Nop()
+
+                .LdLocS(contextResponse)
+                .StLocS(localResponse)
+
+                .MarkLabel(end);
         }
     }
 }

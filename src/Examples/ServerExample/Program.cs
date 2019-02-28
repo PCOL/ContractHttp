@@ -43,6 +43,8 @@ namespace ServerExample
                     if (string.IsNullOrEmpty(content) == false)
                     {
                         var customer = JsonConvert.DeserializeObject<CustomerModel>(content);
+                        Console.WriteLine("Customer Id:     {0}", customer.Id);
+                        Console.WriteLine("Customer Name:   {0}", customer.Name);
                         return customer;
                     }
                 }
