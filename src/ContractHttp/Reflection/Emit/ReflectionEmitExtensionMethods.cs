@@ -148,12 +148,13 @@ namespace ContractHttp.Reflection.Emit
         /// <param name="emitElse">A function to emit the IL to be executed if the object is null.</param>
         public static IEmitter EmitIfNotNullOrEmpty(this IEmitter emitter, ILocal local, Action<IEmitter> emitBody, Action<IEmitter> emitElse = null)
         {
+            var anyMethod = AnyTMethod.MakeGenericMethod(local.LocalType.GetElementType());
+
             return emitter
                 .LdLoc(local)
                 .EmitIfNotNull(
                     il =>
                     {
-                        var anyMethod = AnyTMethod.MakeGenericMethod(local.LocalType.GetElementType());
                         il
                             .LdLoc(local)
                             .Call(anyMethod)

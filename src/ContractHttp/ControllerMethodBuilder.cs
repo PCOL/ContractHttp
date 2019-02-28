@@ -181,25 +181,32 @@ namespace ContractHttp
 
             methodIL
                 .DeclareLocal<Exception>("exception", out ILocal localEx)
+                .DeclareLocal<Controller>("controller", out ILocal localController)
+                .DeclareLocal<IServiceProvider>("services", out ILocal localServices)
+                .DefineLabel("endMethod", out ILabel endMethod)
 
                 // Store Controller reference
-                .DeclareLocal<Controller>("controller", out ILocal localController)
+                .Comment("== Load and store controller ==")
                 .LdArg0()
                 .StLoc(localController)
 
                 // Get Services
-                .DeclareLocal<IServiceProvider>("services", out ILocal localServices)
+                .Comment("== Load and store request service provider ==")
                 .LdArg0()
                 .CallVirt(RequestPropertyInfo.GetGetMethod())
                 .CallVirt(HttpContextPropertyInfo.GetGetMethod())
                 .CallVirt(RequestServicesPropertyInfo.GetGetMethod())
-                .StLoc(localServices)
-
-                .Try();
+                .StLoc(localServices);
 
             // Check for service calls.
             var serviceCallEmitter = new ServiceCallFilterEmitter(this.methodInfo.DeclaringType, methodIL);
             serviceCallEmitter.EmitExecuting(localController, localServices, localResponse);
+
+            methodIL
+                .LdLoc(localResponse)
+                .BrTrue(endMethod)
+                .Try()
+                .Comment("== Service Method Call ==");
 
             this.EmitServiceMethodCall(
                 methodIL,
@@ -248,6 +255,9 @@ namespace ContractHttp
             methodIL
                 .EndExceptionBlock()
 
+                .MarkLabel(endMethod)
+
+                .Comment("== Load Response ==")
                 .LdLoc(localResponse)
                 .Ret();
 

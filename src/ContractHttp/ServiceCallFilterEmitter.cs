@@ -74,7 +74,7 @@ namespace ContractHttp
             }
 
             this.emitter
-                .DeclareLocal<ServiceCallFilterAttribute[]>(out this.localServiceCallAttrs);
+                .DeclareLocal<ServiceCallFilterAttribute[]>("serviceCallAttributes", out this.localServiceCallAttrs);
 
             if (this.HasAttributes == true)
             {
@@ -113,11 +113,10 @@ namespace ContractHttp
             }
 
             this.emitter
+                .Comment("== Service Call Filter Emit Executing ==")
                 .EmitIfNotNullOrEmpty(
                     this.localServiceCallAttrs,
-                    (il) =>
-                    {
-                    il
+                    il => il
                         .DefineLabel("executingAfterLoop", out ILabel afterLoop)
 
                         .For(
@@ -126,12 +125,12 @@ namespace ContractHttp
                             {
                                 this.EmitExecuting(item, localController, localServices, localResponse);
 
-                                il.LdLoc(localResponse)
+                                il
+                                    .LdLoc(localResponse)
                                     .BrTrue(afterLoop);
                             })
 
-                        .MarkLabel(afterLoop);
-                    });
+                        .MarkLabel(afterLoop));
         }
 
         /// <summary>
@@ -147,12 +146,12 @@ namespace ContractHttp
                 return;
             }
 
-            this.emitter.EmitIfNotNullOrEmpty(
-                this.localServiceCallAttrs,
-                (il) =>
-                {
-                    il
-                        .DefineLabel("executeAfterLoop", out ILabel afterLoop)
+            this.emitter
+                .Comment("== Service Call Filter Emit Executed ==")
+                .EmitIfNotNullOrEmpty(
+                    this.localServiceCallAttrs,
+                    il => il
+                        .DefineLabel("executedAfterLoop", out ILabel afterLoop)
 
                         .For(
                             this.localServiceCallAttrs,
@@ -160,12 +159,12 @@ namespace ContractHttp
                             {
                                 this.EmitExecuted(item, localController, localServices, localResponse);
 
-                                em.LdLoc(localResponse)
+                                em
+                                    .LdLoc(localResponse)
                                     .BrTrue(afterLoop);
                             })
 
-                        .MarkLabel(afterLoop);
-                });
+                        .MarkLabel(afterLoop));
         }
 
         /// <summary>
@@ -181,6 +180,10 @@ namespace ContractHttp
             // Create new instance of attribute and call on executing method.
             this.emitter
                 .DeclareLocal<ServiceCallExecutingContext>("excutingContext", out ILocal context)
+                .DeclareLocal<IActionResult>("executingResponse", out ILocal contextResponse)
+                .DefineLabel("executingEnd", out ILabel executingEnd)
+
+                .Comment("== Service Call Filter Executing ==")
 
                 .LdLoc(localController)
                 .LdLoc(localServices)
@@ -191,7 +194,15 @@ namespace ContractHttp
                 .LdLocS(context)
                 .CallVirt(OnExecutingMethod)
                 .GetProperty("Response", context)
-                .StLocS(localResponse);
+                .StLocS(contextResponse)
+
+                .LdLocS(contextResponse)
+                .BrFalseS(executingEnd)
+                .Nop()
+
+                .LdLocS(contextResponse)
+                .StLoc(localResponse)
+                .MarkLabel(executingEnd);
         }
 
         /// <summary>
@@ -207,8 +218,10 @@ namespace ContractHttp
             // Create new instance of attribute and call on executed method.
             this.emitter
                 .DeclareLocal<ServiceCallExecutedContext>("executedContext", out ILocal context)
-                .DeclareLocal<IActionResult>("contextResponse", out ILocal contextResponse)
-                .DefineLabel("executedEnd", out ILabel end)
+                .DeclareLocal<IActionResult>("executedResponse", out ILocal executedResponse)
+                .DefineLabel("executedEnd", out ILabel executedEnd)
+
+                .Comment("== Service Call Filter Executed ==")
 
                 .LdLoc(localController)
                 .LdLoc(localServices)
@@ -220,16 +233,16 @@ namespace ContractHttp
                 .CallVirt(OnExecutedMethod)
 
                 .GetProperty("Response", context)
-                .StLocS(contextResponse)
+                .StLocS(executedResponse)
 
-                .LdLocS(contextResponse)
-                .BrFalseS(end)
+                .LdLocS(executedResponse)
+                .BrFalseS(executedEnd)
                 .Nop()
 
-                .LdLocS(contextResponse)
+                .LdLocS(executedResponse)
                 .StLocS(localResponse)
 
-                .MarkLabel(end);
+                .MarkLabel(executedEnd);
         }
     }
 }

@@ -7,6 +7,7 @@ namespace ServerExample.Services
 
     [HttpController(RoutePrefix = "api/customers")]
     [TestServiceCall]
+    [TestServiceCall]
     public interface ICustomerService
     {
         // [HttpGet("")]
