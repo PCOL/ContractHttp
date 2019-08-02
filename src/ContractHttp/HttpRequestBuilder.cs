@@ -30,7 +30,7 @@ namespace ContractHttp
         /// <summary>
         /// A dictionary of query strings.
         /// </summary>
-        private Dictionary<string, string> queryStrings;
+        private Dictionary<string, object> queryStrings;
 
         /// <summary>
         /// A dictionary of request headers.
@@ -168,8 +168,28 @@ namespace ContractHttp
         /// <returns>The <see cref="HttpRequestBuilder"/> instance.</returns>
         public HttpRequestBuilder AddQueryString(string key, string value)
         {
-            this.queryStrings = this.queryStrings ?? new Dictionary<string, string>();
-            this.queryStrings.Add(key, value);
+            this.queryStrings = this.queryStrings ?? new Dictionary<string, object>();
+
+            if (this.queryStrings.TryGetValue(key, out object existingValue) == true)
+            {
+                if (existingValue is string existingString)
+                {
+                    var list = new List<string>();
+                    list.Add(existingString);
+                    list.Add(value);
+
+                    this.queryStrings[key] = list;    
+                }
+                else if (existingValue is List<string> existingList)
+                {
+                    existingList.Add(value);
+                }
+            }
+            else
+            {
+                this.queryStrings.Add(key, value);
+            }
+
             return this;
         }
 
@@ -211,7 +231,19 @@ namespace ContractHttp
             var requestUri = this.uri;
             if (this.queryStrings != null)
             {
-                var query = string.Join("&", this.queryStrings.Select(q => $"{q.Key}={q.Value}"));
+                string query = string.Empty;
+                foreach (var queryString in this.queryStrings)
+                {
+                    if (queryString.Value is string queryStringValue)
+                    {
+                        query += $"{queryString.Key}={queryStringValue}";
+                    }
+                    else if (queryString.Value is List<string> queryStringList)
+                    {
+                        query += string.Join("&", queryStringList.Select(q => $"{queryString.Key}={q}"));
+                    }
+                }
+
                 requestUri += $"?{query}";
             }
 

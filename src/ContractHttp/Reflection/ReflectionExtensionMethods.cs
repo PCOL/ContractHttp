@@ -86,7 +86,7 @@ namespace ContractHttp.Reflection.Emit
                             ((ProducesResponseTypeAttribute)attr).StatusCode,
                             () => AttributeUtility.GetAttributePropertyValues<ProducesResponseTypeAttribute>((ProducesResponseTypeAttribute)attr, new[] { "type" })));
                 }
- 
+
 /*
                 else if (attr is SwaggerParameterAttribute)
                 {

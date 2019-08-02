@@ -4,6 +4,7 @@ namespace ContractHttp
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using System.Text;
 
     /// <summary>
     /// Http request builder extension methods.
@@ -102,32 +103,58 @@ namespace ContractHttp
             foreach (var query in attrs.OfType<SendAsQueryAttribute>())
             {
                 var name = query.Name.IsNullOrEmpty() == false ? query.Name : parm.Name;
-                var value = argument.ToString();
-                if (query.Format.IsNullOrEmpty() == false)
+                if (typeof(IEnumerable<string>).IsAssignableFrom(parm.ParameterType) == true)
                 {
-                    if (parm.ParameterType == typeof(short))
+                    foreach (var item in (IEnumerable<string>)argument)
                     {
-                        value = ((short)argument).ToString(query.Format);
-                    }
-                    else if (parm.ParameterType == typeof(int))
-                    {
-                        value = ((int)argument).ToString(query.Format);
-                    }
-                    else if (parm.ParameterType == typeof(long))
-                    {
-                        value = ((long)argument).ToString(query.Format);
+                        var value = parm.ConvertParameterValue(item, query.Format, query.Base64, query.Encoding);
+                        requestBuilder.AddQueryString(name, value);
                     }
                 }
-
-                if (query.Base64 == true)
+                else
                 {
-                    value = Convert.ToBase64String(query.Encoding.GetBytes(value));
+                    var value = parm.ConvertParameterValue(argument, query.Format, query.Base64, query.Encoding);
+                    requestBuilder.AddQueryString(name, value);
                 }
-
-                requestBuilder.AddQueryString(name, value);
             }
 
             return requestBuilder;
+        }
+
+        /// <summary>
+        /// Converts a parameter value.
+        /// </summary>
+        /// <param name="parm">The parameter info.</param>
+        /// <param name="argument">The argument value.</param>
+        /// <param name="format">The format to use.</param>
+        /// <param name="toBase64">A value indicating whether or not the value should be base64 encoded.</param>
+        /// <param name="encoding">The encoding to use.</param>
+        /// <returns>The value.</returns>
+        private static string ConvertParameterValue(this ParameterInfo parm, object argument, string format, bool toBase64, Encoding encoding)
+        {
+            var value = argument.ToString();
+            if (format.IsNullOrEmpty() == false)
+            {
+                if (parm.ParameterType == typeof(short))
+                {
+                    value = ((short)argument).ToString(format);
+                }
+                else if (parm.ParameterType == typeof(int))
+                {
+                    value = ((int)argument).ToString(format);
+                }
+                else if (parm.ParameterType == typeof(long))
+                {
+                    value = ((long)argument).ToString(format);
+                }
+            }
+
+            if (toBase64 == true)
+            {
+                value = Convert.ToBase64String(encoding.GetBytes(value));
+            }
+
+            return value;
         }
 
         /// <summary>
