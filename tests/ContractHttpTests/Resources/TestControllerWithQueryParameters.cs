@@ -19,12 +19,12 @@ namespace ContractHttpTests.Resources
         /// </summary>
         /// <param name="items">A list of items.</param>
         /// <returns>An <see cref="IActionResult"/>.</returns>
-        [HttpGet()]
+        [HttpGet]
         public IActionResult Get(IEnumerable<string> items)
         {
             Console.WriteLine("Items: {0}", string.Join(", ", items));
-            
-            if (items.SequenceEqual(new [] { "A", "B", "C", "D" }) == true)
+
+            if (items.SequenceEqual(new[] { "A", "B", "C", "D" }) == true)
             {
                 return this.StatusCode(StatusCodes.Status204NoContent);
             }

@@ -1,6 +1,8 @@
 namespace ContractHttpTests
 {
     using System;
+    using System.Net;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
 
     /// <summary>
@@ -36,6 +38,22 @@ namespace ContractHttpTests
 
             this.retryCounts.GetCount++;
             return this.StatusCode(status);
+        }
+
+        /// <summary>
+        /// Post method.
+        /// </summary>
+        /// <returns>An <see cref="IActionResult"/>.</returns>
+        [HttpPost]
+        public IActionResult Post()
+        {
+            if (this.retryCounts.PostCount == 2)
+            {
+                return this.StatusCode(204);
+            }
+
+            this.retryCounts.PostCount++;
+            return this.StatusCode(StatusCodes.Status429TooManyRequests);
         }
     }
 }

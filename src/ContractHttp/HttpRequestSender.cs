@@ -60,10 +60,10 @@ namespace ContractHttp
                     {
                         if (retryAttribute.HttpStatusCodesToRetry != null)
                         {
-                            return retryAttribute.HttpStatusCodesToRetry.Contains(r.StatusCode);
+                            return !retryAttribute.HttpStatusCodesToRetry.Contains(r.StatusCode);
                         }
 
-                        return false;
+                        return true;
                     })
                     .ConfigureAwait(false);
             }

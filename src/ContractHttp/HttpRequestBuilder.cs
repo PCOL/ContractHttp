@@ -178,7 +178,7 @@ namespace ContractHttp
                     list.Add(existingString);
                     list.Add(value);
 
-                    this.queryStrings[key] = list;    
+                    this.queryStrings[key] = list;
                 }
                 else if (existingValue is List<string> existingList)
                 {

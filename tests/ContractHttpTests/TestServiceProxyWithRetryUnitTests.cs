@@ -1,5 +1,6 @@
 namespace ContractHttpTests
 {
+    using System.Net;
     using System.Threading.Tasks;
     using ContractHttp;
     using Microsoft.AspNetCore.TestHost;
@@ -63,21 +64,21 @@ namespace ContractHttpTests
         [TestMethod]
         public async Task CallMethod_WithRetry_RetriesThreeTimes()
         {
-            await this.testService.GetAsync(404);
+            await this.testService.GetAsync((int)HttpStatusCode.BadGateway);
             Assert.AreEqual(2, this.retryCounts.GetCount);
         }
 
         /// <summary>
-        /// Tests that a method with retry and a response function retries the correct
+        /// Tests that a get method with retry and a response function retries the correct
         /// number of times.
         /// </summary>
         /// <returns>A task.</returns>
         [TestMethod]
-        public async Task CallMethod_WithResponseFunctionAndRetry_RetriesThreeTimes()
+        public async Task CallGetMethod_WithResponseFunctionAndRetry_RetriesThreeTimes()
         {
             bool called = false;
             await this.testService.GetAsync(
-                404,
+                (int)HttpStatusCode.BadGateway,
                 (r) =>
                 {
                     called = true;
@@ -86,6 +87,27 @@ namespace ContractHttpTests
 
             Assert.IsTrue(called);
             Assert.AreEqual(2, this.retryCounts.GetCount);
+        }
+
+        /// <summary>
+        /// Tests that a post method with retry and a response function retries the correct
+        /// number of times.
+        /// </summary>
+        /// <returns>A task.</returns>
+        [TestMethod]
+        public async Task CallPostMethod_WithResponseFunctionAndRetry_RetriesThreeTimes()
+        {
+            bool called = false;
+            var result = await this.testService.PostAsync(
+                (r) =>
+                {
+                    called = true;
+                    return r.IsSuccessStatusCode;
+                });
+
+            Assert.IsTrue(result);
+            Assert.IsTrue(called);
+            Assert.AreEqual(2, this.retryCounts.PostCount);
         }
     }
 }

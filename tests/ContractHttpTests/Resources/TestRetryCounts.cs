@@ -6,8 +6,13 @@ namespace ContractHttpTests
     public class TestRetryCounts
     {
         /// <summary>
-        /// Gets or sets the count.
+        /// Gets or sets the get count.
         /// </summary>
         public int GetCount { get; set; }
-    }
+
+        /// <summary>
+        /// Gets or sets the post count.
+        /// </summary>
+        public int PostCount { get; set; }
+}
 }

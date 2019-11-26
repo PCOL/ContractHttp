@@ -9,7 +9,7 @@ namespace ContractHttpTests
     /// <summary>
     /// Defines a test service with retry.
     /// </summary>
-    [Retry(RetryCount = 3, HttpStatusCodesToRetry = new[] { HttpStatusCode.BadGateway })]
+    [Retry(RetryCount = 3, HttpStatusCodesToRetry = new[] { HttpStatusCode.BadGateway, (HttpStatusCode)429 })]
     [HttpClientContract(Route = "api")]
     public interface ITestServiceWithRetry
     {
@@ -29,5 +29,13 @@ namespace ContractHttpTests
         /// <returns>A value.</returns>
         [Get("{status}")]
         Task<bool> GetAsync(int status, Func<HttpResponseMessage, bool> responseFunc);
+
+        /// <summary>
+        /// Post async
+        /// </summary>
+        /// <param name="responseFunc">A response function.</param>
+        /// <returns>True or false.</returns>
+        [Post]
+        Task<bool> PostAsync(Func<HttpResponseMessage, bool> responseFunc);
     }
 }
