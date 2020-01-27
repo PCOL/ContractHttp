@@ -22,9 +22,25 @@ namespace ContractHttpTests.Resources
         [HttpGet]
         public IActionResult Get(IEnumerable<string> items)
         {
-            Console.WriteLine("Items: {0}", string.Join(", ", items));
-
             if (items.SequenceEqual(new[] { "A", "B", "C", "D" }) == true)
+            {
+                return this.StatusCode(StatusCodes.Status204NoContent);
+            }
+
+            return this.StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        /// <summary>
+        /// Get with multiple query parameters of the same name.
+        /// </summary>
+        /// <param name="name1">Parameter 1.</param>
+        /// <param name="name2">Parameter 2.</param>
+        /// <returns>An <see cref="IActionResult"/>.</returns>
+        [HttpGet("map")]
+        public IActionResult Get(string name1, string name2)
+        {
+            if (name1 == "name1value" &&
+                name2 == "name2value")
             {
                 return this.StatusCode(StatusCodes.Status204NoContent);
             }

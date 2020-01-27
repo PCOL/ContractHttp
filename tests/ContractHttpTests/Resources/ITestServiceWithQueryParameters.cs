@@ -13,9 +13,17 @@ namespace ContractHttpTests.Resources
         /// <summary>
         /// Get.
         /// </summary>
-        /// <param name="items">A list of items query parameters.</param>
+        /// <param name="items">A list of query parameters.</param>
         /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
         [Get]
         HttpResponseMessage Get([SendAsQuery("items")]IEnumerable<string> items);
+
+        /// <summary>
+        /// Get.
+        /// </summary>
+        /// <param name="items">A dictionary of query parameters.</param>
+        /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
+        [Get("map")]
+        HttpResponseMessage Get([SendAsQuery]IDictionary<string, string> items);
     }
 }

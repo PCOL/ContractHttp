@@ -103,12 +103,48 @@ namespace ContractHttp
             foreach (var query in attrs.OfType<SendAsQueryAttribute>())
             {
                 var name = query.Name.IsNullOrEmpty() == false ? query.Name : parm.Name;
-                if (typeof(IEnumerable<string>).IsAssignableFrom(parm.ParameterType) == true)
+
+                if (parm.ParameterType.IsGenericType == true)
                 {
-                    foreach (var item in (IEnumerable<string>)argument)
+                    if (parm.ParameterType.GetGenericTypeDefinition() == typeof(IDictionary<,>))
                     {
-                        var value = parm.ConvertParameterValue(item, query.Format, query.Base64, query.Encoding);
-                        requestBuilder.AddQueryString(name, value);
+                        IDictionary<string, string> queryMap = null;
+                        if (typeof(IDictionary<string, string>).IsAssignableFrom(parm.ParameterType) == true)
+                        {
+                            queryMap = (IDictionary<string, string>)argument;
+                        }
+                        else if (typeof(IDictionary<object, object>).IsAssignableFrom(parm.ParameterType) == true)
+                        {
+                            queryMap = ((IDictionary<object, object>)argument)
+                                .ToDictionary(key => key.Key.ToString(), value => value.Value.ToString());
+                        }
+                        else if (typeof(IDictionary<string, object>).IsAssignableFrom(parm.ParameterType) == true)
+                        {
+                            queryMap = ((IDictionary<string, object>)argument)
+                                .ToDictionary(key => key.Key, value => value.Value.ToString());
+                        }
+                        else if (typeof(IDictionary<object, string>).IsAssignableFrom(parm.ParameterType) == true)
+                        {
+                            queryMap = ((IDictionary<object, string>)argument)
+                                .ToDictionary(key => key.Key.ToString(), value => value.Value);
+                        }
+
+                        if (query != null)
+                        {
+                            foreach (var item in queryMap)
+                            {
+                                var value = parm.ConvertParameterValue(item.Value, query.Format, query.Base64, query.Encoding);
+                                requestBuilder.AddQueryString(item.Key, value);
+                            }
+                        }
+                    }
+                    else if (typeof(IEnumerable<string>).IsAssignableFrom(parm.ParameterType) == true)
+                    {
+                        foreach (var item in (IEnumerable<string>)argument)
+                        {
+                            var value = parm.ConvertParameterValue(item, query.Format, query.Base64, query.Encoding);
+                            requestBuilder.AddQueryString(name, value);
+                        }
                     }
                 }
                 else

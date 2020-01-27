@@ -1,5 +1,6 @@
 namespace ContractHttpTests
 {
+    using System.Collections.Generic;
     using System.Net;
     using ContractHttp;
     using ContractHttpTests.Resources;
@@ -58,9 +59,26 @@ namespace ContractHttpTests
         /// Sends a header.
         /// </summary>
         [TestMethod]
-        public void GetWithHeader_SendsHeader_ReceivesHeaderValue()
+        public void GetWithEnumerableHeader_SendsHeader_ReceivesHeaderValue()
         {
             var items = new[] { "A", "B", "C", "D" };
+            var response = this.testService.Get(items);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
+        }
+
+        /// <summary>
+        /// Sends a header.
+        /// </summary>
+        [TestMethod]
+        public void GetWithDictionaryHeader_SendsHeader_ReceivesHeaderValue()
+        {
+            var items = new Dictionary<string, string>()
+            {
+                { "name1", "name1value" },
+                { "name2", "name2value" }
+            };
+
             var response = this.testService.Get(items);
             Assert.IsNotNull(response);
             Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);

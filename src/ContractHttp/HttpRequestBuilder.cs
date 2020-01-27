@@ -231,9 +231,11 @@ namespace ContractHttp
             var requestUri = this.uri;
             if (this.queryStrings != null)
             {
-                string query = string.Empty;
+                var first = true;
+                var query = string.Empty;
                 foreach (var queryString in this.queryStrings)
                 {
+                    query += first == true ? "?" : "&";
                     if (queryString.Value is string queryStringValue)
                     {
                         query += $"{queryString.Key}={queryStringValue}";
@@ -242,9 +244,11 @@ namespace ContractHttp
                     {
                         query += string.Join("&", queryStringList.Select(q => $"{queryString.Key}={q}"));
                     }
+
+                    first = false;
                 }
 
-                requestUri += $"?{query}";
+                requestUri += query;
             }
 
             var request = new HttpRequestMessage(this.httpMethod, requestUri);
