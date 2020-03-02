@@ -15,13 +15,14 @@ namespace ContractHttpTests
         /// Creates a test server.
         /// </summary>
         /// <param name="configureServices">A configure services action.</param>
-        /// <param name="configure">A configure aciton.</param>
+        /// <param name="configure">A configure action.</param>
+        /// <param name="url">Optional url to use.</param>
         /// <returns>A <see cref="TestServer"/> instance.</returns>
-        public static TestServer CreateTestServer(Action<IServiceCollection> configureServices = null, Action<IApplicationBuilder> configure = null)
+        public static TestServer CreateTestServer(Action<IServiceCollection> configureServices = null, Action<IApplicationBuilder> configure = null, string url = "http://localhost")
         {
             var testServer = new TestServer(
                 new WebHostBuilder()
-                    .UseUrls("http://localhost")
+                    .UseUrls(url)
                     .ConfigureServices(
                         services =>
                         {

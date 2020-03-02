@@ -3,7 +3,6 @@ namespace ContractHttpTests
     using System;
     using System.Net;
     using System.Net.Http;
-    using System.Threading.Tasks;
     using ContractHttp;
     using ContractHttpTests.Resources;
     using Microsoft.Extensions.DependencyInjection;

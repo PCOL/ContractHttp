@@ -30,6 +30,11 @@
         private string baseUri;
 
         /// <summary>
+        /// The base uri path.
+        /// </summary>
+        private string baseUriPath;
+
+        /// <summary>
         /// The types client contract attribute.
         /// </summary>
         private HttpClientContractAttribute clientContractAttribute;
@@ -83,10 +88,9 @@
                     this.options.Timeout = this.clientContractAttribute.Timeout.Value;
                 }
 
-                if (this.baseUri != null &&
-                    string.IsNullOrEmpty(this.clientContractAttribute.Route) == false)
+                if (string.IsNullOrEmpty(this.clientContractAttribute.Route) == false)
                 {
-                    this.baseUri = this.CombineUri(this.baseUri, this.clientContractAttribute.Route);
+                    this.baseUriPath = this.clientContractAttribute.Route;
                 }
             }
         }
@@ -113,8 +117,7 @@
             string[] names = new string[arguments.Length];
 
             HttpMethod httpMethod = HttpMethod.Get;
-            string localBaseUri = this.GetBaseUri();
-            string uri = localBaseUri;
+            string uri = this.baseUriPath ?? string.Empty;
             string contentType = "application/json";
             TimeSpan? timeout = this.options.Timeout;
 
@@ -123,7 +126,7 @@
             if (attr != null)
             {
                 httpMethod = this.GetMethodFromAttribute(attr);
-                uri = this.CombineUri(localBaseUri, attr.Uri);
+                uri = Utility.CombineUri(uri, attr.Uri);
                 contentType = attr.ContentType;
 
                 if (attr.Timeout.HasValue == true)
@@ -135,7 +138,7 @@
             string route = method.GetHttpMethodAndTemplate(out HttpMethod httpAttrMethod);
             if (route != null)
             {
-                uri = this.CombineUri(localBaseUri, route);
+                uri = Utility.CombineUri(uri, route);
             }
 
             httpMethod = httpAttrMethod ?? httpMethod;
@@ -211,7 +214,7 @@
         /// </summary>
         /// <param name="method">The method info.</param>
         /// <param name="httpMethod">The http method.</param>
-        /// <param name="uri">The request Uri.</param>
+        /// <param name="uriPath">The Uri path.</param>
         /// <param name="inArgs">The method calls arguments.</param>
         /// <param name="contentType">The content type.</param>
         /// <param name="timeout">The request timeout value.</param>
@@ -219,7 +222,7 @@
         private Task<object> BuildAndSendRequestAsync(
             MethodInfo method,
             HttpMethod httpMethod,
-            string uri,
+            string uriPath,
             object[] inArgs,
             string contentType,
             TimeSpan? timeout)
@@ -228,30 +231,10 @@
 
             return httpContext.BuildAndSendRequestAsync(
                 httpMethod,
-                uri,
+                this.baseUri,
+                uriPath,
                 contentType,
                 timeout);
-        }
-
-        /// <summary>
-        /// Combines a uri and a path.
-        /// </summary>
-        /// <param name="uri">The uri.</param>
-        /// <param name="path">The path.</param>
-        /// <returns>The combined uri.</returns>
-        private string CombineUri(string uri, string path)
-        {
-            if (uri.EndsWith("/") == false)
-            {
-                uri += "/";
-            }
-
-            if (path.IsNullOrEmpty() == false)
-            {
-                uri += path.TrimStart('/');
-            }
-
-            return uri;
         }
     }
 }

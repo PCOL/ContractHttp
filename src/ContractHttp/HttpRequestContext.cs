@@ -114,24 +114,31 @@ namespace ContractHttp
         /// Builds a request, sends it, and proecesses the response.
         /// </summary>
         /// <param name="httpMethod">The http method.</param>
-        /// <param name="uri">The request Uri.</param>
+        /// <param name="baseUri">The base Uri.</param>
+        /// <param name="uriPath">The Uri path.</param>
         /// <param name="contentType">The content type.</param>
         /// <param name="timeout">A value representing the request timeout.</param>
         /// <returns>The result of the request.</returns>
         public async Task<object> BuildAndSendRequestAsync(
             HttpMethod httpMethod,
-            string uri,
+            string baseUri,
+            string uriPath,
             string contentType,
             TimeSpan? timeout)
         {
             var requestBuilder = new HttpRequestBuilder()
                 .SetMethod(httpMethod);
 
-            var names = this.CheckArgsAndBuildRequest(requestBuilder);
+            var names = this.CheckArgsAndBuildRequest(requestBuilder, out string uri);
+
+            if (string.IsNullOrWhiteSpace(uri) == false)
+            {
+                baseUri = uri;
+            }
 
             requestBuilder
                 .AddMethodHeaders(this.MethodInfo, names, this.Arguments)
-                .SetUri(uri.ExpandString(names, this.Arguments));
+                .SetUri(Utility.CombineUri(baseUri, uriPath.ExpandString(names, this.Arguments)));
 
             Type returnType = this.MethodInfo.ReturnType;
 
@@ -184,10 +191,14 @@ namespace ContractHttp
         /// Checks the arguments for specific ones.
         /// </summary>
         /// <param name="requestBuilder">A request builder.</param>
+        /// <param name="uri">A variable to receive a Uri.</param>
         /// <returns>An array of argument names.</returns>
         private string[] CheckArgsAndBuildRequest(
-            HttpRequestBuilder requestBuilder)
+            HttpRequestBuilder requestBuilder,
+            out string uri)
         {
+            uri = null;
+
             var responseAttr = this.MethodInfo.GetMethodOrTypeAttribute<HttpResponseProcessorAttribute>();
             if (responseAttr != null)
             {
@@ -274,14 +285,24 @@ namespace ContractHttp
                 {
                     this.cancellationTokenSource = (CancellationTokenSource)this.Arguments[i];
                 }
+                else if (parmType == typeof(IUriBuilder))
+                {
+                    uri = ((IUriBuilder)this.Arguments[i]).BuildUri().ToString();
+                }
                 else
                 {
                     this.CheckParameterAttributes(
                         requestBuilder,
                         parms[i],
                         this.Arguments[i],
+                        out string parmUri,
                         out formUrlContent,
                         out contentDisposition);
+
+                    if (parmUri != null)
+                    {
+                        uri = parmUri;
+                    }
 
                     if (formUrlContent == false &&
                         requestBuilder.IsContentSet == false &&
@@ -310,17 +331,21 @@ namespace ContractHttp
         /// <param name="requestBuilder">The request builder.</param>
         /// <param name="parm">The parameter.</param>
         /// <param name="argument">The parameters value.</param>
+        /// <param name="uri">A variable to receive a Uri.</param>
         /// <param name="formUrlContent">A variable to receive the a value indicating whether or not there is form url content.</param>
         /// <param name="contentDisposition">A variable to receive the a value indicating whether or not there is content disposition.</param>
         internal void CheckParameterAttributes(
             HttpRequestBuilder requestBuilder,
             ParameterInfo parm,
             object argument,
+            out string uri,
             out bool formUrlContent,
             out bool contentDisposition)
         {
+            uri = null;
             formUrlContent = false;
             contentDisposition = false;
+
             var attrs = parm.GetCustomAttributes();
             if (attrs == null ||
                 attrs.Any() == false ||
@@ -335,6 +360,12 @@ namespace ContractHttp
                 return;
             }
 */
+
+            var urlAttr = attrs.OfType<UriAttribute>().FirstOrDefault();
+            if (urlAttr != null)
+            {
+                uri = argument.ToString();
+            }
 
             var sendAsAttr = attrs.OfType<SendAsContentAttribute>().FirstOrDefault();
             if (sendAsAttr != null)

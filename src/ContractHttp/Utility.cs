@@ -81,6 +81,28 @@ namespace ContractHttp
         }
 
         /// <summary>
+        /// Combines a uri and a path.
+        /// </summary>
+        /// <param name="uri">The uri.</param>
+        /// <param name="path">The path.</param>
+        /// <returns>The combined uri.</returns>
+        public static string CombineUri(string uri, string path)
+        {
+            uri = uri ?? string.Empty;
+            if (uri.EndsWith("/") == false)
+            {
+                uri += "/";
+            }
+
+            if (path.IsNullOrEmpty() == false)
+            {
+                uri += path.TrimStart('/');
+            }
+
+            return uri;
+        }
+
+        /// <summary>
         /// Expands a string from a key/value list.
         /// </summary>
         /// <param name="str">The str to expand.</param>
@@ -89,8 +111,6 @@ namespace ContractHttp
         /// <returns>The expanded <see cref="string"/>.</returns>
         public static string ExpandString(this string str, IEnumerable<string> keys, IEnumerable<object> values)
         {
-            Utility.ThrowIfArgumentNullOrEmpty(str, nameof(str));
-
             return str.ExpandString(keys.ToKeyValuePair(values));
         }
 
@@ -102,8 +122,6 @@ namespace ContractHttp
         /// <returns>The expanded <see cref="string"/>.</returns>
         public static string ExpandString(this string str, IEnumerable<KeyValuePair<string, object>> keyValuePairs)
         {
-            Utility.ThrowIfArgumentNullOrEmpty(str, nameof(str));
-
             int end = 0;
             int start = str.IndexOf('{');
             if (start != -1)
