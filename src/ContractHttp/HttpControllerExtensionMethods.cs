@@ -9,7 +9,7 @@ namespace ContractHttp
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
-    /// Http extension methods
+    /// Http extension methods.
     /// </summary>
     public static class HttpControllerExtensionMethods
     {
@@ -30,7 +30,7 @@ namespace ContractHttp
         /// <typeparam name="TService">The service type.</typeparam>
         /// <param name="services">A service collection.</param>
         /// <param name="assemblies">A list to receive the assembly the controller is in.</param>
-        /// <returns>The service collection</returns>
+        /// <returns>The service collection.</returns>
         public static IServiceCollection AddDynamicController<TController, TService>(this IServiceCollection services, List<Assembly> assemblies)
             where TController : class
         {
@@ -61,7 +61,7 @@ namespace ContractHttp
         /// <typeparam name="TService">The service type.</typeparam>
         /// <param name="services">A service collection.</param>
         /// <param name="assemblies">A list to receive the assembly the controller is in.</param>
-        /// <returns>The service collection</returns>
+        /// <returns>The service collection.</returns>
         public static IServiceCollection AddDynamicController<TService>(this IServiceCollection services, List<Assembly> assemblies)
             where TService : class
         {
@@ -93,7 +93,7 @@ namespace ContractHttp
         /// <param name="services">A service collection.</param>
         /// <param name="serviceImpl">The service implementation.</param>
         /// <param name="assemblies">A list to receive the assembly the controller is in.</param>
-        /// <returns>The service collection</returns>
+        /// <returns>The service collection.</returns>
         public static IServiceCollection AddDynamicController<TService>(
             this IServiceCollection services,
             TService serviceImpl,
@@ -108,12 +108,12 @@ namespace ContractHttp
         /// <summary>
         /// Add a dynamically generated controller to a service collection.
         /// </summary>
-        /// <typeparam name="TController">The type that defines the controller</typeparam>
+        /// <typeparam name="TController">The type that defines the controller.</typeparam>
         /// <typeparam name="TService">The service type.</typeparam>
         /// <param name="services">A service collection.</param>
         /// <param name="serviceImpl">The service implementation.</param>
         /// <param name="assemblies">A list to receive the assembly the controller is in.</param>
-        /// <returns>The service collection</returns>
+        /// <returns>The service collection.</returns>
         public static IServiceCollection AddDynamicController<TController, TService>(
             this IServiceCollection services,
             TService serviceImpl,
@@ -133,7 +133,7 @@ namespace ContractHttp
         /// <param name="serviceType">The service type.</param>
         /// <param name="serviceImpl">The service implementation.</param>
         /// <param name="assemblies">A list to receive the assembly the controller is in.</param>
-        /// <returns>The service collection</returns>
+        /// <returns>The service collection.</returns>
         public static IServiceCollection AddDynamicController(
             this IServiceCollection services,
             Type serviceType,
@@ -151,11 +151,11 @@ namespace ContractHttp
         /// Add a dynamically generated controller to a service collection.
         /// </summary>
         /// <param name="services">A service collection.</param>
-        /// <param name="controllerContractType">A type that defines the controller</param>
+        /// <param name="controllerContractType">A type that defines the controller.</param>
         /// <param name="serviceType">The service type.</param>
         /// <param name="serviceImpl">The service implementation.</param>
         /// <param name="assemblies">A list to receive the assembly the controller is in.</param>
-        /// <returns>The service collection</returns>
+        /// <returns>The service collection.</returns>
         public static IServiceCollection AddDynamicController(
             this IServiceCollection services,
             Type controllerContractType,
@@ -193,7 +193,7 @@ namespace ContractHttp
         /// <summary>
         /// Adds a list of assembly parts to a <see cref="IMvcBuilder"/>.
         /// </summary>
-        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance</param>
+        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance.</param>
         /// <param name="assemblyParts">A list of assemblies.</param>
         /// <returns>The <see cref="IMvcBuilder"/> instance.</returns>
         public static IMvcBuilder AddAssemblyParts(
@@ -212,7 +212,7 @@ namespace ContractHttp
         /// Adds a dynamic controller.
         /// </summary>
         /// <typeparam name="TService">The service type.</typeparam>
-        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance</param>
+        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance.</param>
         /// <param name="serviceImpl">An instance of the service.</param>
         /// <returns>The <see cref="IMvcBuilder"/> instance.</returns>
         public static IMvcBuilder AddDynamicController<TService>(
@@ -233,9 +233,9 @@ namespace ContractHttp
         /// <summary>
         /// Adds a dynamic controller.
         /// </summary>
-        /// <typeparam name="TController">The type that defines the controller</typeparam>
+        /// <typeparam name="TController">The type that defines the controller.</typeparam>
         /// <typeparam name="TService">The service type.</typeparam>
-        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance</param>
+        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance.</param>
         /// <param name="serviceImpl">An instance of the service.</param>
         /// <returns>The <see cref="IMvcBuilder"/> instance.</returns>
         public static IMvcBuilder AddDynamicController<TController, TService>(
@@ -256,10 +256,10 @@ namespace ContractHttp
         /// <summary>
         /// Adds a dynamic controller.
         /// </summary>
-        /// <typeparam name="TController">The type that defines the controller</typeparam>
+        /// <typeparam name="TController">The type that defines the controller.</typeparam>
         /// <typeparam name="TService">The service type.</typeparam>
-        /// <typeparam name="TServiceImpl">The service implementaion type</typeparam>
-        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance</param>
+        /// <typeparam name="TServiceImpl">The service implementaion type.</typeparam>
+        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance.</param>
         /// <returns>The <see cref="IMvcBuilder"/> instance.</returns>
         public static IMvcBuilder AddDynamicController<TController, TService, TServiceImpl>(
             this IMvcBuilder mvcBuilder)
@@ -279,7 +279,7 @@ namespace ContractHttp
         /// <summary>
         /// Adds a dynamic controller.
         /// </summary>
-        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance</param>
+        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance.</param>
         /// <param name="serviceType">The service type.</param>
         /// <param name="serviceImpl">The service implementation.</param>
         /// <returns>The <see cref="IMvcBuilder"/> instance.</returns>
@@ -298,7 +298,7 @@ namespace ContractHttp
         /// <summary>
         /// Adds a dynamic controller.
         /// </summary>
-        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance</param>
+        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance.</param>
         /// <param name="controllerContractType">The controller type.</param>
         /// <param name="serviceType">The service type.</param>
         /// <param name="serviceImpl">The service implementation.</param>
@@ -322,7 +322,7 @@ namespace ContractHttp
         /// <summary>
         /// Adds a dynamic controller.
         /// </summary>
-        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance</param>
+        /// <param name="mvcBuilder">An <see cref="IMvcBuilder"/> instance.</param>
         /// <param name="controllerContractType">The controller type.</param>
         /// <param name="serviceType">The service type.</param>
         /// <returns>The <see cref="IMvcBuilder"/> instance.</returns>

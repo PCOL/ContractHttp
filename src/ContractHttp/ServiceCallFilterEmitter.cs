@@ -104,7 +104,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="localController">A <see cref="LocalBuilder"/> containing a controller instance.</param>
         /// <param name="localServices">A <see cref="LocalBuilder"/> containing a services instance.</param>
-        /// <param name="localResponse">A <see cref="ILocal"/> for any response.static</param>
+        /// <param name="localResponse">A <see cref="ILocal"/> for any response.</param>
         public void EmitExecuting(ILocal localController, ILocal localServices, ILocal localResponse)
         {
             if (this.HasAttributes == false)
@@ -138,7 +138,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="localController">A <see cref="ILocal"/> containing a controller instance.</param>
         /// <param name="localServices">A <see cref="ILocal"/> containing a services instance.</param>
-        /// <param name="localResponse">A <see cref="ILocal"/> for any response.static</param>
+        /// <param name="localResponse">A <see cref="ILocal"/> for any response.</param>
         public void EmitExecuted(ILocal localController, ILocal localServices, ILocal localResponse)
         {
             if (this.HasAttributes == false)
@@ -174,7 +174,7 @@ namespace ContractHttp
         /// <param name="localAttr">A <see cref="ILocal"/> containing a attribute instance.</param>
         /// <param name="localController">A <see cref="ILocal"/> containing a controller instance.</param>
         /// <param name="localServices">A <see cref="ILocal"/> containing a services instance.</param>
-        /// <param name="localResponse">A <see cref="ILocal"/> for any response.static</param>
+        /// <param name="localResponse">A <see cref="ILocal"/> for any response.</param>
         private void EmitExecuting(ILocal localAttr, ILocal localController, ILocal localServices, ILocal localResponse)
         {
             // Create new instance of attribute and call on executing method.
@@ -212,7 +212,7 @@ namespace ContractHttp
         /// <param name="localAttr">A <see cref="ILocal"/> containing a attribute instance.</param>
         /// <param name="localController">A <see cref="ILocal"/> containing a controller instance.</param>
         /// <param name="localServices">A <see cref="ILocal"/> containing a services instance.</param>
-        /// <param name="localResponse">A <see cref="ILocal"/> for any response.static</param>
+        /// <param name="localResponse">A <see cref="ILocal"/> for any response.</param>
         private void EmitExecuted(ILocal localAttr, ILocal localController, ILocal localServices, ILocal localResponse)
         {
             // Create new instance of attribute and call on executed method.

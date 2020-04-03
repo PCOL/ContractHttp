@@ -218,7 +218,7 @@ namespace ContractHttp
         /// <summary>
         /// Set the value of an objects property by the type of property.
         /// </summary>
-        /// <typeparam name="T">The property type.null</typeparam>
+        /// <typeparam name="T">The property type.</typeparam>
         /// <param name="obj">The object.</param>
         /// <param name="value">The value.</param>
         public static void SetObjectProperty<T>(this object obj, T value)
@@ -229,7 +229,7 @@ namespace ContractHttp
         /// <summary>
         /// Set the value of an objects property by the type of property.
         /// </summary>
-        /// <typeparam name="T">The property type.null</typeparam>
+        /// <typeparam name="T">The property type.</typeparam>
         /// <param name="obj">The object.</param>
         /// <param name="valueFunction">The function that provides the value.</param>
         public static void SetObjectProperty<T>(this object obj, Func<T> valueFunction)
@@ -241,8 +241,8 @@ namespace ContractHttp
         /// <summary>
         /// Set the value of a property by the type of property.
         /// </summary>
-        /// <typeparam name="T">The property type.null</typeparam>
-        /// <param name="properties">A list of properties</param>
+        /// <typeparam name="T">The property type.</typeparam>
+        /// <param name="properties">A list of properties.</param>
         /// <param name="obj">The object.</param>
         /// <param name="value">The value.</param>
         public static void SetProperty<T>(this IEnumerable<PropertyInfo> properties, object obj, T value)
@@ -253,8 +253,8 @@ namespace ContractHttp
         /// <summary>
         /// Set the value of a property by the type of property.
         /// </summary>
-        /// <typeparam name="T">The property type.null</typeparam>
-        /// <param name="properties">A list of properties</param>
+        /// <typeparam name="T">The property type.</typeparam>
+        /// <param name="properties">A list of properties.</param>
         /// <param name="obj">The object.</param>
         /// <param name="valueFunction">The function that provides the value.</param>
         public static void SetProperty<T>(this IEnumerable<PropertyInfo> properties, object obj, Func<T> valueFunction)
@@ -269,7 +269,7 @@ namespace ContractHttp
         /// <summary>
         /// Set the value of a property by the type of property.
         /// </summary>
-        /// <param name="properties">A list of properties</param>
+        /// <param name="properties">A list of properties.</param>
         /// <param name="obj">The object.</param>
         /// <param name="propertyType">The properties type.</param>
         /// <param name="valueFunction">The function that provides the value.</param>
@@ -288,7 +288,7 @@ namespace ContractHttp
         /// <typeparam name="T">The return type.</typeparam>
         /// <typeparam name="TDefault">The default type.</typeparam>
         /// <param name="serviceProvider">The service provider.</param>
-        /// <returns>A service implementation or default</returns>
+        /// <returns>A service implementation or default.</returns>
         public static T GetServiceOrDefault<T, TDefault>(this IServiceProvider serviceProvider)
             where T : class
             where TDefault : T
@@ -302,7 +302,7 @@ namespace ContractHttp
         /// <param name="serviceProvider">The service provider.</param>
         /// <param name="serviceType">The service type.</param>
         /// <param name="defaultType">The default service type.</param>
-        /// <returns>A service implementation or default</returns>
+        /// <returns>A service implementation or default.</returns>
         public static object GetServiceOrDefault(this IServiceProvider serviceProvider, Type serviceType, Type defaultType)
         {
             if (serviceType.IsAssignableFrom(defaultType) == false)

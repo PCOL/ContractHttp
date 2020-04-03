@@ -28,7 +28,7 @@ namespace ContractHttp.Reflection.Emit
         /// Emits a type converter.
         /// </summary>
         /// <param name="methodIL">An emitter.</param>
-        /// <param name="fromType">The type to convert from.`</param>
+        /// <param name="fromType">The type to convert from.</param>
         /// <param name="toType">The type to convert to.</param>
         /// <returns>The emitter.</returns>
         public static IEmitter EmitConverter(this IEmitter methodIL, Type fromType, Type toType)

@@ -25,7 +25,7 @@ namespace ContractHttp
         }
 
         /// <summary>
-        /// Gets or sets the contentType
+        /// Gets or sets the contentType.
         /// </summary>
         [System.ComponentModel.Browsable(false)]
         [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
@@ -106,7 +106,7 @@ namespace ContractHttp
         /// </summary>
         /// <param name="obj">The <see cref="JObject"/> instance.</param>
         /// <param name="objectType">The type of object to get.</param>
-        /// <param name="jsonPath">The path to the json object.true</param>
+        /// <param name="jsonPath">The path to the json object.</param>
         /// <returns>An object if found; otherwise null.</returns>
         private object GetObject(JObject obj, Type objectType, string jsonPath)
         {

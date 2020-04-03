@@ -5,7 +5,7 @@ namespace ContractHttp
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
-    /// Represents client proxy options
+    /// Represents client proxy options.
     /// </summary>
     public class HttpClientProxyOptions
     {
@@ -33,7 +33,7 @@ namespace ContractHttp
         public HttpClient HttpClient { get; set; }
 
         /// <summary>
-        /// Gets or sets the <see cref="IServiceProvider"/>
+        /// Gets or sets the <see cref="IServiceProvider"/>.
         /// </summary>
         public IServiceProvider Services { get; set; }
 

@@ -167,7 +167,7 @@
         /// <summary>
         /// Gets the <see cref="HttpMethod"/> from a <see cref="HttpCallContractAttribute"/>.
         /// </summary>
-        /// <param name="attr">The <see cref="HttpCallContractAttribute"/></param>
+        /// <param name="attr">The <see cref="HttpCallContractAttribute"/>.</param>
         /// <returns>A <see cref="HttpMethod"/>.</returns>
         private HttpMethod GetMethodFromAttribute(HttpCallContractAttribute attr)
         {

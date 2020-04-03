@@ -14,7 +14,7 @@
         /// Initializes a new instance of the <see cref="HttpCallContractAttribute"/> class.
         /// </summary>
         /// <param name="method">The Http method to use when the request is made.</param>
-        /// <param name="uri">The Uri to send the request to./></param>
+        /// <param name="uri">The Uri to send the request to.</param>
         /// <param name="contentType">The content type of the request.</param>
         public HttpCallContractAttribute(HttpCallMethod method, string uri, string contentType = "application/json")
         {

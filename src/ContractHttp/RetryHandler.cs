@@ -5,7 +5,7 @@ namespace ContractHttp
     using System.Threading.Tasks;
 
     /// <summary>
-    /// A simple retry handler.`
+    /// A simple retry handler.
     /// </summary>
     public class RetryHandler
     {
@@ -44,7 +44,7 @@ namespace ContractHttp
         /// <summary>
         /// Sets an exception type to retry on.
         /// </summary>
-        /// <typeparam name="T">The type of exception</typeparam>
+        /// <typeparam name="T">The type of exception.</typeparam>
         /// <returns>The <see cref="RetryHandler"/> instance.</returns>
         public RetryHandler RetryOnException<T>()
             where T : Exception
@@ -57,7 +57,7 @@ namespace ContractHttp
         /// <summary>
         /// Sets the number of retries.
         /// </summary>
-        /// <param name="count">The number of retries.`</param>
+        /// <param name="count">The number of retries.</param>
         /// <returns>The <see cref="RetryHandler"/> instance.</returns>
         public RetryHandler RetryCount(int count)
         {

@@ -23,6 +23,6 @@ namespace ContractHttp
         /// <summary>
         /// The parameter comes from a route parameter.
         /// </summary>
-        Route
+        Route,
     }
 }

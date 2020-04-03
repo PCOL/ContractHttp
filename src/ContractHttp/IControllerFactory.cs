@@ -26,7 +26,7 @@
         /// <summary>
         /// Create instance of a controller.
         /// </summary>
-        /// <param name="controllerType">The controller type</param>
+        /// <param name="controllerType">The controller type.</param>
         /// <param name="instance">The instance of the service the controlller will call into.</param>
         /// <returns>An instance of the controller.</returns>
         object CreateController(Type controllerType, object instance);

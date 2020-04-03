@@ -37,7 +37,7 @@ namespace ContractHttp.Reflection.Emit
         }
 
         /// <summary>
-        /// Emits a call to the return a status code and result as an <see cref="IActionResult"/>
+        /// Emits a call to the return a status code and result as an <see cref="IActionResult"/>.
         /// </summary>
         /// <param name="emitter">An emitter.</param>
         /// <param name="statusCode">The status code.</param>

@@ -17,7 +17,7 @@
         /// <param name="typeBuilder">The <see cref="TypeBuilder"/> being use to create the type.</param>
         /// <param name="newType">The new type being built.</param>
         /// <param name="baseType">The base type being built on.</param>
-        /// <param name="services">The current dependency injection scope</param>
+        /// <param name="services">The current dependency injection scope.</param>
         /// <param name="baseObjectField">The <see cref="FieldBuilder"/> that holds the base type instance.</param>
         /// <param name="servicesField">The <see cref="FieldBuilder"/> that holds the <see cref="IServiceProvider"/> instance.</param>
         /// <param name="ctorBuilder">The <see cref="ConstructorBuilder"/> for the types constructor.</param>
@@ -46,7 +46,7 @@
         /// <param name="typeBuilder">The <see cref="TypeBuilder"/> being use to create the type.</param>
         /// <param name="newType">The new type being built.</param>
         /// <param name="baseTypes">The base types being built on.</param>
-        /// <param name="services">The current dependency injection scope</param>
+        /// <param name="services">The current dependency injection scope.</param>
         /// <param name="baseObjectField">The <see cref="FieldBuilder"/> that holds the base type instance.</param>
         /// <param name="servicesField">The <see cref="FieldBuilder"/> that holds the <see cref="IServiceProvider"/> instance.</param>
         /// <param name="ctorBuilder">The <see cref="ConstructorBuilder"/> for the types constructor.</param>
@@ -69,7 +69,7 @@
         }
 
         /// <summary>
-        ///  Gets the <see cref="TypeBuilder"/>
+        ///  Gets the <see cref="TypeBuilder"/>.
         /// </summary>
         public ITypeBuilder TypeBuilder { get; }
 

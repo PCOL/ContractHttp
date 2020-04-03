@@ -15,7 +15,7 @@ namespace ContractHttp
         /// <summary>
         /// Initializes a new instance of the <see cref="BindToModelAttribute"/> class.
         /// </summary>
-        /// <param name="modelType">The model type</param>
+        /// <param name="modelType">The model type.</param>
         public BindToModelAttribute(Type modelType)
         {
             this.ModelType = modelType;

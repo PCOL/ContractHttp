@@ -7,7 +7,7 @@ namespace ContractHttp
     using System.Reflection.Emit;
 
     /// <summary>
-    /// Attribute utility methods
+    /// Attribute utility methods.
     /// </summary>
     public static class AttributeUtility
     {

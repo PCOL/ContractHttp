@@ -2,7 +2,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <VersionPrefix>1.0.0</VersionPrefix>
-    <VersionSuffix>alpha16</VersionSuffix>
+    <VersionSuffix>alpha17</VersionSuffix>
     <PackageId>ContractHttp</PackageId>
     <Authors>pcol</Authors>
     <AssemblyTitle>ContractHttp</AssemblyTitle>
@@ -20,7 +20,7 @@
     <LangVersion>Latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.0.2" />
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" />
     <PackageReference Include="System.Reflection" Version="4.3.0" />
     <PackageReference Include="System.Reflection.Emit" Version="4.3.0" />
     <PackageReference Include="Microsoft.AspNetCore" Version="2.0.1" />
@@ -29,77 +29,8 @@
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="2.0.4" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
     <PackageReference Include="Microsoft.DotNet.InternalAbstractions" Version="1.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="Fluent.IL" Version="1.0.0-alpha9" />
     <PackageReference Include="DynProxy" Version="1.0.0-alpha5" />
-    <Content Include="ControllerFactory.cs" />
-    <Content Include="HttpCallContractAttribute.cs" />
-    <Content Include="HttpCallMethod.cs" />
-    <Content Include="HttpClientContractAttribute.cs" />
-    <Content Include="HttpClientProxy.cs" />
-    <Content Include="HttpControllerAttribute.cs" />
-    <Content Include="HttpControllerEndPointAttribute.cs" />
-    <Content Include="IControllerFactory.cs" />
-    <Content Include="ProcessAsContentAttribute.cs" />
-    <Content Include="FromParameterAttribute.cs" />
-    <Content Include="AttributeUtility.cs" />
-    <Content Include="BindToModelAttribute.cs" />
-    <Content Include="ControllerMethodParameterAttribute.cs" />
-    <Content Include="ControllerMethodParameterFromOption.cs" />
-    <Content Include="ExceptionHandlerAttribute.cs" />
-    <Content Include="HttpClientProxyExtensionMethods.cs" />
-    <Content Include="HttpControllerExtensionMethods.cs" />
-    <Content Include="HttpModelValidationAttribute.cs" />
-    <Content Include="HttpResponseAttribute.cs" />
-    <Content Include="IHttpClientFactory.cs" />
-    <Content Include="SendAsContentAttribute.cs" />
-    <Content Include="SendAsHeaderAttribute.cs" />
-    <Content Include="SendAsQueryAttribute.cs" />
-    <Content Include="ServiceCallExecutedContext.cs" />
-    <Content Include="ServiceCallExecutingContext.cs" />
-    <Content Include="ServiceCallFilterAttribute.cs" />
-    <Content Include="ServiceCallFilterEmitter.cs" />
-    <Content Include="Utility.cs" />
-    <Content Include="IProxy.cs" />
-    <Content Include="ControllerFactoryContext.cs" />
-    <Content Include="IControllerFactoryContext.cs" />
-    <Content Include="Reflection\Emit\ReflectionEmitExtensionMethods.cs" />
-    <Content Include="Reflection\Binder.cs" />
-    <Content Include="AsyncCall.cs" />
-    <Content Include="IAuthorizationHeaderFactory.cs" />
-    <Content Include="AuthorizationHeaderFactory.cs" />
-    <Content Include="AddAuthorizationHeaderAttribute.cs" />
-    <Content Include="AddHeaderAttribute.cs" />
-    <Content Include="SendAsFormUrlAttribute.cs" />
-    <Content Include="AddFormUrlEncodedPropertyAttribute.cs" />
-    <Content Include="HttpRequestBuilder.cs" />
-    <Content Include="FromJsonAttribute.cs" />
-    <Content Include="HttpRequestContext.cs" />
-    <Content Include="IObjectSerializer.cs" />
-    <Content Include="JsonObjectSerializer.cs" />
-    <Content Include="SerializationExtensionMethods.cs" />
-    <Content Include="HttpClientProxyOptions.cs" />
-    <Content Include="FromModelAttribute.cs" />
-    <Content Include="PostAttribute.cs" />
-    <Content Include="GetAttribute.cs" />
-    <Content Include="PutAttribute.cs" />
-    <Content Include="PatchAttribute.cs" />
-    <Content Include="DeleteAttribute.cs" />
-    <Content Include="IHttpRequestModifier.cs" />
-    <Content Include="RetryHandler.cs" />
-    <Content Include="IHttpRequestBuilder.cs" />
-    <Content Include="HttpRequestBuilderExtensions.cs" />
-    <Content Include="IHttpRequestSender.cs" />
-    <Content Include="HttpRequestSender.cs" />
-    <Content Include="IHttpRequestContext.cs" />
-    <Content Include="MethodArgType.cs" />
-    <Content Include="IHttpRequestSenderFactory.cs" />
-    <Content Include="FromResponseAttribute.cs" />
-    <Content Include="HttpClientSingleton.cs" />
-    <Content Include="RetryAttribute.cs" />
-    <Content Include="MethodAttribute.cs" />
-    <Content Include="HttpResponseProcessorAttribute.cs" />
-    <Content Include="HttpResponseProcessor{T}.cs" />
-    <Content Include="Reflection\ReflectionExtensionMethods.cs" />
   </ItemGroup>
 </Project>

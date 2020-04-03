@@ -116,7 +116,7 @@ namespace ContractHttp.Reflection.Emit
         /// <summary>
         /// Checks if the type is a model object.
         /// </summary>
-        /// <param name="type">The type</param>
+        /// <param name="type">The type.</param>
         /// <returns>True if the type is a model object; otherwise false.</returns>
         internal static bool IsModelObject(this Type type)
         {

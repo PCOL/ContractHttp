@@ -15,7 +15,7 @@ namespace ContractHttp
     internal class AsyncCall<T>
     {
         /// <summary>
-        /// A reference to the <see cref="IHttpRequestSender"/>
+        /// A reference to the <see cref="IHttpRequestSender"/>.
         /// </summary>
         private readonly IHttpRequestSender requestSender;
 
@@ -27,8 +27,8 @@ namespace ContractHttp
         /// <summary>
         /// Initializes a new instance of the <see cref="AsyncCall{T}"/> class.
         /// </summary>
-        /// <param name="requestSender">A <see cref="IHttpRequestSender"/></param>
-        /// <param name="httpContext">A <see cref="HttpRequestContext"/></param>
+        /// <param name="requestSender">A <see cref="IHttpRequestSender"/>.</param>
+        /// <param name="httpContext">A <see cref="HttpRequestContext"/>.</param>
         public AsyncCall(
             IHttpRequestSender requestSender,
             HttpRequestContext httpContext)

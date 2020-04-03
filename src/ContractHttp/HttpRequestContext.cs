@@ -711,7 +711,7 @@ namespace ContractHttp
         }
 
         /// <summary>
-        /// Sets the call timeout
+        /// Sets the call timeout.
         /// </summary>
         /// <param name="timeout">The timeout value.</param>
         private void SetTimeout(TimeSpan timeout)

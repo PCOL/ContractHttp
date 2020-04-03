@@ -17,7 +17,7 @@ namespace ContractHttp
         /// <summary>
         /// Initializes a new instance of the <see cref="DeleteAttribute"/> class.
         /// </summary>
-        /// <param name="template">A path template</param>
+        /// <param name="template">A path template.</param>
         public DeleteAttribute(string template)
         {
             this.Template = template;

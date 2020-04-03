@@ -12,7 +12,7 @@ namespace ContractHttp
         /// <summary>
         /// Initializes a new instance of the <see cref="ServiceCallExecutingContext"/> class.
         /// </summary>
-        /// <param name="controller">The controller instance,</param>
+        /// <param name="controller">The controller instance.</param>
         /// <param name="services">The services instance.</param>
         public ServiceCallExecutingContext(
             Controller controller,
@@ -28,7 +28,7 @@ namespace ContractHttp
         public Controller Controller { get; }
 
         /// <summary>
-        /// Gets the services.`
+        /// Gets the services.
         /// </summary>
         public IServiceProvider Services { get; }
 

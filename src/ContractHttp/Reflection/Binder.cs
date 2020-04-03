@@ -25,7 +25,7 @@ namespace ContractHttp.Reflection
         /// </summary>
         /// <typeparam name="T">The type of object to copy from.</typeparam>
         /// <typeparam name="TResult">The type of object to create and copy to.</typeparam>
-        /// <param name="obj">The </param>
+        /// <param name="obj">The object to bind.</param>
         /// <returns>An instance of typeparamref name="TResult".</returns>
         public static TResult Bind<T, TResult>(T obj)
             where T : class
