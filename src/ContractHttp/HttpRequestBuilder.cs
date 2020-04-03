@@ -238,11 +238,11 @@ namespace ContractHttp
                     query += first == true ? "?" : "&";
                     if (queryString.Value is string queryStringValue)
                     {
-                        query += $"{queryString.Key}={queryStringValue}";
+                        query += $"{Uri.EscapeDataString(queryString.Key)}={Uri.EscapeDataString(queryStringValue)}";
                     }
                     else if (queryString.Value is List<string> queryStringList)
                     {
-                        query += string.Join("&", queryStringList.Select(q => $"{queryString.Key}={q}"));
+                        query += string.Join("&", queryStringList.Select(q => $"{Uri.EscapeDataString(queryString.Key)}={Uri.EscapeDataString(q)}"));
                     }
 
                     first = false;
@@ -267,7 +267,8 @@ namespace ContractHttp
                 this.content = new FormUrlEncodedContent(this.formUrlProperties);
             }
 
-            Console.WriteLine("Mulipart {0}, Disposition: {1}", this.isMultipartContent, this.contentDispositionHeader);
+            ////Console.WriteLine("Uri: {0}", requestUri);
+            ////Console.WriteLine("Mulipart {0}, Disposition: {1}", this.isMultipartContent, this.contentDispositionHeader);
             if (this.isMultipartContent == true &&
                 this.contentDispositionHeader != null)
             {
