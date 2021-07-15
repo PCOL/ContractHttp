@@ -7,495 +7,89 @@
 
 // Validating benchmarks:
 Assembly Benchmarks which defines benchmarks references non-optimized ContractHttp
-Assembly Benchmarks which defines benchmarks references non-optimized DynProxy
 Assembly Benchmarks which defines benchmarks is non-optimized
 Benchmark was built without optimization enabled (most probably a DEBUG configuration). Please, build it in RELEASE.
 // ***** Building 4 benchmark(s) in Parallel: Start   *****
-// ***** Done, took 00:00:51 (51.09 sec)   *****
-// **************************
-// Benchmark: ClientBenchmarks.SimpleGet: DefaultJob
-// *** Execute ***
-// Launch: 1 / 1
-Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
-// BeforeAnythingElse
-
-// Benchmark Process Environment Information:
-// Runtime=.NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT
-// GC=Concurrent Workstation
-// Job: DefaultJob
-
-Pilot  1: 16 op, 12907843.00 ns, 806.7402 us/op
-Pilot  2: 32 op, 35525466.00 ns, 1.1102 ms/op
-Pilot  3: 64 op, 58258697.00 ns, 910.2921 us/op
-Pilot  4: 128 op, 113003920.00 ns, 882.8431 us/op
-Pilot  5: 256 op, 216815706.00 ns, 846.9364 us/op
-Pilot  6: 512 op, 453734552.00 ns, 886.2003 us/op
-Pilot  7: 1024 op, 864673965.00 ns, 844.4082 us/op
-
-IdleWarmup  1: 1024 op, 24120.00 ns, 23.5547 ns/op
-IdleWarmup  2: 1024 op, 6036.00 ns, 5.8945 ns/op
-IdleWarmup  3: 1024 op, 6384.00 ns, 6.2344 ns/op
-IdleWarmup  4: 1024 op, 5796.00 ns, 5.6602 ns/op
-IdleWarmup  5: 1024 op, 6696.00 ns, 6.5391 ns/op
-IdleWarmup  6: 1024 op, 7776.00 ns, 7.5938 ns/op
-IdleWarmup  7: 1024 op, 5880.00 ns, 5.7422 ns/op
-
-IdleTarget  1: 1024 op, 6036.00 ns, 5.8945 ns/op
-IdleTarget  2: 1024 op, 5952.00 ns, 5.8125 ns/op
-IdleTarget  3: 1024 op, 5773.00 ns, 5.6377 ns/op
-IdleTarget  4: 1024 op, 5868.00 ns, 5.7305 ns/op
-IdleTarget  5: 1024 op, 5808.00 ns, 5.6719 ns/op
-IdleTarget  6: 1024 op, 5700.00 ns, 5.5664 ns/op
-IdleTarget  7: 1024 op, 6036.00 ns, 5.8945 ns/op
-IdleTarget  8: 1024 op, 6216.00 ns, 6.0703 ns/op
-IdleTarget  9: 1024 op, 6276.00 ns, 6.1289 ns/op
-IdleTarget 10: 1024 op, 5784.00 ns, 5.6484 ns/op
-IdleTarget 11: 1024 op, 6012.00 ns, 5.8711 ns/op
-IdleTarget 12: 1024 op, 5784.00 ns, 5.6484 ns/op
-IdleTarget 13: 1024 op, 6996.00 ns, 6.8320 ns/op
-IdleTarget 14: 1024 op, 5916.00 ns, 5.7773 ns/op
-IdleTarget 15: 1024 op, 6108.00 ns, 5.9648 ns/op
-
-MainWarmup  1: 1024 op, 942743540.00 ns, 920.6480 us/op
-MainWarmup  2: 1024 op, 915359607.00 ns, 893.9059 us/op
-MainWarmup  3: 1024 op, 938375786.00 ns, 916.3826 us/op
-MainWarmup  4: 1024 op, 891204842.00 ns, 870.3172 us/op
-MainWarmup  5: 1024 op, 903275732.00 ns, 882.1052 us/op
-MainWarmup  6: 1024 op, 837820960.00 ns, 818.1845 us/op
-
-// BeforeMainRun
-MainTarget  1: 1024 op, 875338262.00 ns, 854.8225 us/op
-MainTarget  2: 1024 op, 893542193.00 ns, 872.5998 us/op
-MainTarget  3: 1024 op, 880797898.00 ns, 860.1542 us/op
-MainTarget  4: 1024 op, 877081660.00 ns, 856.5251 us/op
-MainTarget  5: 1024 op, 862057553.00 ns, 841.8531 us/op
-MainTarget  6: 1024 op, 890523708.00 ns, 869.6521 us/op
-MainTarget  7: 1024 op, 900027879.00 ns, 878.9335 us/op
-MainTarget  8: 1024 op, 873795059.00 ns, 853.3155 us/op
-MainTarget  9: 1024 op, 851929370.00 ns, 831.9623 us/op
-MainTarget 10: 1024 op, 875140129.00 ns, 854.6290 us/op
-MainTarget 11: 1024 op, 871571371.00 ns, 851.1439 us/op
-MainTarget 12: 1024 op, 869603848.00 ns, 849.2225 us/op
-MainTarget 13: 1024 op, 852059077.00 ns, 832.0889 us/op
-MainTarget 14: 1024 op, 903654392.00 ns, 882.4750 us/op
-MainTarget 15: 1024 op, 848931873.00 ns, 829.0350 us/op
-MainTarget 16: 1024 op, 889785155.00 ns, 868.9308 us/op
-
-// AfterMainRun
-Result  1: 1024 op, 875332244.33 ns, 854.8166 us/op
-Result  2: 1024 op, 893536175.33 ns, 872.5939 us/op
-Result  3: 1024 op, 880791880.33 ns, 860.1483 us/op
-Result  4: 1024 op, 877075642.33 ns, 856.5192 us/op
-Result  5: 1024 op, 862051535.33 ns, 841.8472 us/op
-Result  6: 1024 op, 890517690.33 ns, 869.6462 us/op
-Result  7: 1024 op, 900021861.33 ns, 878.9276 us/op
-Result  8: 1024 op, 873789041.33 ns, 853.3096 us/op
-Result  9: 1024 op, 851923352.33 ns, 831.9564 us/op
-Result 10: 1024 op, 875134111.33 ns, 854.6232 us/op
-Result 11: 1024 op, 871565353.33 ns, 851.1380 us/op
-Result 12: 1024 op, 869597830.33 ns, 849.2166 us/op
-Result 13: 1024 op, 852053059.33 ns, 832.0831 us/op
-Result 14: 1024 op, 903648374.33 ns, 882.4691 us/op
-Result 15: 1024 op, 848925855.33 ns, 829.0292 us/op
-Result 16: 1024 op, 889779137.33 ns, 868.9249 us/op
-GC:  0 0 0 0 0
-
-// AfterAll
-
-Mean = 855.4531 us, StdErr = 4.0955 us (0.48%); N = 16, StdDev = 16.3822 us
-Min = 829.0292 us, Q1 = 845.5319 us, Median = 854.7199 us, Q3 = 869.2856 us, Max = 882.4691 us
-IQR = 23.7536 us, LowerFence = 809.9015 us, UpperFence = 904.9160 us
-ConfidenceInterval = [838.7729 us; 872.1333 us] (CI 99.9%), Margin = 16.6802 us (1.95% of Mean)
-Skewness = -0.06, Kurtosis = 1.84
+// ***** Done, took 00:00:02 (2.35 sec)   *****
+// Build Exception:   Determining projects to restore...
+C:\Program Files\dotnet\sdk\5.0.103\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.EolTargetFrameworks.targets(28,5): warning NETSDK1138: The target framework 'netcoreapp2.0' is out of support and will not receive security updates in the future. Please refer to https://aka.ms/dotnet-core-support for more information about the support policy. [C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\b73fe0cb-b45b-4ed5-a5ec-59c4034f7304\BenchmarkDotNet.Autogenerated.csproj]
+C:\Program Files\dotnet\sdk\5.0.103\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.EolTargetFrameworks.targets(28,5): warning NETSDK1138: The target framework 'netcoreapp2.0' is out of support and will not receive security updates in the future. Please refer to https://aka.ms/dotnet-core-support for more information about the support policy. [C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\b73fe0cb-b45b-4ed5-a5ec-59c4034f7304\BenchmarkDotNet.Autogenerated.csproj]
+C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\b73fe0cb-b45b-4ed5-a5ec-59c4034f7304\BenchmarkDotNet.Autogenerated.csproj : error NU1201: Project Benchmarks is not compatible with netcoreapp2.0 (.NETCoreApp,Version=v2.0). Project Benchmarks supports: net5.0 (.NETCoreApp,Version=v5.0)
+  Failed to restore C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\b73fe0cb-b45b-4ed5-a5ec-59c4034f7304\BenchmarkDotNet.Autogenerated.csproj (in 265 ms).
 
 
-// **************************
-// Benchmark: ClientBenchmarks.SimpleGetAsync: DefaultJob
-// *** Execute ***
-// Launch: 1 / 1
-Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
-// BeforeAnythingElse
-
-// Benchmark Process Environment Information:
-// Runtime=.NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT
-// GC=Concurrent Workstation
-// Job: DefaultJob
-
-Pilot  1: 16 op, 15476351.00 ns, 967.2719 us/op
-Pilot  2: 32 op, 37173573.00 ns, 1.1617 ms/op
-Pilot  3: 64 op, 69340786.00 ns, 1.0834 ms/op
-Pilot  4: 128 op, 136503004.00 ns, 1.0664 ms/op
-Pilot  5: 256 op, 258946174.00 ns, 1.0115 ms/op
-Pilot  6: 512 op, 505684585.00 ns, 987.6652 us/op
-
-IdleWarmup  1: 512 op, 23892.00 ns, 46.6641 ns/op
-IdleWarmup  2: 512 op, 4572.00 ns, 8.9297 ns/op
-IdleWarmup  3: 512 op, 3552.00 ns, 6.9375 ns/op
-IdleWarmup  4: 512 op, 4140.00 ns, 8.0859 ns/op
-IdleWarmup  5: 512 op, 3480.00 ns, 6.7969 ns/op
-IdleWarmup  6: 512 op, 3876.00 ns, 7.5703 ns/op
-IdleWarmup  7: 512 op, 3624.00 ns, 7.0781 ns/op
-
-IdleTarget  1: 512 op, 4236.00 ns, 8.2734 ns/op
-IdleTarget  2: 512 op, 3984.00 ns, 7.7813 ns/op
-IdleTarget  3: 512 op, 5604.00 ns, 10.9453 ns/op
-IdleTarget  4: 512 op, 3540.00 ns, 6.9141 ns/op
-IdleTarget  5: 512 op, 3564.00 ns, 6.9609 ns/op
-IdleTarget  6: 512 op, 3468.00 ns, 6.7734 ns/op
-IdleTarget  7: 512 op, 3696.00 ns, 7.2188 ns/op
-IdleTarget  8: 512 op, 5040.00 ns, 9.8438 ns/op
-IdleTarget  9: 512 op, 3588.00 ns, 7.0078 ns/op
-IdleTarget 10: 512 op, 3840.00 ns, 7.5000 ns/op
-IdleTarget 11: 512 op, 3696.00 ns, 7.2188 ns/op
-IdleTarget 12: 512 op, 3576.00 ns, 6.9844 ns/op
-IdleTarget 13: 512 op, 3492.00 ns, 6.8203 ns/op
-IdleTarget 14: 512 op, 3900.00 ns, 7.6172 ns/op
-IdleTarget 15: 512 op, 3684.00 ns, 7.1953 ns/op
-IdleTarget 16: 512 op, 4080.00 ns, 7.9688 ns/op
-IdleTarget 17: 512 op, 3552.00 ns, 6.9375 ns/op
-IdleTarget 18: 512 op, 3600.00 ns, 7.0313 ns/op
-IdleTarget 19: 512 op, 64008.00 ns, 125.0156 ns/op
-IdleTarget 20: 512 op, 4980.00 ns, 9.7266 ns/op
-
-MainWarmup  1: 512 op, 523250464.00 ns, 1.0220 ms/op
-MainWarmup  2: 512 op, 516799303.00 ns, 1.0094 ms/op
-MainWarmup  3: 512 op, 520902229.00 ns, 1.0174 ms/op
-MainWarmup  4: 512 op, 522815523.00 ns, 1.0211 ms/op
-MainWarmup  5: 512 op, 543183575.00 ns, 1.0609 ms/op
-MainWarmup  6: 512 op, 522869908.00 ns, 1.0212 ms/op
-MainWarmup  7: 512 op, 533388308.00 ns, 1.0418 ms/op
-MainWarmup  8: 512 op, 510159992.00 ns, 996.4062 us/op
-
-// BeforeMainRun
-MainTarget  1: 512 op, 529221181.00 ns, 1.0336 ms/op
-MainTarget  2: 512 op, 513485677.00 ns, 1.0029 ms/op
-MainTarget  3: 512 op, 519769884.00 ns, 1.0152 ms/op
-MainTarget  4: 512 op, 519267922.00 ns, 1.0142 ms/op
-MainTarget  5: 512 op, 544603513.00 ns, 1.0637 ms/op
-MainTarget  6: 512 op, 520396476.00 ns, 1.0164 ms/op
-MainTarget  7: 512 op, 517903220.00 ns, 1.0115 ms/op
-MainTarget  8: 512 op, 530013411.00 ns, 1.0352 ms/op
-MainTarget  9: 512 op, 523001356.00 ns, 1.0215 ms/op
-MainTarget 10: 512 op, 513386413.00 ns, 1.0027 ms/op
-MainTarget 11: 512 op, 544288428.00 ns, 1.0631 ms/op
-MainTarget 12: 512 op, 513704234.00 ns, 1.0033 ms/op
-MainTarget 13: 512 op, 529968699.00 ns, 1.0351 ms/op
-MainTarget 14: 512 op, 512170272.00 ns, 1.0003 ms/op
-MainTarget 15: 512 op, 534718666.00 ns, 1.0444 ms/op
-MainTarget 16: 512 op, 515227588.00 ns, 1.0063 ms/op
-MainTarget 17: 512 op, 520357980.00 ns, 1.0163 ms/op
-
-// AfterMainRun
-Result  1: 512 op, 529214224.60 ns, 1.0336 ms/op
-Result  2: 512 op, 513478720.60 ns, 1.0029 ms/op
-Result  3: 512 op, 519762927.60 ns, 1.0152 ms/op
-Result  4: 512 op, 519260965.60 ns, 1.0142 ms/op
-Result  5: 512 op, 544596556.60 ns, 1.0637 ms/op
-Result  6: 512 op, 520389519.60 ns, 1.0164 ms/op
-Result  7: 512 op, 517896263.60 ns, 1.0115 ms/op
-Result  8: 512 op, 530006454.60 ns, 1.0352 ms/op
-Result  9: 512 op, 522994399.60 ns, 1.0215 ms/op
-Result 10: 512 op, 513379456.60 ns, 1.0027 ms/op
-Result 11: 512 op, 544281471.60 ns, 1.0630 ms/op
-Result 12: 512 op, 513697277.60 ns, 1.0033 ms/op
-Result 13: 512 op, 529961742.60 ns, 1.0351 ms/op
-Result 14: 512 op, 512163315.60 ns, 1.0003 ms/op
-Result 15: 512 op, 534711709.60 ns, 1.0444 ms/op
-Result 16: 512 op, 515220631.60 ns, 1.0063 ms/op
-Result 17: 512 op, 520351023.60 ns, 1.0163 ms/op
-GC:  0 0 0 0 0
-
-// AfterAll
-
-Mean = 1.0227 ms, StdErr = 0.0049 ms (0.48%); N = 17, StdDev = 0.0201 ms
-Min = 1.0003 ms, Q1 = 1.0048 ms, Median = 1.0163 ms, Q3 = 1.0351 ms, Max = 1.0637 ms
-IQR = 0.0303 ms, LowerFence = 0.9593 ms, UpperFence = 1.0806 ms
-ConfidenceInterval = [1.0031 ms; 1.0423 ms] (CI 99.9%), Margin = 0.0196 ms (1.92% of Mean)
-Skewness = 0.78, Kurtosis = 2.36
+// Build Exception:   Determining projects to restore...
+C:\Program Files\dotnet\sdk\5.0.103\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.EolTargetFrameworks.targets(28,5): warning NETSDK1138: The target framework 'netcoreapp2.0' is out of support and will not receive security updates in the future. Please refer to https://aka.ms/dotnet-core-support for more information about the support policy. [C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\6c826cde-2db0-4be9-ab4d-23cfc39c5427\BenchmarkDotNet.Autogenerated.csproj]
+C:\Program Files\dotnet\sdk\5.0.103\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.EolTargetFrameworks.targets(28,5): warning NETSDK1138: The target framework 'netcoreapp2.0' is out of support and will not receive security updates in the future. Please refer to https://aka.ms/dotnet-core-support for more information about the support policy. [C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\6c826cde-2db0-4be9-ab4d-23cfc39c5427\BenchmarkDotNet.Autogenerated.csproj]
+C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\6c826cde-2db0-4be9-ab4d-23cfc39c5427\BenchmarkDotNet.Autogenerated.csproj : error NU1201: Project Benchmarks is not compatible with netcoreapp2.0 (.NETCoreApp,Version=v2.0). Project Benchmarks supports: net5.0 (.NETCoreApp,Version=v5.0)
+  Failed to restore C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\6c826cde-2db0-4be9-ab4d-23cfc39c5427\BenchmarkDotNet.Autogenerated.csproj (in 240 ms).
 
 
-// **************************
-// Benchmark: ClientBenchmarks.SimpleGetByName: DefaultJob
-// *** Execute ***
-// Launch: 1 / 1
-Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
-// BeforeAnythingElse
-
-// Benchmark Process Environment Information:
-// Runtime=.NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT
-// GC=Concurrent Workstation
-// Job: DefaultJob
-
-Pilot  1: 16 op, 16077085.00 ns, 1.0048 ms/op
-Pilot  2: 32 op, 37710142.00 ns, 1.1784 ms/op
-Pilot  3: 64 op, 63991417.00 ns, 999.8659 us/op
-Pilot  4: 128 op, 133358171.00 ns, 1.0419 ms/op
-Pilot  5: 256 op, 266690889.00 ns, 1.0418 ms/op
-Pilot  6: 512 op, 551457287.00 ns, 1.0771 ms/op
-
-IdleWarmup  1: 512 op, 23988.00 ns, 46.8516 ns/op
-IdleWarmup  2: 512 op, 3528.00 ns, 6.8906 ns/op
-IdleWarmup  3: 512 op, 3648.00 ns, 7.1250 ns/op
-IdleWarmup  4: 512 op, 3828.00 ns, 7.4766 ns/op
-IdleWarmup  5: 512 op, 3504.00 ns, 6.8438 ns/op
-IdleWarmup  6: 512 op, 4476.00 ns, 8.7422 ns/op
-IdleWarmup  7: 512 op, 3384.00 ns, 6.6094 ns/op
-
-IdleTarget  1: 512 op, 3240.00 ns, 6.3281 ns/op
-IdleTarget  2: 512 op, 3852.00 ns, 7.5234 ns/op
-IdleTarget  3: 512 op, 3660.00 ns, 7.1484 ns/op
-IdleTarget  4: 512 op, 4116.00 ns, 8.0391 ns/op
-IdleTarget  5: 512 op, 4128.00 ns, 8.0625 ns/op
-IdleTarget  6: 512 op, 3276.00 ns, 6.3984 ns/op
-IdleTarget  7: 512 op, 3372.00 ns, 6.5859 ns/op
-IdleTarget  8: 512 op, 3480.00 ns, 6.7969 ns/op
-IdleTarget  9: 512 op, 3672.00 ns, 7.1719 ns/op
-IdleTarget 10: 512 op, 3336.00 ns, 6.5156 ns/op
-IdleTarget 11: 512 op, 3672.00 ns, 7.1719 ns/op
-IdleTarget 12: 512 op, 3708.00 ns, 7.2422 ns/op
-IdleTarget 13: 512 op, 3936.00 ns, 7.6875 ns/op
-IdleTarget 14: 512 op, 4428.00 ns, 8.6484 ns/op
-IdleTarget 15: 512 op, 3600.00 ns, 7.0313 ns/op
-IdleTarget 16: 512 op, 4464.00 ns, 8.7188 ns/op
-IdleTarget 17: 512 op, 3360.00 ns, 6.5625 ns/op
-IdleTarget 18: 512 op, 4140.00 ns, 8.0859 ns/op
-IdleTarget 19: 512 op, 3432.00 ns, 6.7031 ns/op
-IdleTarget 20: 512 op, 3552.00 ns, 6.9375 ns/op
-
-MainWarmup  1: 512 op, 532920391.00 ns, 1.0409 ms/op
-MainWarmup  2: 512 op, 529424833.00 ns, 1.0340 ms/op
-MainWarmup  3: 512 op, 533474335.00 ns, 1.0419 ms/op
-MainWarmup  4: 512 op, 554979173.00 ns, 1.0839 ms/op
-MainWarmup  5: 512 op, 541415659.00 ns, 1.0575 ms/op
-MainWarmup  6: 512 op, 541141820.00 ns, 1.0569 ms/op
-MainWarmup  7: 512 op, 528090947.00 ns, 1.0314 ms/op
-MainWarmup  8: 512 op, 545377586.00 ns, 1.0652 ms/op
-MainWarmup  9: 512 op, 541095043.00 ns, 1.0568 ms/op
-
-// BeforeMainRun
-MainTarget  1: 512 op, 534956794.00 ns, 1.0448 ms/op
-MainTarget  2: 512 op, 541167199.00 ns, 1.0570 ms/op
-MainTarget  3: 512 op, 632076841.00 ns, 1.2345 ms/op
-MainTarget  4: 512 op, 525956084.00 ns, 1.0273 ms/op
-MainTarget  5: 512 op, 544835257.00 ns, 1.0641 ms/op
-MainTarget  6: 512 op, 544129368.00 ns, 1.0628 ms/op
-MainTarget  7: 512 op, 527448658.00 ns, 1.0302 ms/op
-MainTarget  8: 512 op, 568541425.00 ns, 1.1104 ms/op
-MainTarget  9: 512 op, 527273098.00 ns, 1.0298 ms/op
-MainTarget 10: 512 op, 533708228.00 ns, 1.0424 ms/op
-MainTarget 11: 512 op, 544715113.00 ns, 1.0639 ms/op
-MainTarget 12: 512 op, 542241933.00 ns, 1.0591 ms/op
-MainTarget 13: 512 op, 527655635.00 ns, 1.0306 ms/op
-MainTarget 14: 512 op, 554237715.00 ns, 1.0825 ms/op
-MainTarget 15: 512 op, 531598325.00 ns, 1.0383 ms/op
-MainTarget 16: 512 op, 563046364.00 ns, 1.0997 ms/op
-MainTarget 17: 512 op, 527365198.00 ns, 1.0300 ms/op
-MainTarget 18: 512 op, 560364097.00 ns, 1.0945 ms/op
-MainTarget 19: 512 op, 564999223.00 ns, 1.1035 ms/op
-MainTarget 20: 512 op, 542044772.00 ns, 1.0587 ms/op
-MainTarget 21: 512 op, 533457440.00 ns, 1.0419 ms/op
-MainTarget 22: 512 op, 544526532.00 ns, 1.0635 ms/op
-MainTarget 23: 512 op, 540643098.00 ns, 1.0559 ms/op
-
-// AfterMainRun
-Result  1: 512 op, 534953072.80 ns, 1.0448 ms/op
-Result  2: 512 op, 541163477.80 ns, 1.0570 ms/op
-Result  3: 512 op, 525952362.80 ns, 1.0273 ms/op
-Result  4: 512 op, 544831535.80 ns, 1.0641 ms/op
-Result  5: 512 op, 544125646.80 ns, 1.0627 ms/op
-Result  6: 512 op, 527444936.80 ns, 1.0302 ms/op
-Result  7: 512 op, 568537703.80 ns, 1.1104 ms/op
-Result  8: 512 op, 527269376.80 ns, 1.0298 ms/op
-Result  9: 512 op, 533704506.80 ns, 1.0424 ms/op
-Result 10: 512 op, 544711391.80 ns, 1.0639 ms/op
-Result 11: 512 op, 542238211.80 ns, 1.0591 ms/op
-Result 12: 512 op, 527651913.80 ns, 1.0306 ms/op
-Result 13: 512 op, 554233993.80 ns, 1.0825 ms/op
-Result 14: 512 op, 531594603.80 ns, 1.0383 ms/op
-Result 15: 512 op, 563042642.80 ns, 1.0997 ms/op
-Result 16: 512 op, 527361476.80 ns, 1.0300 ms/op
-Result 17: 512 op, 560360375.80 ns, 1.0945 ms/op
-Result 18: 512 op, 564995501.80 ns, 1.1035 ms/op
-Result 19: 512 op, 542041050.80 ns, 1.0587 ms/op
-Result 20: 512 op, 533453718.80 ns, 1.0419 ms/op
-Result 21: 512 op, 544522810.80 ns, 1.0635 ms/op
-Result 22: 512 op, 540639376.80 ns, 1.0559 ms/op
-GC:  0 0 0 0 0
-
-// AfterAll
-
-Mean = 1.0587 ms, StdErr = 0.0055 ms (0.51%); N = 22, StdDev = 0.0256 ms
-Min = 1.0273 ms, Q1 = 1.0383 ms, Median = 1.0578 ms, Q3 = 1.0641 ms, Max = 1.1104 ms
-IQR = 0.0259 ms, LowerFence = 0.9995 ms, UpperFence = 1.1029 ms
-ConfidenceInterval = [1.0379 ms; 1.0795 ms] (CI 99.9%), Margin = 0.0208 ms (1.97% of Mean)
-Skewness = 0.58, Kurtosis = 2.13
+// Build Exception:   Determining projects to restore...
+C:\Program Files\dotnet\sdk\5.0.103\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.EolTargetFrameworks.targets(28,5): warning NETSDK1138: The target framework 'netcoreapp2.0' is out of support and will not receive security updates in the future. Please refer to https://aka.ms/dotnet-core-support for more information about the support policy. [C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\45f6cc82-555b-4e1d-a235-28fdc124bea6\BenchmarkDotNet.Autogenerated.csproj]
+C:\Program Files\dotnet\sdk\5.0.103\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.EolTargetFrameworks.targets(28,5): warning NETSDK1138: The target framework 'netcoreapp2.0' is out of support and will not receive security updates in the future. Please refer to https://aka.ms/dotnet-core-support for more information about the support policy. [C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\45f6cc82-555b-4e1d-a235-28fdc124bea6\BenchmarkDotNet.Autogenerated.csproj]
+C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\45f6cc82-555b-4e1d-a235-28fdc124bea6\BenchmarkDotNet.Autogenerated.csproj : error NU1201: Project Benchmarks is not compatible with netcoreapp2.0 (.NETCoreApp,Version=v2.0). Project Benchmarks supports: net5.0 (.NETCoreApp,Version=v5.0)
+  Failed to restore C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\45f6cc82-555b-4e1d-a235-28fdc124bea6\BenchmarkDotNet.Autogenerated.csproj (in 243 ms).
 
 
-// **************************
-// Benchmark: ClientBenchmarks.SimpleGetByNameAsync: DefaultJob
-// *** Execute ***
-// Launch: 1 / 1
-Failed to set up high priority. Make sure you have the right permissions. Message: Permission denied
-// BeforeAnythingElse
-
-// Benchmark Process Environment Information:
-// Runtime=.NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT
-// GC=Concurrent Workstation
-// Job: DefaultJob
-
-Pilot  1: 16 op, 16748282.00 ns, 1.0468 ms/op
-Pilot  2: 32 op, 38919252.00 ns, 1.2162 ms/op
-Pilot  3: 64 op, 73356340.00 ns, 1.1462 ms/op
-Pilot  4: 128 op, 151029073.00 ns, 1.1799 ms/op
-Pilot  5: 256 op, 307933140.00 ns, 1.2029 ms/op
-Pilot  6: 512 op, 573753225.00 ns, 1.1206 ms/op
-
-IdleWarmup  1: 512 op, 22812.00 ns, 44.5547 ns/op
-IdleWarmup  2: 512 op, 5880.00 ns, 11.4844 ns/op
-IdleWarmup  3: 512 op, 3792.00 ns, 7.4063 ns/op
-IdleWarmup  4: 512 op, 4548.00 ns, 8.8828 ns/op
-IdleWarmup  5: 512 op, 3768.00 ns, 7.3594 ns/op
-IdleWarmup  6: 512 op, 3768.00 ns, 7.3594 ns/op
-IdleWarmup  7: 512 op, 3744.00 ns, 7.3125 ns/op
-
-IdleTarget  1: 512 op, 4428.00 ns, 8.6484 ns/op
-IdleTarget  2: 512 op, 3984.00 ns, 7.7813 ns/op
-IdleTarget  3: 512 op, 5280.00 ns, 10.3125 ns/op
-IdleTarget  4: 512 op, 3552.00 ns, 6.9375 ns/op
-IdleTarget  5: 512 op, 3480.00 ns, 6.7969 ns/op
-IdleTarget  6: 512 op, 4416.00 ns, 8.6250 ns/op
-IdleTarget  7: 512 op, 3948.00 ns, 7.7109 ns/op
-IdleTarget  8: 512 op, 3888.00 ns, 7.5938 ns/op
-IdleTarget  9: 512 op, 4068.00 ns, 7.9453 ns/op
-IdleTarget 10: 512 op, 3744.00 ns, 7.3125 ns/op
-IdleTarget 11: 512 op, 3720.00 ns, 7.2656 ns/op
-IdleTarget 12: 512 op, 4464.00 ns, 8.7188 ns/op
-IdleTarget 13: 512 op, 3372.00 ns, 6.5859 ns/op
-IdleTarget 14: 512 op, 4404.00 ns, 8.6016 ns/op
-IdleTarget 15: 512 op, 4188.00 ns, 8.1797 ns/op
-IdleTarget 16: 512 op, 3372.00 ns, 6.5859 ns/op
-IdleTarget 17: 512 op, 3432.00 ns, 6.7031 ns/op
-IdleTarget 18: 512 op, 3612.00 ns, 7.0547 ns/op
-IdleTarget 19: 512 op, 3864.00 ns, 7.5469 ns/op
-IdleTarget 20: 512 op, 3468.00 ns, 6.7734 ns/op
-
-MainWarmup  1: 512 op, 599111590.00 ns, 1.1701 ms/op
-MainWarmup  2: 512 op, 619048181.00 ns, 1.2091 ms/op
-MainWarmup  3: 512 op, 586481752.00 ns, 1.1455 ms/op
-MainWarmup  4: 512 op, 611906154.00 ns, 1.1951 ms/op
-MainWarmup  5: 512 op, 598533634.00 ns, 1.1690 ms/op
-MainWarmup  6: 512 op, 602665936.00 ns, 1.1771 ms/op
-
-// BeforeMainRun
-MainTarget  1: 512 op, 578535351.00 ns, 1.1300 ms/op
-MainTarget  2: 512 op, 603185165.00 ns, 1.1781 ms/op
-MainTarget  3: 512 op, 583487051.00 ns, 1.1396 ms/op
-MainTarget  4: 512 op, 590776666.00 ns, 1.1539 ms/op
-MainTarget  5: 512 op, 603110248.00 ns, 1.1779 ms/op
-MainTarget  6: 512 op, 574546701.00 ns, 1.1222 ms/op
-MainTarget  7: 512 op, 583321294.00 ns, 1.1393 ms/op
-MainTarget  8: 512 op, 582478629.00 ns, 1.1377 ms/op
-MainTarget  9: 512 op, 585653510.00 ns, 1.1439 ms/op
-MainTarget 10: 512 op, 591718055.00 ns, 1.1557 ms/op
-MainTarget 11: 512 op, 595953954.00 ns, 1.1640 ms/op
-MainTarget 12: 512 op, 601016353.00 ns, 1.1739 ms/op
-MainTarget 13: 512 op, 592601353.00 ns, 1.1574 ms/op
-MainTarget 14: 512 op, 587681429.00 ns, 1.1478 ms/op
-MainTarget 15: 512 op, 654994007.00 ns, 1.2793 ms/op
-
-// AfterMainRun
-Result  1: 512 op, 578531416.80 ns, 1.1299 ms/op
-Result  2: 512 op, 603181230.80 ns, 1.1781 ms/op
-Result  3: 512 op, 583483116.80 ns, 1.1396 ms/op
-Result  4: 512 op, 590772731.80 ns, 1.1539 ms/op
-Result  5: 512 op, 603106313.80 ns, 1.1779 ms/op
-Result  6: 512 op, 574542766.80 ns, 1.1222 ms/op
-Result  7: 512 op, 583317359.80 ns, 1.1393 ms/op
-Result  8: 512 op, 582474694.80 ns, 1.1376 ms/op
-Result  9: 512 op, 585649575.80 ns, 1.1438 ms/op
-Result 10: 512 op, 591714120.80 ns, 1.1557 ms/op
-Result 11: 512 op, 595950019.80 ns, 1.1640 ms/op
-Result 12: 512 op, 601012418.80 ns, 1.1739 ms/op
-Result 13: 512 op, 592597418.80 ns, 1.1574 ms/op
-Result 14: 512 op, 587677494.80 ns, 1.1478 ms/op
-GC:  0 0 0 0 0
-
-// AfterAll
-
-Mean = 1.1515 ms, StdErr = 0.0047 ms (0.41%); N = 14, StdDev = 0.0175 ms
-Min = 1.1222 ms, Q1 = 1.1393 ms, Median = 1.1508 ms, Q3 = 1.1640 ms, Max = 1.1781 ms
-IQR = 0.0247 ms, LowerFence = 1.1023 ms, UpperFence = 1.2010 ms
-ConfidenceInterval = [1.1317 ms; 1.1713 ms] (CI 99.9%), Margin = 0.0198 ms (1.72% of Mean)
-Skewness = 0.11, Kurtosis = 1.74
+// Build Exception:   Determining projects to restore...
+C:\Program Files\dotnet\sdk\5.0.103\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.EolTargetFrameworks.targets(28,5): warning NETSDK1138: The target framework 'netcoreapp2.0' is out of support and will not receive security updates in the future. Please refer to https://aka.ms/dotnet-core-support for more information about the support policy. [C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\5994cbf4-91e9-4a6e-a28d-8d0c81b94039\BenchmarkDotNet.Autogenerated.csproj]
+C:\Program Files\dotnet\sdk\5.0.103\Sdks\Microsoft.NET.Sdk\targets\Microsoft.NET.EolTargetFrameworks.targets(28,5): warning NETSDK1138: The target framework 'netcoreapp2.0' is out of support and will not receive security updates in the future. Please refer to https://aka.ms/dotnet-core-support for more information about the support policy. [C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\5994cbf4-91e9-4a6e-a28d-8d0c81b94039\BenchmarkDotNet.Autogenerated.csproj]
+C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\5994cbf4-91e9-4a6e-a28d-8d0c81b94039\BenchmarkDotNet.Autogenerated.csproj : error NU1201: Project Benchmarks is not compatible with netcoreapp2.0 (.NETCoreApp,Version=v2.0). Project Benchmarks supports: net5.0 (.NETCoreApp,Version=v5.0)
+  Failed to restore C:\SRC\github\ContractHttp\src\Performance\Benchmarks\bin\Debug\net5.0\5994cbf4-91e9-4a6e-a28d-8d0c81b94039\BenchmarkDotNet.Autogenerated.csproj (in 239 ms).
 
 
 // ***** BenchmarkRunner: Finish  *****
 
 // * Export *
-  BenchmarkDotNet.Artifacts/results/Benchmarks.ClientBenchmarks-report.csv
-  BenchmarkDotNet.Artifacts/results/Benchmarks.ClientBenchmarks-report-github.md
-  BenchmarkDotNet.Artifacts/results/Benchmarks.ClientBenchmarks-report.html
+  BenchmarkDotNet.Artifacts\results\Benchmarks.ClientBenchmarks-report.csv
+  BenchmarkDotNet.Artifacts\results\Benchmarks.ClientBenchmarks-report-github.md
+  BenchmarkDotNet.Artifacts\results\Benchmarks.ClientBenchmarks-report.html
 
 // * Detailed results *
 ClientBenchmarks.SimpleGet: DefaultJob
-Runtime = .NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT; GC = Concurrent Workstation
-Mean = 855.4531 us, StdErr = 4.0955 us (0.48%); N = 16, StdDev = 16.3822 us
-Min = 829.0292 us, Q1 = 845.5319 us, Median = 854.7199 us, Q3 = 869.2856 us, Max = 882.4691 us
-IQR = 23.7536 us, LowerFence = 809.9015 us, UpperFence = 904.9160 us
-ConfidenceInterval = [838.7729 us; 872.1333 us] (CI 99.9%), Margin = 16.6802 us (1.95% of Mean)
-Skewness = -0.06, Kurtosis = 1.84
-
+Runtime = ; GC = 
+There are not any results runs
 
 ClientBenchmarks.SimpleGetAsync: DefaultJob
-Runtime = .NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT; GC = Concurrent Workstation
-Mean = 1.0227 ms, StdErr = 0.0049 ms (0.48%); N = 17, StdDev = 0.0201 ms
-Min = 1.0003 ms, Q1 = 1.0048 ms, Median = 1.0163 ms, Q3 = 1.0351 ms, Max = 1.0637 ms
-IQR = 0.0303 ms, LowerFence = 0.9593 ms, UpperFence = 1.0806 ms
-ConfidenceInterval = [1.0031 ms; 1.0423 ms] (CI 99.9%), Margin = 0.0196 ms (1.92% of Mean)
-Skewness = 0.78, Kurtosis = 2.36
-
+Runtime = ; GC = 
+There are not any results runs
 
 ClientBenchmarks.SimpleGetByName: DefaultJob
-Runtime = .NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT; GC = Concurrent Workstation
-Mean = 1.0587 ms, StdErr = 0.0055 ms (0.51%); N = 22, StdDev = 0.0256 ms
-Min = 1.0273 ms, Q1 = 1.0383 ms, Median = 1.0578 ms, Q3 = 1.0641 ms, Max = 1.1104 ms
-IQR = 0.0259 ms, LowerFence = 0.9995 ms, UpperFence = 1.1029 ms
-ConfidenceInterval = [1.0379 ms; 1.0795 ms] (CI 99.9%), Margin = 0.0208 ms (1.97% of Mean)
-Skewness = 0.58, Kurtosis = 2.13
-
+Runtime = ; GC = 
+There are not any results runs
 
 ClientBenchmarks.SimpleGetByNameAsync: DefaultJob
-Runtime = .NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT; GC = Concurrent Workstation
-Mean = 1.1515 ms, StdErr = 0.0047 ms (0.41%); N = 14, StdDev = 0.0175 ms
-Min = 1.1222 ms, Q1 = 1.1393 ms, Median = 1.1508 ms, Q3 = 1.1640 ms, Max = 1.1781 ms
-IQR = 0.0247 ms, LowerFence = 1.1023 ms, UpperFence = 1.2010 ms
-ConfidenceInterval = [1.1317 ms; 1.1713 ms] (CI 99.9%), Margin = 0.0198 ms (1.72% of Mean)
-Skewness = 0.11, Kurtosis = 1.74
+Runtime = ; GC = 
+There are not any results runs
 
-
-Total time: 00:02:20 (140.93 sec)
+Total time: 00:00:02 (2.39 sec)
 
 // * Summary *
 
-BenchmarkDotNet=v0.10.12, OS=galliumos 2.1
-Intel Celeron CPU N2840 2.16GHz, 1 CPU, 2 logical cores and 2 physical cores
-.NET Core SDK=2.1.403
-  [Host]     : .NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT DEBUG
-  DefaultJob : .NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT
+BenchmarkDotNet=v0.10.12, OS=Windows 10.0.19042
+Intel Core i7-6820HQ CPU 2.70GHz (Skylake), 1 CPU, 8 logical cores and 4 physical cores
+.NET Core SDK=5.0.103
+  [Host] : .NET Core 5.0.3 (Framework .NET 5.0.3), 64bit RyuJIT DEBUG
 
 
-               Method |       Mean |    Error |   StdDev |
---------------------- |-----------:|---------:|---------:|
-            SimpleGet |   855.5 us | 16.68 us | 16.38 us |
-       SimpleGetAsync | 1,022.7 us | 19.60 us | 20.12 us |
-      SimpleGetByName | 1,058.7 us | 20.82 us | 25.56 us |
- SimpleGetByNameAsync | 1,151.5 us | 19.79 us | 17.54 us |
+               Method | Mean | Error |
+--------------------- |-----:|------:|
+            SimpleGet |   NA |    NA |
+       SimpleGetAsync |   NA |    NA |
+      SimpleGetByName |   NA |    NA |
+ SimpleGetByNameAsync |   NA |    NA |
+
+Benchmarks with issues:
+  ClientBenchmarks.SimpleGet: DefaultJob
+  ClientBenchmarks.SimpleGetAsync: DefaultJob
+  ClientBenchmarks.SimpleGetByName: DefaultJob
+  ClientBenchmarks.SimpleGetByNameAsync: DefaultJob
 
 // * Legends *
-  Mean   : Arithmetic mean of all measurements
-  Error  : Half of 99.9% confidence interval
-  StdDev : Standard deviation of all measurements
-  1 us   : 1 Microsecond (0.000001 sec)
+  Mean  : Arithmetic mean of all measurements
+  Error : Half of 99.9% confidence interval
+  1 ns  : 1 Nanosecond (0.000000001 sec)
 
 // ***** BenchmarkRunner: End *****
 // * Artifacts cleanup *

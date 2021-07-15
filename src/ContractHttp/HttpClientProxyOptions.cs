@@ -63,6 +63,11 @@ namespace ContractHttp
         public IHttpRequestModifier RequestModifier { get; set; }
 
         /// <summary>
+        /// Gets or sets the http version.
+        /// </summary>
+        public Version HttpVersion { get; set; } = new Version(1, 1);
+
+        /// <summary>
         /// Gets a <see cref="HttpClient"/> instance.
         /// </summary>
         /// <returns>An <see cref="HttpClient"/> instance.</returns>

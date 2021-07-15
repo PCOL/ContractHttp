@@ -82,6 +82,11 @@ namespace ContractHttp
         private CancellationTokenSource cancellationTokenSource;
 
         /// <summary>
+        /// A cancellation token.
+        /// </summary>
+        private CancellationToken cancellationToken = CancellationToken.None;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestContext"/> class.
         /// </summary>
         /// <param name="methodInfo">The methods <see cref="MethodInfo"/>.</param>
@@ -127,7 +132,8 @@ namespace ContractHttp
             TimeSpan? timeout)
         {
             var requestBuilder = new HttpRequestBuilder()
-                .SetMethod(httpMethod);
+                .SetMethod(httpMethod)
+                .SetHttpVersion(this.options.HttpVersion);
 
             var names = this.CheckArgsAndBuildRequest(requestBuilder, out string uri);
 
@@ -142,7 +148,7 @@ namespace ContractHttp
 
             Type returnType = this.MethodInfo.ReturnType;
 
-            requestBuilder.AddAuthorizationHeader(
+            await requestBuilder.AddAuthorizationHeaderAsync(
                 this.MethodInfo,
                 names,
                 this.Arguments,
@@ -182,7 +188,7 @@ namespace ContractHttp
                     completionOption)
                 .ConfigureAwait(false);
 
-            return this.ProcessResult(
+            return await this.ProcessResultAsync(
                 response,
                 returnType);
         }
@@ -284,6 +290,10 @@ namespace ContractHttp
                 else if (parmType == typeof(CancellationTokenSource))
                 {
                     this.cancellationTokenSource = (CancellationTokenSource)this.Arguments[i];
+                }
+                else if (parmType == typeof(CancellationToken))
+                {
+                    this.cancellationToken = (CancellationToken)this.Arguments[i];
                 }
                 else if (parmType == typeof(IUriBuilder))
                 {
@@ -476,7 +486,7 @@ namespace ContractHttp
         /// <param name="response">A <see cref="HttpResponseMessage"/>.</param>
         /// <param name="returnType">The return type.</param>
         /// <returns>The result.</returns>
-        internal object ProcessResult(
+        internal async Task<object> ProcessResultAsync(
             HttpResponseMessage response,
             Type returnType)
         {
@@ -508,18 +518,18 @@ namespace ContractHttp
                 if (returnType != typeof(HttpResponseMessage) &&
                     returnType != typeof(void))
                 {
-                    result = this.DeserialiseObjectAsync(
+                    result = await this.DeserialiseObjectAsync(
                         response,
                         returnType,
-                        this.MethodInfo.ReturnParameter).Result;
+                        this.MethodInfo.ReturnParameter);
                 }
 
                 if (this.dataArg != -1)
                 {
-                    this.Arguments[this.dataArg] = this.DeserialiseObjectAsync(
+                    this.Arguments[this.dataArg] = await this.DeserialiseObjectAsync(
                         response,
                         this.dataArgType,
-                        this.MethodInfo.GetParameters()[this.dataArg]).Result;
+                        this.MethodInfo.GetParameters()[this.dataArg]);
                 }
             }
 
@@ -728,10 +738,16 @@ namespace ContractHttp
         {
             if (this.cancellationTokenSource != null)
             {
+                if (this.cancellationToken != CancellationToken.None)
+                {
+                    var linkedSource = CancellationTokenSource.CreateLinkedTokenSource(this.cancellationToken, this.cancellationTokenSource.Token);
+                    return linkedSource.Token;
+                }
+
                 return this.cancellationTokenSource.Token;
             }
 
-            return CancellationToken.None;
+            return this.cancellationToken;
         }
     }
 }

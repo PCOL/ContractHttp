@@ -53,6 +53,11 @@ namespace ContractHttp
         private bool isMultipartContent;
 
         /// <summary>
+        /// The http version.
+        /// </summary>
+        private Version httpVersion = new Version(1, 1);
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestBuilder"/> class.
         /// </summary>
         public HttpRequestBuilder()
@@ -103,6 +108,17 @@ namespace ContractHttp
         }
 
         /// <summary>
+        /// Sets the http version.
+        /// </summary>
+        /// <param name="httpVersion">The http version to set.</param>
+        /// <returns>This instance of the <see cref="HttpRequestBuilder"/> class.</returns>
+        public HttpRequestBuilder SetHttpVersion(Version httpVersion)
+        {
+            this.httpVersion = httpVersion;
+            return this;
+        }
+
+        /// <summary>
         /// Sets the requests Uri.
         /// </summary>
         /// <param name="uri">The Uri.</param>
@@ -143,8 +159,21 @@ namespace ContractHttp
         /// <returns>The <see cref="HttpRequestBuilder"/> instance.</returns>
         public HttpRequestBuilder AddHeader(string key, string value)
         {
+            if (value.IndexOf(',') != -1)
+            {
+                value = $"\"{value}\"";
+            }
+
             this.headers = this.headers ?? new Dictionary<string, string>();
-            this.headers.Add(key, value);
+            if (this.headers.TryGetValue(key, out string currentValue) == true)
+            {
+                this.headers[key] = currentValue += $", {value}";
+            }
+            else
+            {
+                this.headers.Add(key, value);
+            }
+
             return this;
         }
 
@@ -251,7 +280,10 @@ namespace ContractHttp
                 requestUri += query;
             }
 
-            var request = new HttpRequestMessage(this.httpMethod, requestUri);
+            var request = new HttpRequestMessage(this.httpMethod, requestUri)
+            {
+                Version = this.httpVersion
+            };
 
             if (this.headers != null)
             {

@@ -34,7 +34,11 @@ namespace ContractHttpTests
                 services =>
                 {
                     services.AddTransient<TestController>();
-                    services.AddMvc();
+                    services.AddMvc(
+                        options =>
+                        {
+                            options.EnableEndpointRouting = false;
+                        });
                 });
 
             var httpClient = this.testServer.CreateClient();

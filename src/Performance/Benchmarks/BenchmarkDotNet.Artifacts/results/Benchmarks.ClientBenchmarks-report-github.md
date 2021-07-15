@@ -1,16 +1,20 @@
 ``` ini
 
-BenchmarkDotNet=v0.10.12, OS=galliumos 2.1
-Intel Celeron CPU N2840 2.16GHz, 1 CPU, 2 logical cores and 2 physical cores
-.NET Core SDK=2.1.403
-  [Host]     : .NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT DEBUG
-  DefaultJob : .NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT
+BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19042
+Intel Core i7-6820HQ CPU 2.70GHz (Skylake), 1 CPU, 8 logical and 4 physical cores
+.NET Core SDK=5.0.103
+  [Host]     : .NET Core 5.0.3 (CoreCLR 5.0.321.7212, CoreFX 5.0.321.7212), X64 RyuJIT DEBUG
+  DefaultJob : .NET Core 5.0.3 (CoreCLR 5.0.321.7212, CoreFX 5.0.321.7212), X64 RyuJIT
 
 
 ```
-|               Method |       Mean |    Error |   StdDev |
-|--------------------- |-----------:|---------:|---------:|
-|            SimpleGet |   855.5 us | 16.68 us | 16.38 us |
-|       SimpleGetAsync | 1,022.7 us | 19.60 us | 20.12 us |
-|      SimpleGetByName | 1,058.7 us | 20.82 us | 25.56 us |
-| SimpleGetByNameAsync | 1,151.5 us | 19.79 us | 17.54 us |
+|               Method |     Mean |    Error |    StdDev |
+|--------------------- |---------:|---------:|----------:|
+|            SimpleGet | 553.6 μs | 42.52 μs | 124.70 μs |
+|       SimpleGetAsync |       NA |       NA |        NA |
+|      SimpleGetByName | 172.0 μs |  3.33 μs |   4.67 μs |
+| SimpleGetByNameAsync |       NA |       NA |        NA |
+
+Benchmarks with issues:
+  ClientBenchmarks.SimpleGetAsync: DefaultJob
+  ClientBenchmarks.SimpleGetByNameAsync: DefaultJob

@@ -30,7 +30,11 @@ namespace ContractHttpTests
                 services =>
                 {
                     services.AddTransient<TestControllerWithQueryParameters>();
-                    services.AddMvc();
+                    services.AddMvc(
+                        options =>
+                        {
+                            options.EnableEndpointRouting = false;
+                        });
                 });
 
             this.clientProxy = new HttpClientProxy<ITestServiceWithQueryParameters>(

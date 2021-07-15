@@ -31,7 +31,11 @@ namespace ContractHttpTests
                 {
                     services.AddSingleton<TestRetryCounts>(this.retryCounts);
                     services.AddTransient<TestControllerForRetry>();
-                    services.AddMvc();
+                    services.AddMvc(
+                        options =>
+                        {
+                            options.EnableEndpointRouting = false;
+                        });
                 });
 
             var httpClient = this.testServer.CreateClient();

@@ -1,5 +1,7 @@
 namespace ContractHttp
 {
+    using System.Threading.Tasks;
+
     /// <summary>
     /// Defines the authorization header factory.
     /// </summary>
@@ -16,5 +18,11 @@ namespace ContractHttp
         /// </summary>
         /// <returns>The authorization header value.</returns>
         string GetAuthorizationHeaderValue();
+
+        /// <summary>
+        /// Gets the authorization header value.
+        /// </summary>
+        /// <returns>The authorization header value.</returns>
+        Task<string> GetAuthorizationHeaderValueAsync();
     }
 }

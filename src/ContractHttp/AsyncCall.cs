@@ -5,6 +5,7 @@ namespace ContractHttp
     using System.Net.Http;
     using System.Reflection;
     using System.Threading.Tasks;
+    using DynProxy;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -63,7 +64,9 @@ namespace ContractHttp
                 return (T)(object)result;
             }
 
-            return (T)this.httpContext.ProcessResult(response, typeof(T));
+            var res = await this.httpContext.ProcessResultAsync(response, typeof(T));
+            return (T)res;
+            ////return await res.AsTask<object, T>();
         }
     }
 }

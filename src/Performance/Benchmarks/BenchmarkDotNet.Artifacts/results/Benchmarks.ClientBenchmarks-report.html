@@ -2,32 +2,32 @@
 <html lang='en'>
 <head>
 <meta charset='utf-8' />
-<title>ClientBenchmarks</title>
+<title>Benchmarks.ClientBenchmarks-20210318-115003</title>
 
 <style type="text/css">
 	table { border-collapse: collapse; display: block; width: 100%; overflow: auto; }
-	td, th { padding: 6px 13px; border: 1px solid #ddd; }
+	td, th { padding: 6px 13px; border: 1px solid #ddd; text-align: right; }
 	tr { background-color: #fff; border-top: 1px solid #ccc; }
 	tr:nth-child(even) { background: #f8f8f8; }
 </style>
 </head>
 <body>
 <pre><code>
-BenchmarkDotNet=v0.10.12, OS=galliumos 2.1
-Intel Celeron CPU N2840 2.16GHz, 1 CPU, 2 logical cores and 2 physical cores
-.NET Core SDK=2.1.403
-  [Host]     : .NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT DEBUG
-  DefaultJob : .NET Core 2.1.5 (Framework 4.6.26919.02), 64bit RyuJIT
+BenchmarkDotNet=v0.12.1, OS=Windows 10.0.19042
+Intel Core i7-6820HQ CPU 2.70GHz (Skylake), 1 CPU, 8 logical and 4 physical cores
+.NET Core SDK=5.0.103
+  [Host]     : .NET Core 5.0.3 (CoreCLR 5.0.321.7212, CoreFX 5.0.321.7212), X64 RyuJIT DEBUG
+  DefaultJob : .NET Core 5.0.3 (CoreCLR 5.0.321.7212, CoreFX 5.0.321.7212), X64 RyuJIT
 </code></pre>
 <pre><code></code></pre>
 
 <table>
 <thead><tr><th>        Method</th><th>Mean</th><th>Error</th><th>StdDev</th>
 </tr>
-</thead><tbody><tr><td>SimpleGet</td><td>855.5 us</td><td>16.68 us</td><td>16.38 us</td>
-</tr><tr><td>SimpleGetAsync</td><td>1,022.7 us</td><td>19.60 us</td><td>20.12 us</td>
-</tr><tr><td>SimpleGetByName</td><td>1,058.7 us</td><td>20.82 us</td><td>25.56 us</td>
-</tr><tr><td>SimpleGetByNameAsync</td><td>1,151.5 us</td><td>19.79 us</td><td>17.54 us</td>
+</thead><tbody><tr><td>SimpleGet</td><td>553.6 &mu;s</td><td>42.52 &mu;s</td><td>124.70 &mu;s</td>
+</tr><tr><td>SimpleGetAsync</td><td>NA</td><td>NA</td><td>NA</td>
+</tr><tr><td>SimpleGetByName</td><td>172.0 &mu;s</td><td>3.33 &mu;s</td><td>4.67 &mu;s</td>
+</tr><tr><td>SimpleGetByNameAsync</td><td>NA</td><td>NA</td><td>NA</td>
 </tr></tbody></table>
 </body>
 </html>

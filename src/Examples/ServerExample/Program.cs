@@ -13,7 +13,7 @@ namespace ServerExample
     {
         static void Main(string[] args)
         {
-            DebugOutput.Output = new ConsoleOutput();
+            // DebugOutput.Output = new ConsoleOutput();
 
             string url = "http://localhost:6000";
 

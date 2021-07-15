@@ -98,12 +98,23 @@
         /// <summary>
         /// Intercepts the invocation of methods on the proxied interface.
         /// </summary>
-        /// <param name="method">The method being called.</param>
+        /// <param name="methodInfo">The method being called.</param>
         /// <param name="arguments">The method arguments.</param>
         /// <returns>The return value.</returns>
-        protected override object Invoke(MethodInfo method, object[] arguments)
+        protected override object Invoke(MethodInfo methodInfo, object[] arguments)
         {
-            return this.InvokeInternal(method, arguments);
+            return this.InvokeInternalAsync(methodInfo, arguments).Result;
+        }
+
+        /// <summary>
+        /// Intercepts the invocation of async methods on the proxied interface.
+        /// </summary>
+        /// <param name="methodInfo">The method being called.</param>
+        /// <param name="arguments">The method arguments.</param>
+        /// <returns>The return value.</returns>
+        protected override Task<object> InvokeAsync(MethodInfo methodInfo, object[] arguments)
+        {
+            return this.InvokeInternalAsync(methodInfo, arguments);
         }
 
         /// <summary>
@@ -112,7 +123,7 @@
         /// <param name="method">The method beign invoked.</param>
         /// <param name="arguments">The methods arguments.</param>
         /// <returns>The return value.</returns>
-        private object InvokeInternal(MethodInfo method, object[] arguments)
+        private async Task<object> InvokeInternalAsync(MethodInfo method, object[] arguments)
         {
             string[] names = new string[arguments.Length];
 
@@ -145,22 +156,17 @@
 
             try
             {
-                return this.BuildAndSendRequestAsync(
+                return await this.BuildAndSendRequestAsync(
                     method,
                     httpMethod,
                     uri,
                     arguments,
                     contentType,
-                    timeout).Result;
+                    timeout);
             }
-            catch (AggregateException ex)
+            catch (Exception ex)
             {
-                foreach (var e in ex.InnerExceptions)
-                {
-                    Console.WriteLine(e.ToString());
-                }
-
-                throw ex.Flatten().InnerException;
+                return Task.FromException(ex);
             }
         }
 

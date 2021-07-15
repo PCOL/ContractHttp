@@ -1,48 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <IsPackable>false</IsPackable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <CodeAnalysisRuleSet>../../ca.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.1.18" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.1.18" />
-    <PackageReference Include="Microsoft.AspNetCore" Version="2.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.1" />
-    <PackageReference Include="Moq" Version="4.8.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="2.2.3" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.3" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="5.0.4" />
+    <PackageReference Include="Moq" Version="4.16.1" />
     <ProjectReference Include="..\..\src\ContractHttp\ContractHttp.csproj" />
-    <Content Include="ClientUnitTests.cs" />
-    <Content Include="Resources\ITestService.cs" />
-    <Content Include="Resources\TestController.cs" />
-    <Content Include="Resources\Models\TestData.cs" />
-    <Content Include="Resources\TestControllerWithHeaders.cs" />
-    <Content Include="Resources\ITestServiceWithHeaders.cs" />
-    <Content Include="TestUtils.cs" />
-    <Content Include="TestServiceProxyUnitTests.cs" />
-    <Content Include="TestServiceWithHeaderProxyUnitTests.cs" />
-    <Content Include="Resources\Models\CreateResponseModel.cs" />
-    <Content Include="Resources\Models\CreateModel.cs" />
-    <Content Include="Resources\ITestControllerService.cs" />
-    <Content Include="Resources\TestControllerService.cs" />
-    <Content Include="ControllerServiceUnitTests.cs" />
-    <Content Include="Resources\ITestServiceUsingMvcAttributes.cs" />
-    <Content Include="TestServiceUsingMvcAttributesProxyUnitTests.cs" />
-    <Content Include="Resources\ITestServiceWithInterception.cs" />
-    <Content Include="InterceptionTests.cs" />
-    <Content Include="TestServiceProxyWithRetryUnitTests.cs" />
-    <Content Include="Resources\TestControllerForRetry.cs" />
-    <Content Include="Resources\ITestServiceWithRetry.cs" />
-    <Content Include="Resources\TestRetryCounts.cs" />
-    <Content Include="RetryHandlerUnitTests.cs" />
-    <Content Include="RequestSenderUnitTests.cs" />
-    <Content Include="Resources\IServiceResult{T}.cs" />
-    <Content Include="Resources\ServiceResult{T}.cs" />
-    <Content Include="ServiceCallFilterTestAttribute.cs" />
-    <Content Include="ServiceResponseProcessor{T}.cs" />
   </ItemGroup>
 </Project>

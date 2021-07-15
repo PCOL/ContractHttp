@@ -1,10 +1,12 @@
 namespace ContractHttp
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
     using System.Text;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Http request builder extension methods.
@@ -79,6 +81,49 @@ namespace ContractHttp
                         requestBuilder.AddAuthorizationHeader(
                             authFactory.GetAuthorizationHeaderScheme(),
                             authFactory.GetAuthorizationHeaderValue());
+                    }
+                }
+            }
+
+            return requestBuilder;
+        }
+
+        /// <summary>
+        /// Adds an authorization header.
+        /// </summary>
+        /// <param name="requestBuilder">A request builder.</param>
+        /// <param name="methodInfo">A method info.</param>
+        /// <param name="names">The methods parameter names.</param>
+        /// <param name="arguments">The methods arguments.</param>
+        /// <param name="serviceProvider">A <see cref="IServiceProvider"/> instance.</param>
+        /// <returns>The request builder.</returns>
+        public static async Task<HttpRequestBuilder> AddAuthorizationHeaderAsync(
+            this HttpRequestBuilder requestBuilder,
+            MethodInfo methodInfo,
+            IEnumerable<string> names,
+            IEnumerable<object> arguments,
+            IServiceProvider serviceProvider)
+        {
+            var authAttr = methodInfo.GetCustomAttribute<AddAuthorizationHeaderAttribute>() ??
+                methodInfo.DeclaringType.GetCustomAttribute<AddAuthorizationHeaderAttribute>();
+
+            if (authAttr != null)
+            {
+                if (authAttr.HeaderValue != null)
+                {
+                    requestBuilder.AddHeader(
+                        "Authorization",
+                        authAttr.HeaderValue.ExpandString(names, arguments));
+                }
+                else
+                {
+                    var authFactoryType = authAttr.AuthorizationFactoryType ?? typeof(IAuthorizationHeaderFactory);
+                    var authFactory = serviceProvider?.GetService(authFactoryType) as IAuthorizationHeaderFactory;
+                    if (authFactory != null)
+                    {
+                        requestBuilder.AddAuthorizationHeader(
+                            authFactory.GetAuthorizationHeaderScheme(),
+                            await authFactory.GetAuthorizationHeaderValueAsync());
                     }
                 }
             }
@@ -205,19 +250,34 @@ namespace ContractHttp
             IEnumerable<Attribute> attrs,
             object argument)
         {
-            foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
+            void AddHeader(string name, string format, object arg)
             {
-                if (string.IsNullOrEmpty(attr.Format) == false)
+                if (string.IsNullOrEmpty(format) == false)
                 {
                     requestBuilder.AddHeader(
-                        attr.Name,
-                        string.Format(attr.Format, argument.ToString()));
+                        name,
+                        string.Format(format, arg.ToString()));
                 }
                 else
                 {
                     requestBuilder.AddHeader(
-                        attr.Name,
-                        argument.ToString());
+                        name,
+                        arg.ToString());
+                }
+            }
+
+            foreach (var attr in attrs.OfType<SendAsHeaderAttribute>())
+            {
+                if (typeof(IEnumerable<string>).IsAssignableFrom(argument.GetType()) == true)
+                {
+                    foreach (var item in (IEnumerable<string>)argument)
+                    {
+                        AddHeader(attr.Name, attr.Format, item);
+                    }
+                }
+                else
+                {
+                    AddHeader(attr.Name, attr.Format, argument);
                 }
             }
 

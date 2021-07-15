@@ -1,3 +1,4 @@
+using System.Buffers;
 namespace Benchmarks
 {
     using Benchmarks.Contracts;
@@ -22,7 +23,11 @@ namespace Benchmarks
                 services =>
                 {
                     services.AddTransient<BenchmarkController>();
-                    services.AddMvc();
+                    services.AddMvc(
+                        options =>
+                        {
+                            options.EnableEndpointRouting = false;
+                        });
                 });
 
             var httpClient = testServer.CreateClient();

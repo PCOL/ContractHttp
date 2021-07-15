@@ -3,6 +3,7 @@ namespace ContractHttp
     using System;
     using System.Net.Http;
     using System.Reflection;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Routing;
     using Microsoft.Extensions.DependencyInjection;
@@ -138,6 +139,32 @@ namespace ContractHttp
             this IServiceCollection services,
             string scheme,
             Func<IServiceProvider, string> getAuthHeaderValue)
+        {
+            services.AddScoped<IAuthorizationHeaderFactory>(
+                sp =>
+                {
+                    return new AuthorizationHeaderFactory(
+                        scheme,
+                        () =>
+                        {
+                            return getAuthHeaderValue?.Invoke(sp);
+                        });
+                });
+
+            return services;
+        }
+
+        /// <summary>
+        /// Adds an async authorization header factory.
+        /// </summary>
+        /// <param name="services">A <see cref="IServiceCollection"/> instance.</param>
+        /// <param name="scheme">The Authorization header scheme.</param>
+        /// <param name="getAuthHeaderValue">A function to get the authorization header value.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
+        public static IServiceCollection AddAsyncAuthorizationHeaderFactory(
+            this IServiceCollection services,
+            string scheme,
+            Func<IServiceProvider, Task<string>> getAuthHeaderValue)
         {
             services.AddScoped<IAuthorizationHeaderFactory>(
                 sp =>

@@ -36,16 +36,16 @@ namespace ContractHttpTests
                 services =>
                 {
                     services
-                        .AddMvc()
+                        .AddMvc(
+                            options =>
+                            {
+                                options.EnableEndpointRouting = false;
+                            })
                         .AddDynamicController<ITestControllerService>(
                             new TestControllerService());
                 },
                 app =>
                 {
-                    var loggerFactory = app.ApplicationServices.GetService<ILoggerFactory>();
-                    loggerFactory.AddDebug();
-                    loggerFactory.AddConsole();
-
                     app.UseMvc();
                 });
 
