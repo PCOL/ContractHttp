@@ -103,7 +103,14 @@
         /// <returns>The return value.</returns>
         protected override object Invoke(MethodInfo methodInfo, object[] arguments)
         {
-            return this.InvokeInternalAsync(methodInfo, arguments).Result;
+            try
+            {
+                return this.InvokeInternalAsync(methodInfo, arguments).Result;
+            }
+            catch (AggregateException ex)
+            {
+                throw ex.Flatten().InnerException;
+            }
         }
 
         /// <summary>
@@ -154,20 +161,13 @@
 
             httpMethod = httpAttrMethod ?? httpMethod;
 
-            try
-            {
-                return await this.BuildAndSendRequestAsync(
-                    method,
-                    httpMethod,
-                    uri,
-                    arguments,
-                    contentType,
-                    timeout);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromException(ex);
-            }
+            return await this.BuildAndSendRequestAsync(
+                method,
+                httpMethod,
+                uri,
+                arguments,
+                contentType,
+                timeout);
         }
 
         /// <summary>
