@@ -94,9 +94,75 @@ namespace ContractHttpTests.Resources
         /// <param name="name">The name.</param>
         /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
         [Get("id/{id}")]
-        HttpResponseMessage GetById(
+        HttpResponseMessage GetById_OutName(
             string id,
             [FromJson("name")]out string name);
+
+        /// <summary>
+        /// Get by id.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <param name="data">The data.</param>
+        /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
+        [Get("id/{id}")]
+        HttpResponseMessage GetById_OutData(
+            string id,
+            [FromJson("data")]out TestModel data);
+
+        /// <summary>
+        /// Get by id.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <param name="array">The array.</param>
+        /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
+        [Get("id/{id}")]
+        HttpResponseMessage GetById_OutArray(
+            string id,
+            [FromJson("array")]out TestModel[] array);
+
+        /// <summary>
+        /// Get by id.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <param name="array">The array.</param>
+        /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
+        [Get("id/{id}")]
+        HttpResponseMessage GetById_OutArrayEnum(
+            string id,
+            [FromJson("array")]out IEnumerable<TestModel> array);
+
+        /// <summary>
+        /// Get by id.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <param name="array">The array.</param>
+        /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
+        [Get("id/{id}")]
+        HttpResponseMessage GetById_OutArrayList(
+            string id,
+            [FromJson("array")]out List<TestModel> array);
+
+        /// <summary>
+        /// Get by id.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <param name="array">The array.</param>
+        /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
+        [Get("id/{id}")]
+        HttpResponseMessage GetById_OutArrayIList(
+            string id,
+            [FromJson("array")]out IList<TestModel> array);
+
+        /// <summary>
+        /// Get by id.
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <param name="text">The text.</param>
+        /// <returns>The <see cref="HttpResponseMessage"/>.</returns>
+        [Get("id/{id}")]
+        HttpResponseMessage GetById_OutDataText(
+            string id,
+            [FromJson("data.text")]out string text);
 
         /// <summary>
         /// Get address by id.

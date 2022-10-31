@@ -18,6 +18,16 @@ namespace ContractHttpTests.Resources.Models
         public string Address { get; set; }
 
         /// <summary>
+        /// Gets or sets the data.
+        /// </summary>
+        public TestModel Data { get; set; }
+
+        /// <summary>
+        /// Gets or sets the array.
+        /// </summary>
+        public TestModel[] Array { get; set; }
+
+        /// <summary>
         /// Gets or sets the Http response.
         /// </summary>
         public HttpResponseMessage Response { get; set; }

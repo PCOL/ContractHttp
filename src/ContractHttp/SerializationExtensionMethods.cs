@@ -12,14 +12,30 @@ namespace ContractHttp
     public static class SerializationExtensionMethods
     {
         /// <summary>
+        /// Adds the Newtonsoft JSON object serializer to dependency injection.
+        /// </summary>
+        /// <param name="services">A <see cref="IServiceCollection"/> instance.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
+        public static IServiceCollection AddNewtonsoftJsonSerializer(this IServiceCollection services)
+        {
+            services.RemoveAll<IObjectSerializer>();
+
+            return services
+                .AddObjectSerializer<JsonObjectSerializer>()
+                .AddObjectSerializerFactory();
+        }
+
+        /// <summary>
         /// Adds a JSON object serializer to dependency injection.
         /// </summary>
         /// <param name="services">A <see cref="IServiceCollection"/> instance.</param>
         /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
-        public static IServiceCollection AddJsonObjectSerializer(this IServiceCollection services)
+        public static IServiceCollection AddMicrosoftJsonSerializer(this IServiceCollection services)
         {
+            services.RemoveAll<IObjectSerializer>();
+
             return services
-                .AddObjectSerializer<JsonObjectSerializer>()
+                .AddObjectSerializer<TextJsonObjectSerializer>()
                 .AddObjectSerializerFactory();
         }
 
@@ -56,6 +72,29 @@ namespace ContractHttp
                 });
 
             return services;
+        }
+
+        /// <summary>
+        /// Adds the Newtonsoft JSON object serializer to dependency injection.
+        /// </summary>
+        /// <param name="options">A <see cref="IServiceCollection"/> instance.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
+        public static HttpClientProxyOptions SetNewtonsoftJsonSerializer(this HttpClientProxyOptions options)
+        {
+            options.ObjectSerializer = new JsonObjectSerializer();
+
+            return options;
+        }
+
+        /// <summary>
+        /// Sets the options to use the Microsoft object serializer.
+        /// </summary>
+        /// <param name="options">A <see cref="HttpClientProxyOptions"/> instance.</param>
+        /// <returns>The <see cref="HttpClientProxyOptions"/> instance.</returns>
+        public static HttpClientProxyOptions SetMicrosoftJsonSerializer(this HttpClientProxyOptions options)
+        {
+            options.ObjectSerializer = new TextJsonObjectSerializer();
+            return options;
         }
     }
 }

@@ -2,6 +2,7 @@ namespace ContractHttpTests
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -256,12 +257,102 @@ namespace ContractHttpTests
         /// <see cref="FromJsonAttribute"/>.
         /// </summary>
         [TestMethod]
-        public void CallGetById_WithFromJsonAttribute()
+        public void CallGetByIdOutName_WithFromJsonAttribute()
         {
-            var response = this.testService.GetById("id", out string name);
+            var response = this.testService.GetById_OutName("id", out string name);
             Assert.IsNotNull(response);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
             Assert.AreEqual("Name", name);
+        }
+
+        /// <summary>
+        /// Creates a proxy and calls a get by id method that returns a value using a
+        /// <see cref="FromJsonAttribute"/>.
+        /// </summary>
+        [TestMethod]
+        public void CallGetByIdOutData_WithFromJsonAttribute()
+        {
+            var response = this.testService.GetById_OutData("id", out var data);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual("SomeText", data.Text);
+        }
+
+        /// <summary>
+        /// Creates a proxy and calls a get by id method that returns a value using a
+        /// <see cref="FromJsonAttribute"/>.
+        /// </summary>
+        [TestMethod]
+        public void CallGetByIdOutDataText_WithFromJsonAttribute()
+        {
+            var response = this.testService.GetById_OutDataText("id", out string text);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual("SomeText", text);
+        }
+
+        /// <summary>
+        /// Creates a proxy and calls a get by id method that returns a value using a
+        /// <see cref="FromJsonAttribute"/>.
+        /// </summary>
+        [TestMethod]
+        public void CallGetByIdOutArray_WithFromJsonAttribute()
+        {
+            var response = this.testService.GetById_OutArray("id", out TestModel[] array);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual("Item1", array[0].Text);
+            Assert.AreEqual(100, array[0].Number);
+            Assert.AreEqual("Item2", array[1].Text);
+            Assert.AreEqual(200, array[1].Number);
+        }
+
+        /// <summary>
+        /// Creates a proxy and calls a get by id method that returns a value using a
+        /// <see cref="FromJsonAttribute"/>.
+        /// </summary>
+        [TestMethod]
+        public void CallGetByIdOutArrayAsEnumerable_WithFromJsonAttribute()
+        {
+            var response = this.testService.GetById_OutArrayEnum("id", out IEnumerable<TestModel> list);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual("Item1", list.First().Text);
+            Assert.AreEqual(100, list.First().Number);
+            Assert.AreEqual("Item2", list.Skip(1).First().Text);
+            Assert.AreEqual(200, list.Skip(1).First().Number);
+        }
+
+        /// <summary>
+        /// Creates a proxy and calls a get by id method that returns a value using a
+        /// <see cref="FromJsonAttribute"/>.
+        /// </summary>
+        [TestMethod]
+        public void CallGetByIdOutArrayAsList_WithFromJsonAttribute()
+        {
+            var response = this.testService.GetById_OutArrayList("id", out List<TestModel> array);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual("Item1", array[0].Text);
+            Assert.AreEqual(100, array[0].Number);
+            Assert.AreEqual("Item2", array[1].Text);
+            Assert.AreEqual(200, array[1].Number);
+        }
+
+        /// <summary>
+        /// Creates a proxy and calls a get by id method that returns a value using a
+        /// <see cref="FromJsonAttribute"/>.
+        /// </summary>
+        [TestMethod]
+        public void CallGetByIdOutArrayAsIList_WithFromJsonAttribute()
+        {
+            var response = this.testService.GetById_OutArrayIList("id", out IList<TestModel> array);
+            Assert.IsNotNull(response);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual("Item1", array[0].Text);
+            Assert.AreEqual(100, array[0].Number);
+            Assert.AreEqual("Item2", array[1].Text);
+            Assert.AreEqual(200, array[1].Number);
         }
 
         /// <summary>

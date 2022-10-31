@@ -50,6 +50,14 @@ The methods parameters can be used to define content, query parameters, or heade
 
 * SendAsFormUrlAttribute - Specifies that a paremeter is to be used as a form url content property.
 
+```cs
+public interface ICustomerClient
+{
+    [HttpGet("api/customer/update")]
+    Task<HttpResponseMessage> UpdateCustomerAsync([SendAsHeader]string id, [SendAsContent]CustomerModel customer);
+}
+```
+
 #### Out Parameters
 
 Out parameters are supported for returning data on synchronous methods:
@@ -60,6 +68,14 @@ Out parameters are supported for returning data on synchronous methods:
 
 * An out parameter decorated with FromModelAttribute can be used to return a property from a model that was deserialised from the requests content.
 
+```cs
+public interface ICustomerClient
+{
+    [HttpGet("api/customer/{id}")]
+    CustomerModel GetCustomer(string id, [FromHeader(Name = "X-Account")] out string account);
+}
+```
+
 #### Special Parameters
 
 Special parameter types are also supported:
@@ -68,7 +84,15 @@ Special parameter types are also supported:
 
 * A parameter of type Action\<HttpResponseMessage> will be called just after the response has been received.
 
-* A parameter of type Func\<HttpResponseMessage, *ReturnType*> will be called just before the method returns.
+* A parameter of type Func\<HttpResponseMessage, *ReturnType*> will be called just before the method returns. The method will then return the response from the lambda allowing it to decode the response.
+
+```cs
+public interface ICustomerClient
+{
+    [HttpGet("api/customer/{id}")]
+    Task<CustomerModel> GetCustomerAsync(string id, Action<HttpRequestMessage> requestAction, Func<HttpResponseMessage, CustomerMode> responseFunc);
+}
+```
 
 ### Attributes
 
@@ -105,7 +129,86 @@ the corresponding response values are put into those properties when the call re
 
 * Any property of type **HttpResponseMessage** will return the http response.
 
-* Any property of type **HttpStatusCode** will return the 
+* Any property of type **HttpStatusCode** will return the status code.
+
+```cs
+public class CustomerModel
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public HttpResponseMessage Response { get; set; }
+    public HttpStatusCode StatusCode { get; set; }
+}
+```
+
+```cs
+public interface ICustomerClient
+{
+    [HttpGet("{id}")]
+    Task<CustomerModel> GetCustomerAsync(string id);
+}
+```
+
+### Http Response Processors
+
+For clients that wish to create a more complex response model there is the `HttpResponseProcessor` type.
+These types allow the response to be intercepted and converted into much more complex results.
+
+```cs
+public interface IResult<T>
+{
+    int StatusCode { get; }
+    T Result { get; }
+    string ErrorMessage { get; }
+}
+```
+
+```cs
+public class Result<T>
+    : IResult<T>
+{
+    public int StatusCode { get; set; }
+    public T Result { get; set; }
+    public string ErrorMessage { get; set; }
+}
+```
+
+```cs
+public class ResultProcessor<T>
+    : HttpResponseProcessor<IResult<T>>
+{
+    public override async Task<IResult<T>> ProcessResponseAsync(HttpResponseMessage httpResponse)
+    {
+        var result = new Result<T>;
+        result.StatusCode = (int)httpResponse.StatusCode;
+        if (httpResponse.IsSuccessStatusCode == true)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            if (string.IsNullOrEmpty(content) == false)
+            {
+                result.Result = JsonConvert.DeserializeObject<T>(content);
+            }
+        }
+        else
+        {
+            result.ErrorMessage = "";
+        }
+
+        return result;
+    }
+}
+```
+
+```cs
+[HttpClientContract(Route = "api/customers", ContentType = "aplication/json")]
+public interface ICustomerClient
+{
+    [HttpGet("")]
+    [HttpResponseProcessor(typeof(ResultProcessor<IEnumerable<CustomerModel>>))]
+    Task<IResult<IEnumerable<CustomerModel>>> GetCustomersAsync();
+}
+```
+
 ### Example synchronous client
 
 Create an interface and decorate with attributes to define how the client should interact with the service:
@@ -132,6 +235,7 @@ var httpClient = new HttpClient();
 var httpProxy = new HttpClientProxy<ICustomerClient>(
     "http://localhost",
     httpClient);
+
 var customerClient = httpProxy.GetProxyObject();
 
 var response = customerClient.CreateCustomer(
@@ -141,7 +245,44 @@ var response = customerClient.CreateCustomer(
         Address = "Somewhere",
         PhoneNumber = "123456789"
     });
+```
 
+### Example asynchronous client
+
+Create an interface and decorate with attributes to define how the client should interact with the service:
+
+```cs
+[HttpClientContract(Route = "api/customers", ContentType = "aplication/json")]
+public interface ICustomerClient
+{
+    [HttpPost("")]
+    Task<CreateCustomerResponseModel> CreateCustomerAsync(CreateCustomerModel customer);
+
+    [HttpGet("")]
+    Task<IEnumerable<CustomerModel>> GetCustomersAsync();
+
+    [HttpGet("{name}")]
+    Task<CustomerModel> GetCustomerByName(string name);
+}
+```
+
+Again, once the interface is defined a proxy can be generated and then used to call the service:
+
+```cs
+var httpClient = new HttpClient();
+var httpProxy = new HttpClientProxy<ICustomerClient>(
+    "http://localhost",
+    httpClient);
+
+var customerClient = httpProxy.GetProxyObject();
+
+var response = await customerClient.CreateCustomerAsync(
+    new CreateCustomerModel()
+    {
+        Name = "Customer",
+        Address = "Somewhere",
+        PhoneNumber = "123456789"
+    });
 ```
 
 ## Services

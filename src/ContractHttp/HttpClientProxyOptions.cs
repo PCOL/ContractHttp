@@ -14,7 +14,7 @@ namespace ContractHttp
         /// </summary>
         public HttpClientProxyOptions()
         {
-            this.ObjectSerializer = new JsonObjectSerializer();
+            this.ObjectSerializer = new TextJsonObjectSerializer();
         }
 
         /// <summary>
@@ -66,6 +66,11 @@ namespace ContractHttp
         /// Gets or sets the http version.
         /// </summary>
         public Version HttpVersion { get; set; } = new Version(1, 1);
+
+        /// <summary>
+        /// Gets or sets a value indicating whether or not debug output is on.
+        /// </summary>
+        public bool DebugOuputEnabled { get; set; }
 
         /// <summary>
         /// Gets a <see cref="HttpClient"/> instance.

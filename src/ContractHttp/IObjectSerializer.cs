@@ -26,5 +26,14 @@ namespace ContractHttp
         /// <param name="type">The type of object to create.</param>
         /// <returns>An instance of the object.</returns>
         object DeserializeObject(string data, Type type);
+
+        /// <summary>
+        /// Gets an object from another object using a path.
+        /// </summary>
+        /// <param name="obj">The object to extract from.</param>
+        /// <param name="returnType">The expected type.</param>
+        /// <param name="path">The path to object.</param>
+        /// <returns>The object at the path; otherwise null.</returns>
+        object GetObjectFromPath(object obj, Type returnType, string path);
     }
 }

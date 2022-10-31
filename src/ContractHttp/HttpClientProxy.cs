@@ -1,21 +1,10 @@
 ﻿namespace ContractHttp
 {
     using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
     using System.Net.Http;
-    using System.Net.Http.Headers;
     using System.Reflection;
-    using System.Text;
-    using System.Threading;
     using System.Threading.Tasks;
     using DynProxy;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.AspNetCore.Mvc.Routing;
-    using Microsoft.Extensions.DependencyInjection;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Represents a proxy class for accessing an Http end point.

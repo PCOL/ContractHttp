@@ -1,13 +1,8 @@
 namespace ContractHttp
 {
-    using System;
     using System.IO;
     using System.Net.Http;
-    using System.Reflection;
     using System.Threading.Tasks;
-    using DynProxy;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Represents a typed asynchronous call.

@@ -131,7 +131,7 @@ namespace ContractHttp
             string contentType,
             TimeSpan? timeout)
         {
-            var requestBuilder = new HttpRequestBuilder()
+            var requestBuilder = new HttpRequestBuilder(this.options)
                 .SetMethod(httpMethod)
                 .SetHttpVersion(this.options.HttpVersion);
 
@@ -324,8 +324,15 @@ namespace ContractHttp
                             throw new NotSupportedException($"Serializer for {this.contentType} not found");
                         }
 
+                        var content = serializer.SerializeObject(this.Arguments[i]);
+
+                        if (this.options.DebugOuputEnabled == true)
+                        {
+                            Console.WriteLine(content);
+                        }
+
                         requestBuilder.SetContent(new StringContent(
-                            serializer.SerializeObject(this.Arguments[i]),
+                            content,
                             Encoding.UTF8,
                             this.contentType));
                     }

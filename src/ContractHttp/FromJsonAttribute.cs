@@ -4,8 +4,6 @@ namespace ContractHttp
     using System.Collections.Generic;
     using System.Linq;
     using System.Net.Http;
-    using System.Reflection;
-    using Newtonsoft.Json.Linq;
 
     /// <summary>
     /// Allows an out parameter or return value to be set from a JSON value.
@@ -58,11 +56,7 @@ namespace ContractHttp
                 return null;
             }
 
-            var jobj = JObject.Parse(content);
-            if (jobj == null)
-            {
-                return null;
-            }
+            var obj = serializer.DeserializeObject(content, typeof(object));
 
             Type objectType = this.ReturnType ?? dataType;
             var properties = objectType.GetProperties();
@@ -70,28 +64,37 @@ namespace ContractHttp
             object returnObj = null;
             if (objectType.IsGenericType == false)
             {
-                returnObj = this.GetObject(jobj, objectType, this.JsonPath);
+                returnObj = serializer.GetObjectFromPath(obj, objectType, this.JsonPath);
             }
             else
             {
-                if (dataType.IsAssignableFrom(objectType) == false)
+                if (objectType.GetGenericTypeDefinition() == typeof(IEnumerable<>) ||
+                    objectType.GetGenericTypeDefinition() == typeof(List<>) ||
+                    objectType.GetGenericTypeDefinition() == typeof(IList<>))
                 {
-                    throw new InvalidCastException($"Cannot cast {objectType.Name} to {dataType.Name}");
+                    returnObj = serializer.GetObjectFromPath(obj, objectType, this.JsonPath);
                 }
-
-                var genArgs = objectType.GetGenericArguments();
-                if (genArgs?.Length > 1)
+                else
                 {
-                    throw new NotSupportedException("Only one generic argument is supported");
+                    if (dataType.IsAssignableFrom(objectType) == false)
+                    {
+                        throw new InvalidCastException($"Cannot cast {objectType.Name} to {dataType.Name}");
+                    }
+
+                    var genArgs = objectType.GetGenericArguments();
+                    if (genArgs?.Length > 1)
+                    {
+                        throw new NotSupportedException("Only one generic argument is supported");
+                    }
+
+                    var resultType = genArgs.First();
+
+                    returnObj = Activator.CreateInstance(this.ReturnType);
+                    properties.SetProperty(
+                        returnObj,
+                        resultType,
+                        () => serializer.GetObjectFromPath(obj, resultType, this.JsonPath));
                 }
-
-                var resultType = genArgs.First();
-
-                returnObj = Activator.CreateInstance(this.ReturnType);
-                properties.SetProperty(
-                    returnObj,
-                    resultType,
-                    () => this.GetObject(jobj, resultType, this.JsonPath));
             }
 
             properties.SetProperty<HttpResponseMessage>(
@@ -99,24 +102,6 @@ namespace ContractHttp
                 () => response);
 
             return returnObj;
-        }
-
-        /// <summary>
-        /// Gets an object from a <see cref="JObject"/> instance.
-        /// </summary>
-        /// <param name="obj">The <see cref="JObject"/> instance.</param>
-        /// <param name="objectType">The type of object to get.</param>
-        /// <param name="jsonPath">The path to the json object.</param>
-        /// <returns>An object if found; otherwise null.</returns>
-        private object GetObject(JObject obj, Type objectType, string jsonPath)
-        {
-            if (jsonPath.IsNullOrEmpty() == false)
-            {
-                var token = obj.SelectToken(jsonPath);
-                return token?.ToObject(objectType);
-            }
-
-            return obj.ToObject(objectType);
         }
     }
 }

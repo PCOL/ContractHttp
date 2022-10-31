@@ -2,37 +2,49 @@ namespace ContractHttp
 {
     using System;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     /// <summary>
-    /// A json object serializer.
+    /// A json object serializer which uses the Newtonsoft JSON serializer.
     /// </summary>
     public class JsonObjectSerializer
         : IObjectSerializer
     {
-        /// <summary>
-        /// Gets the serializers content type.
-        /// </summary>
+        /// <inheritdoc />
         public string ContentType { get; } = "application/json";
 
-        /// <summary>
-        /// Deserializes an object.
-        /// </summary>
-        /// <param name="value">The value to deserialize.</param>
-        /// <param name="type">The type of object to deserialize.</param>
-        /// <returns>An instance of the object.</returns>
+        /// <inheritdoc />
         public object DeserializeObject(string value, Type type)
         {
             return JsonConvert.DeserializeObject(value, type);
         }
 
-        /// <summary>
-        /// Serializes an object.
-        /// </summary>
-        /// <param name="value">The object to serialize.</param>
-        /// <returns>The serilised object.</returns>
+        /// <inheritdoc />
         public string SerializeObject(object value)
         {
             return JsonConvert.SerializeObject(value);
+        }
+
+        /// <inheritdoc />
+        public object GetObjectFromPath(object obj, Type returnType, string path)
+        {
+            if (obj is JObject jsonObj)
+            {
+                if (path.IsNullOrEmpty() == false)
+                {
+                    var token = jsonObj.SelectToken(path);
+                    return token?.ToObject(returnType);
+                }
+
+                return jsonObj.ToObject(returnType);
+            }
+            else if (obj.GetType() == returnType &&
+                path.IsNullOrEmpty() == true)
+            {
+                return obj;
+            }
+
+            return null;
         }
     }
 }

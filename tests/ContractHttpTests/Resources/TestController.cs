@@ -165,7 +165,25 @@ namespace ContractHttpTests.Resources
                 new TestData()
                 {
                     Name = "Name",
-                    Address = "Address"
+                    Address = "Address",
+                    Data = new TestModel()
+                    {
+                        Text = "SomeText",
+                        Number = 1000
+                    },
+                    Array = new[]
+                    {
+                        new TestModel()
+                        {
+                            Text = "Item1",
+                            Number = 100
+                        },
+                        new TestModel()
+                        {
+                            Text = "Item2",
+                            Number = 200
+                        },
+                    }
                 });
         }
     }

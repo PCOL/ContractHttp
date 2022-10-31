@@ -39,5 +39,17 @@ namespace ContractHttp
                 return UTF8Encoding.UTF8.GetString(stream.ToArray());
             }
         }
+
+        /// <inheritdoc />
+        public object GetObjectFromPath(object obj, Type returnType, string path)
+        {
+            if (obj.GetType() == returnType &&
+                path.IsNullOrEmpty() == true)
+            {
+                return obj;
+            }
+
+            return null;
+        }
     }
 }

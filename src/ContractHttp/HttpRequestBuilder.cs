@@ -13,6 +13,11 @@ namespace ContractHttp
         : IHttpRequestBuilder
     {
         /// <summary>
+        /// The proxy options.
+        /// </summary>
+        private readonly HttpClientProxyOptions options;
+
+        /// <summary>
         /// The http method.
         /// </summary>
         private HttpMethod httpMethod = HttpMethod.Get;
@@ -60,8 +65,10 @@ namespace ContractHttp
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestBuilder"/> class.
         /// </summary>
-        public HttpRequestBuilder()
+        /// <param name="options">The proxy options.</param>
+        public HttpRequestBuilder(HttpClientProxyOptions options)
         {
+            this.options = options;
         }
 
         /// <summary>
@@ -317,9 +324,19 @@ namespace ContractHttp
                 }
             }
 
+            if (this.options.DebugOuputEnabled == true)
+            {
+                Console.WriteLine("Uri: {0}", requestUri);
+            }
+
             if (this.content != null)
             {
                 request.Content = this.content;
+
+                if (this.options.DebugOuputEnabled == true)
+                {
+                    Console.WriteLine("Content: {0}", this.content);
+                }
             }
 
             return request;
