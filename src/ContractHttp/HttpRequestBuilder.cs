@@ -324,7 +324,7 @@ namespace ContractHttp
                 }
             }
 
-            if (this.options.DebugOuputEnabled == true)
+            if (this.options.DebugOutputEnabled == true)
             {
                 Console.WriteLine("Uri: {0}", requestUri);
             }
@@ -333,7 +333,7 @@ namespace ContractHttp
             {
                 request.Content = this.content;
 
-                if (this.options.DebugOuputEnabled == true)
+                if (this.options.DebugOutputEnabled == true)
                 {
                     Console.WriteLine("Content: {0}", this.content);
                 }

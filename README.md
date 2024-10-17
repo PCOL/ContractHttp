@@ -22,7 +22,7 @@ Methods can be defined as synchronous or asynchronous.
 
 #### Return Types
 
-As mentioned earlier methods can be synchronous or asynchronous so supported return types are:
+As mentioned earlier methods can be synchronous or asynchronous so supported return types    are:
 
 * void - No return value.
 * T - Any type that the content can be deserialised to.

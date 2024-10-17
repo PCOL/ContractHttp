@@ -70,7 +70,7 @@ namespace ContractHttp
         /// <summary>
         /// Gets or sets a value indicating whether or not debug output is on.
         /// </summary>
-        public bool DebugOuputEnabled { get; set; }
+        public bool DebugOutputEnabled { get; set; }
 
         /// <summary>
         /// Gets a <see cref="HttpClient"/> instance.

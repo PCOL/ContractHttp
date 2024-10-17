@@ -326,7 +326,7 @@ namespace ContractHttp
 
                         var content = serializer.SerializeObject(this.Arguments[i]);
 
-                        if (this.options.DebugOuputEnabled == true)
+                        if (this.options.DebugOutputEnabled == true)
                         {
                             Console.WriteLine(content);
                         }
@@ -404,8 +404,14 @@ namespace ContractHttp
                         throw new NotSupportedException($"Serializer for {contType} not found");
                     }
 
+                    var content = serializer.SerializeObject(argument);
+                    if (this.options.DebugOutputEnabled == true)
+                    {
+                        Console.WriteLine(content);
+                    }
+
                     requestBuilder.SetContent(new StringContent(
-                        serializer.SerializeObject(argument),
+                        content,
                         sendAsAttr.Encoding ?? Encoding.UTF8,
                         serializer.ContentType));
                 }
